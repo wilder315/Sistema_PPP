@@ -7,10 +7,7 @@ from werkzeug.utils import secure_filename
 from bd import obtener_conexion
 from bd import obtener_conexion
 import controladores.controlador_usuario as controlador_usuario
-from controladores.controlador_estudiante import obtener_estudiantes_por_fecha
-from controladores.controlador_estudiante import obtener_estadisticas_estudiantes
-from controladores.controlador_estudiante import obtener_ppp_finalizadas
-
+import controladores.controlador_informeAlumno as controlador_informeAlumno
 import time
 
 login_attempts = {}
@@ -18,39 +15,10 @@ router_main = Blueprint('router_main', __name__)
 
 # Login
 
-# Login
-
 @router_main.route("/")
 @router_main.route("/login", methods=["GET", "POST"])
 def login():
     return render_template("/dashboard/login.html")
-
-@router_main.route("/index")
-def index():
-    return render_template("/dashboard/index.html")
-
-@router_main.route("/indexga")
-def gestion_academica():
-    #obtener los registros por fecha
-    registros_por_fecha = obtener_estudiantes_por_fecha()
-    
-    # Asegúrate de que registros_por_fecha nunca sea None
-    if registros_por_fecha is None:
-        registros_por_fecha = []
-    
-    #obtener las estadisticas para las tarjetas
-    estadisticas = obtener_estadisticas_estudiantes()
-    
-    #obtener las prácticas finalizadas
-    ppp_finalizadas = obtener_ppp_finalizadas()
-    
-    # pasamos estadisticas y registrosPorFecha al template
-    return render_template("gestion_academica/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
-
-
-@router_main.route("/indexppp")
-def practicas_pre_profesionales():
-    return render_template("/ppp/index.html")
 
 @router_main.route("/procesar_login", methods=["POST"])
 def procesar_login():
@@ -68,7 +36,6 @@ def procesar_login():
         if username not in login_attempts:
             login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
         if login_attempts[username]['attempts'] >= 3 and (time.time() - login_attempts[username]['last_attempt_time']) < 300:
-            return jsonify({'mensaje': 'Cuenta bloqueada. Intente de nuevo más tarde.', 'logeo': False})      
             return jsonify({'mensaje': 'Cuenta bloqueada. Intente de nuevo más tarde.', 'logeo': False})      
         if usuario is None:
             return jsonify({'mensaje': 'El usuario no existe', 'logeo': False})
@@ -100,6 +67,19 @@ def procesar_login():
         return jsonify({'mensaje': f'Error al procesar el login: {str(e)}', 'logeo': False})
 
 # Principal
+
+@router_main.route("/index")
+def index():
+    return render_template("/dashboard/index.html")
+
+@router_main.route("/indexga")
+def gestion_academica():
+    return render_template("/gestion_academica/index.html")
+
+@router_main.route("/indexppp")
+def practicas_pre_profesionales():
+    return render_template("/ppp/index.html")
+
 @router_main.route('/home')
 def home():
     return render_template('home.html')
@@ -110,19 +90,10 @@ def perfil():
 
 # Módulo de Gestión Académica
 
-# Módulo de Gestión Académica
-
 @router_main.route("/docente")
 def docente():
     return render_template('/gestion_academica/docente.html')  
 
-@router_main.route("/escuela")
-def escuela():
-    return render_template('/gestion_academica/escuela.html')
-
-@router_main.route('/estudiante')
-def estudiante():
-    return render_template('/gestion_academica/estudiante.html')
 @router_main.route("/escuela")
 def escuela():
     return render_template('/gestion_academica/escuela.html')
@@ -138,30 +109,11 @@ def facultad():
 @router_main.route("/genero")
 def genero():
     return render_template('gestion_academica/genero.html') 
-@router_main.route("/genero")
-def genero():
-    return render_template('gestion_academica/genero.html') 
 
 @router_main.route("/institucion")
 def institucion():
     return render_template('gestion_academica/institucion.html') 
-@router_main.route("/institucion")
-def institucion():
-    return render_template('gestion_academica/institucion.html') 
 
-@router_main.route("/semestre")
-def semestre():
-    return render_template('gestion_academica/semestre.html')
-
-@router_main.route("/usuario")
-def usuario():
-    return render_template('gestion_academica/usuario.html')
-
-# Módulo de Prácticas Pre Profesionales
-
-@router_main.route('/ppp_registro')
-def ppp_registro():
-    return render_template('ppp_registro.html')
 @router_main.route("/semestre")
 def semestre():
     return render_template('gestion_academica/semestre.html')
@@ -208,80 +160,6 @@ def horas_practica():
 def horas_practica_escuela():
     return render_template('ppp/informeHorasPracticaEscuela.html')
 
-
-
-@router_main.route("/datos_horas_practica")
-def datos_horas_practica():
-    try:
-        datos = controlador_informeAlumno.obtener_reporte_horas_practicas()
-        if isinstance(datos, dict) and "error" in datos:
-            return jsonify({"error": datos["error"]}), 500
-        return jsonify(datos)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-@router_main.route("/datos_horas_practica_escuela")
-def datos_horas_practica_escuela():
-    try:
-        datos = controlador_informeAlumno.obtener_resumen_horas_por_escuela()
-        if isinstance(datos, dict) and "error" in datos:
-            return jsonify({"error": datos["error"]}), 500
-        return jsonify(datos)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500    
-    
-    
-@router_main.route("/practicas-terminadas")
-def practicas_terminadas():
-    return render_template('ppp/informePracticasTerminadas.html')
-
-@router_main.route("/datos_practicas_terminadas")
-def datos_practicas_terminadas():
-    try:
-        # Obtener mes y año de los parámetros de la URL
-        mes = request.args.get('mes', type=int)
-        anio = request.args.get('anio', type=int)
-        
-        # Si no se proporcionan mes y año, usar los valores actuales
-        if not mes or not anio:
-            from datetime import datetime
-            fecha_actual = datetime.now()
-            mes = fecha_actual.month
-            anio = fecha_actual.year
-        
-        # Llamar al controlador con los parámetros
-        datos = controlador_informeAlumno.obtener_practicas_terminadas_mes(mes, anio)
-        
-        if isinstance(datos, dict) and "error" in datos:
-            return jsonify({"error": datos["error"]}), 500
-        return jsonify(datos)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-@router_main.route("/dashboard-tendencias")
-def dashboard_tendencias():
-    return render_template('ppp/dashboardTendencias.html')
-
-@router_main.route("/datos_dashboard_tendencias")
-def datos_dashboard_tendencias():
-    try:
-        datos = controlador_informeAlumno.obtener_dashboard_tendencias_escuela()
-        if isinstance(datos, dict) and "error" in datos:
-            return jsonify({"error": datos["error"]}), 500
-        return jsonify(datos)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500    
-@router_main.route("/InformesPorAlumno")
-def InformesAlumno():
-    return render_template('ppp/InformesAlumno.html')
-
-@router_main.route("/horas-practica")
-def horas_practica():
-    return render_template('ppp/informeHorasPractica.html')
-
-@router_main.route("/horas-practica-escuela")
-def horas_practica_escuela():
-    return render_template('ppp/informeHorasPracticaEscuela.html')
 
 
 @router_main.route("/datos_horas_practica")
