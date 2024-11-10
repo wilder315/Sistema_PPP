@@ -161,6 +161,7 @@ def horas_practica_escuela():
     return render_template('ppp/informeHorasPracticaEscuela.html')
 
 
+
 @router_main.route("/datos_horas_practica")
 def datos_horas_practica():
     try:
