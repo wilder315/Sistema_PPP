@@ -1,0 +1,37 @@
+{% extends "/gestion_academica/index.html" %}
+{% block titulo %} Dashboard {% endblock %}
+{% block contenido %}
+
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb"  style="padding-bottom: 0px; margin-bottom: -10px;">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Inicio</li>
+    </ol>
+</nav>
+    
+<div class="container-wrapper">
+    
+
+    
+</div>
+
+
+
+{% block scripts %}
+<!-- Librerías específicas para los botones de DataTables -->
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        
+
+    });
+</script>
+{% endblock %}
+{% endblock %}

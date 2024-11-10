@@ -362,7 +362,7 @@
                 idFacultad: $('#facultadEscuelaMod').val()
             };
             $.ajax({
-                url: '/modificar_escuela',
+                url: '/actualizar_escuela',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),

@@ -10,7 +10,18 @@ def estudiante():
 @router_estudiante.route("/datos_estudiantes", methods=["GET"])
 def datos_estudiantes():
     estudiantes = controlador_estudiante.obtener_estudiantes()
-    return jsonify(estudiantes)
+    return render_template('gestion_academica/index.html', registrosPorFecha=estudiantes)
+
+@router_estudiante.route("/estudiante_fechas", methods=["GET"])
+def estudiante_fechas():
+    registros_por_fecha = controlador_estudiante.obtener_estudiantes_por_fecha()
+    
+    #agregar una validación para asegurar de que no sea None
+    if registros_por_fecha is None: 
+        registros_por_fecha = []
+    
+    print("Datos de registros_por_fecha:", registros_por_fecha)  # Verifica el contenido en la consola
+    return render_template("gestion_academica/index.html", registrosPorFecha=registros_por_fecha)
 
 @router_estudiante.route("/obtener_estudiante_por_id/<int:idEstudiante>", methods=["GET"])
 def obtener_estudiante_por_id(idEstudiante):
