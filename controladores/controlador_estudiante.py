@@ -1,4 +1,5 @@
 from bd import obtener_conexion
+from service.email_service import EmailService
 
 def obtener_estudiantes():
     conexion = obtener_conexion()
@@ -93,10 +94,24 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
-            return {"mensaje": "Estudiante agregado correctamente"}
+            
+            # Enviar correo de bienvenida
+            email_service = EmailService()
+            envio_exitoso = email_service.enviar_correo_bienvenida(
+                nombre=nombre,
+                apellidos=apellidos,
+                correo_destino=correoP,
+                codigo=codUniversitario
+            )
+
+           
+            
     except Exception as e:
         conexion.rollback()
-        return {"error": str(e)}
+        return {
+            "success": False,
+            "error": str(e)
+        }
     finally:
         conexion.close()
 

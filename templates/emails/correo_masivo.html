@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de PPP - USAT</h1>
+        </div>
+        <div class="content">
+            {{ contenido | safe }}
+        </div>
+        <div class="footer">
+            <p>Universidad Católica Santo Toribio de Mogrovejo - USAT</p>
+            <p>Sistema de Prácticas Pre-Profesionales</p>
+        </div>
+    </div>
+</body>
+</html>

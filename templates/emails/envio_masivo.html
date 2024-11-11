@@ -1,0 +1,153 @@
+{% extends "/gestion_academica/index.html" %}
+{% block titulo %}Envío de Correos Masivos{% endblock %}
+
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item active"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Envío de Correos</li>
+    </ol>
+</nav>
+
+<div class="container-fluid my-4">
+    <div class="card">
+        <div class="card-header bg-red-usat text-white">
+            <h4 class="mb-0">Envío de Correos Masivos</h4>
+        </div>
+        <div class="card-body">
+            <form id="formCorreoMasivo" method="POST">
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="asunto" class="form-label">Asunto:</label>
+                        <input type="text" class="form-control" id="asunto" name="asunto" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="contenido" class="form-label">Contenido:</label>
+                        <textarea class="form-control" id="contenido" name="contenido" rows="6" required></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-end">
+                        <button type="submit" class="btn btn-primary" id="btnEnviar">
+                            <i class="fas fa-paper-plane"></i> Enviar Correos
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Carga -->
+<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h5 class="mb-3">Enviando correos masivos...</h5>
+                <p class="text-muted mb-0">Por favor, espere mientras se procesan los envíos.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="resultadoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resultado del Envío</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="resultadoMensaje"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#formCorreoMasivo').on('submit', async function(e) {
+            e.preventDefault();
+            
+            // Mostrar modal de carga
+            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            loadingModal.show();
+            
+            // Deshabilitar botón de envío
+            $('#btnEnviar').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Enviando...');
+            
+            const formData = {
+                asunto: $('#asunto').val(),
+                contenido: $('#contenido').val()
+            };
+
+            try {
+                const response = await fetch('/api/email/masivo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                // Ocultar modal de carga
+                loadingModal.hide();
+                
+                // Mostrar resultado en modal con formato
+                let mensajeHtml = '';
+                if (result.success) {
+                    mensajeHtml = `
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-check-circle"></i> Envío Exitoso</h5>
+                            <p>${result.message}</p>
+                            <hr>
+                            <p class="mb-0">Total de estudiantes: ${result.total_estudiantes}</p>
+                        </div>
+                    `;
+                    $('#formCorreoMasivo')[0].reset();
+                } else {
+                    mensajeHtml = `
+                        <div class="alert alert-danger">
+                            <h5><i class="fas fa-exclamation-circle"></i> Error</h5>
+                            <p>${result.message}</p>
+                        </div>
+                    `;
+                }
+                
+                $('#resultadoMensaje').html(mensajeHtml);
+                new bootstrap.Modal(document.getElementById('resultadoModal')).show();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                // Ocultar modal de carga
+                loadingModal.hide();
+                
+                $('#resultadoMensaje').html(`
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Error</h5>
+                        <p>Hubo un error al procesar la solicitud.</p>
+                    </div>
+                `);
+                new bootstrap.Modal(document.getElementById('resultadoModal')).show();
+            } finally {
+                // Restaurar botón de envío
+                $('#btnEnviar').prop('disabled', false).html('<i class="fas fa-paper-plane"></i> Enviar Correos');
+            }
+        });
+    });
+</script>
+{% endblock %}
