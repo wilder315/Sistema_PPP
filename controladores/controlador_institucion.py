@@ -37,15 +37,13 @@ def obtener_instituciones():
 def obtener_jefe(ruc):
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    
+        return {"error": "No se pudo establecer conexión con la base de datos."}  
     instituciones = []
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT p.apellidos, p.nombre FROM persona p INNER JOIN institucion i ON p.idPersona = i.idPersona where i.numdoc = %s", (ruc,))
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
-
             for row in rows:
                 institucion_dict = dict(zip(column_names, row))
                 instituciones.append(institucion_dict)
@@ -53,9 +51,35 @@ def obtener_jefe(ruc):
         return {"error": str(e)}
     finally:
         conexion.close()
-    
     return instituciones 
 
+def obtener_jefes():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
+    jefes = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT p.idPersona, CONCAT(p.apellidos, ' ', p.nombre) AS jefe
+                FROM persona p 
+                LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                WHERE u.idTipoUsuario = 4 ORDER BY jefe ASC
+            """
+            )
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                jefe_dict = dict(zip(column_names, row))
+                jefes.append(jefe_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    
+    return jefes
 
 def obtener_institucion_por_numdoc(numDoc):
     conexion = obtener_conexion()
@@ -66,7 +90,7 @@ def obtener_institucion_por_numdoc(numDoc):
             cursor.execute(
                 """
                 SELECT i.numDoc, i.razonSocial, i.giro, i.direccion, i.tel, i.correo,
-                       i.idDistrito, pro.idProvincia, dep.idDepartamento, pa.idPais, i.idPersona as jefe, i.idTipoDoc
+                       i.idDistrito, pro.idProvincia, dep.idDepartamento, pa.idPais, CONCAT(p.apellidos, ' ', p.nombre) AS jefe, i.idTipoDoc
                 FROM institucion i
                 INNER JOIN distrito d ON i.idDistrito = d.idDistrito
                 INNER JOIN provincia pro on pro.idProvincia = d.idProvincia

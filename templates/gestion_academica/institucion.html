@@ -154,7 +154,6 @@
         if ($.fn.DataTable.isDataTable('#tabla-institucion')) {
             $('#tabla-institucion').DataTable().clear().destroy();
         }
-
         const table = $('#tabla-institucion').DataTable({
             paging: true,
             pageLength: 10,
@@ -221,6 +220,7 @@
             }
         });
 
+        // Funcion para mostrar alerta
         function mostrarAlerta(tipo, titulo, mensaje) {
             Swal.fire({
                 icon: tipo,
@@ -228,6 +228,27 @@
                 html: mensaje,
                 showConfirmButton: true,
                 timer: 5000
+            });
+        }
+
+        // Función para cargar los jefes dinámicamente
+        function cargarJefes(selectedJefeId) {
+            $.ajax({
+                url: '/datos_jefes',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var jefeSelect = $('#jefeMod');
+                    jefeSelect.empty();
+                    jefeSelect.append('<option value="" disabled selected>Seleccionar jefe</option>');
+                    response.forEach(function (jefe) {
+                        var selected = parseInt(jefe.idPersona) === parseInt(selectedJefeId) ? 'selected' : '';  
+                        jefeSelect.append(`<option value="${jefe.idPersona}" ${selected}>${jefe.jefe}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros.");
+                }
             });
         }
 
@@ -245,13 +266,13 @@
                         $('#modal-title').text("Ver Institucion");
                         $('#formInstitucion')[0].reset();
                         $('#numDocMod').val(response.numDoc).prop('disabled', true);
+                        $('#giroMod').val(response.giro).prop('disabled', true);
                         $('#razonSocialMod').val(response.razonSocial).prop('disabled', true);
                         $('#direccionMod').val(response.direccion).prop('disabled', true);
                         $('#telMod').val(response.tel).prop('disabled', true);
                         $('#correoMod').val(response.correo).prop('disabled', true);
                         $('#idDistrito').val(response.idDistrito).prop('disabled', true);
-                        $('#idPersona').val(response.idPersona).prop('disabled', true);
-                        $('#idTipoDoc').val(response.idTipoDoc).prop('disabled', true);
+                        $('#jefeMod').val(response.jefe).prop('disabled', true);
                         $('#modalInstitucion').modal('show');
                     }
                 },

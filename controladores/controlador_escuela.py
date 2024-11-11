@@ -33,7 +33,7 @@ def obtener_escuela_por_id(idEscuela):
         with conexion.cursor() as cursor:
             cursor.execute(""" 
                 SELECT e.idEscuela, e.nombre, e.abreviatura, e.estado, 
-                       f.idFacultad, f.nombre AS facultad, e.hRequeridas
+                       e.idFacultad, e.hRequeridas
                 FROM escuela e
                 WHERE e.idEscuela = %s
             """, (idEscuela,))

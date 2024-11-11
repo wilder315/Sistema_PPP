@@ -3,7 +3,6 @@ import controladores.controlador_institucion as controlador_institucion
 
 router_institucion = Blueprint('router_institucion', __name__)
 
-# Ruta para obtener la lista de instituciones
 @router_institucion.route("/datos_instituciones", methods=["GET"])
 def datos_instituciones():
     instituciones = controlador_institucion.obtener_instituciones()
@@ -15,12 +14,16 @@ def jefe_institucion():
     jefes = controlador_institucion.obtener_jefe(ruc)
     return jsonify(jefes)
 
+@router_institucion.route("/datos_jefes", methods=["GET"])
+def datos_jefes():
+    jefes = controlador_institucion.obtener_jefes()
+    return jsonify(jefes)
+
 @router_institucion.route("/obtener_institucion_por_numdoc/<string:numDoc>", methods=["GET"])
 def obtener_institucion_por_numdoc(numDoc):
     institucion = controlador_institucion.obtener_institucion_por_numdoc(numDoc)
     return jsonify(institucion)
 
-# Ruta para agregar una nueva institución
 @router_institucion.route("/institucion", methods=["POST"])
 def agregar_institucion():
     datos = request.get_json()
@@ -38,7 +41,6 @@ def agregar_institucion():
     )
     return jsonify(resultado)
 
-# Ruta para modificar una institución existente
 @router_institucion.route("/institucion/<string:numDoc>", methods=["PUT"])
 def modificar_institucion(numDoc):
     datos = request.get_json()
@@ -55,13 +57,11 @@ def modificar_institucion(numDoc):
     )
     return jsonify(resultado)
 
-# Ruta para eliminar una institución
 @router_institucion.route("/institucion/<string:numDoc>", methods=["DELETE"])
 def eliminar_institucion(numDoc):
     resultado = controlador_institucion.eliminar_institucion(numDoc)
     return jsonify(resultado)
 
-# Ruta para dar de baja una institución (cambiar su estado a inactivo)
 @router_institucion.route("/institucion/dar_baja/<string:numDoc>", methods=["PUT"])
 def dar_de_baja_institucion(numDoc):
     resultado = controlador_institucion.dar_de_baja_institucion(numDoc)
