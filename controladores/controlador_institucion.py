@@ -78,7 +78,6 @@ def obtener_jefes():
         return {"error": str(e)}
     finally:
         conexion.close()
-    
     return jefes
 
 def obtener_institucion_por_numdoc(numDoc):
@@ -90,7 +89,7 @@ def obtener_institucion_por_numdoc(numDoc):
             cursor.execute(
                 """
                 SELECT i.numDoc, i.razonSocial, i.giro, i.direccion, i.tel, i.correo,
-                       i.idDistrito, pro.idProvincia, dep.idDepartamento, pa.idPais, CONCAT(p.apellidos, ' ', p.nombre) AS jefe, i.idTipoDoc
+                       i.idDistrito AS distrito, pro.idProvincia AS provincia, dep.idDepartamento AS departamento, pa.idPais AS pais, p.idPersona AS jefe, i.idTipoDoc
                 FROM institucion i
                 INNER JOIN distrito d ON i.idDistrito = d.idDistrito
                 INNER JOIN provincia pro on pro.idProvincia = d.idProvincia
@@ -112,16 +111,16 @@ def obtener_institucion_por_numdoc(numDoc):
     finally:
         conexion.close()
 
-def agregar_institucion(numDoc, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
+def agregar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO institucion (numDoc, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (numDoc, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc))
+                INSERT INTO institucion (numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc))
             conexion.commit()
             return {"mensaje": "Institución agregada correctamente"}
     except Exception as e:
@@ -130,7 +129,7 @@ def agregar_institucion(numDoc, razonSocial, direccion, tel, correo, idDistrito,
     finally:
         conexion.close()
 
-def modificar_institucion(numDoc, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
+def modificar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -138,10 +137,10 @@ def modificar_institucion(numDoc, razonSocial, direccion, tel, correo, idDistrit
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE institucion 
-                SET razonSocial = %s, direccion = %s, tel = %s, correo = %s, 
+                SET razonSocial = %s, giro = %s, direccion = %s, tel = %s, correo = %s, 
                     idDistrito = %s, idPersona = %s, idTipoDoc = %s
                 WHERE numDoc = %s
-            """, (razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc, numDoc))
+            """, (razonSocial, giro, direccion, tel, correo, idDistrito, idPersona, idTipoDoc, numDoc))
             conexion.commit()
             return {"mensaje": "Institución modificada correctamente"}
     except Exception as e:
@@ -157,7 +156,7 @@ def eliminar_institucion(numDoc):
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
-        with conexion.cursor() as cursor:
+        with conexion.cursor() as cursor:   
             cursor.execute("DELETE FROM institucion WHERE numDoc = %s", (numDoc,))
             conexion.commit()
             return {"mensaje": "Institución eliminada correctamente"}
@@ -167,20 +166,106 @@ def eliminar_institucion(numDoc):
     finally:
         conexion.close()
 
-def dar_de_baja_institucion(numDoc):
-    if not numDoc:
-        return {"error": "El número de documento es requerido."}
+def obtener_paises():
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
+    paises = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("UPDATE institucion SET correo = 'I' WHERE numDoc = %s", (numDoc,))
-            conexion.commit()
-            return {"mensaje": "Institución dada de baja correctamente"}
+            cursor.execute(
+                """
+                SELECT p.idPais, p.nombre
+                FROM pais p 
+                ORDER BY p.nombre ASC
+            """
+            )
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                pais_dict = dict(zip(column_names, row))
+                paises.append(pais_dict)
     except Exception as e:
-        conexion.rollback()
         return {"error": str(e)}
     finally:
         conexion.close()
+    return paises
 
+def obtener_departamentos():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
+    departamentos = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT d.idDepartamento, d.nombre
+                FROM departamento d 
+                ORDER BY d.nombre ASC
+            """
+            )
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                departamento_dict = dict(zip(column_names, row))
+                departamentos.append(departamento_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return departamentos
+
+def obtener_provincias():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
+    provincias = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT p.idProvincia, p.nombre
+                FROM provincia p 
+                ORDER BY p.nombre ASC
+            """
+            )
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                provincia_dict = dict(zip(column_names, row))
+                provincias.append(provincia_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return provincias
+
+def obtener_distritos():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
+    distritos = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT d.idDistrito, d.nombre
+                FROM distrito d 
+                ORDER BY d.nombre ASC
+            """
+            )
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                distrito_dict = dict(zip(column_names, row))
+                distritos.append(distrito_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return distritos

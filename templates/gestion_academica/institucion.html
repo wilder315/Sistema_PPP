@@ -21,10 +21,10 @@
                             <th style="width: 8%" class="text-center">RUC</th>
                             <th class="text-center">Razón Social</th>
                             <th style="width: 8%" class="text-center">Teléfono</th>
-                            <th style="width: 13%" class="text-center">Correo</th>
+                            <th style="width: 15%" class="text-center">Correo</th>
                             <th style="width: 15%" class="text-center">Representante Legal</th>
                             <th class="text-center">Ubicación</th>
-                            <th style="width: 12%" class="text-center">Opciones</th>
+                            <th style="width: 13%" class="text-center">Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +46,8 @@
             </div>
             <div class="modal-body">
                 <form id="formInstitucion">
-                    
+                    <input type="hidden" id="idInstitucionMod" name="idInstitucionMod">
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">RUC:</label>
@@ -107,15 +108,15 @@
                     </div>
 
                     <div class="text-end">
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
-                    </div>
+                        <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                        <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
+                    </div>   
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
     aria-hidden="true">
@@ -126,12 +127,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p><span id="texto-confirmar"></span><strong id="nombreGeneroConfirmar"></strong>?</p>
-                <input type="hidden" id="idGeneroConfirmar" name="idGeneroConfirmar">
+                <p><span id="texto-confirmar"></span><strong id="razonSocialConfirmar"></strong>?</p>
+                <input type="hidden" id="idInstitucionConfirmar" name="idInstitucionConfirmar">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="confirmarGenero">Aceptar</button>
+                <button type="button" class="btn btn-success" id="confirmarInstitucion">Aceptar</button>
             </div>
         </div>
     </div>
@@ -209,8 +210,7 @@
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${row.numDoc}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${row.numDoc}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.numDoc}" data-razonSocial="${row.razonSocial}" title="Eliminar"><i class="fas fa-times"></i></button>
-                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.numDoc}" data-razonSocial="${row.razonSocial}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.numDoc}" data-razonsocial="${row.razonSocial}" title="Eliminar"><i class="fas fa-times"></i></button>
                         `;
                     }
                 }
@@ -231,6 +231,90 @@
             });
         }
 
+        // Función para cargar los países dinámicamente
+        function cargarPaises(selectedPaisId) {
+            $.ajax({
+                url: '/datos_paises',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var paisSelect = $('#paisMod');
+                    paisSelect.empty();
+                    paisSelect.append('<option value="" disabled selected>Seleccionar país</option>');
+                    response.forEach(function (pais) {
+                        var selected = parseInt(pais.idPais) === parseInt(selectedPaisId) ? 'selected' : '';  
+                        paisSelect.append(`<option value="${pais.idPais}" ${selected}>${pais.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los países.");
+                }
+            });
+        }
+
+        // Función para cargar los departamentos dinámicamente
+        function cargarDepartamentos(selectedDepartamentoId) {
+            $.ajax({
+                url: '/datos_departamentos',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var departamentoSelect = $('#departamentoMod');
+                    departamentoSelect.empty();
+                    departamentoSelect.append('<option value="" disabled selected>Seleccionar departamento</option>');
+                    response.forEach(function (departamento) {
+                        var selected = parseInt(departamento.idDepartamento) === parseInt(selectedDepartamentoId) ? 'selected' : '';  
+                        departamentoSelect.append(`<option value="${departamento.idDepartamento}" ${selected}>${departamento.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los departamentos.");
+                }
+            });
+        }
+
+        // Función para cargar las provincias dinámicamente
+        function cargarProvincias(selectedProvinciaId) {
+            $.ajax({
+                url: '/datos_provincias',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var provinciaSelect = $('#provinciaMod');
+                    provinciaSelect.empty();
+                    provinciaSelect.append('<option value="" disabled selected>Seleccionar provincia</option>');
+                    response.forEach(function (provincia) {
+                        var selected = parseInt(provincia.idProvincia) === parseInt(selectedProvinciaId) ? 'selected' : '';  
+                        provinciaSelect.append(`<option value="${provincia.idProvincia}" ${selected}>${provincia.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los provincias.");
+                }
+            });
+        }
+
+        // Función para cargar las distritos dinámicamente
+        function cargarDistritos(selectedDistritoId) {
+            $.ajax({
+                url: '/datos_distritos',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var distritoSelect = $('#distritoMod');
+                    distritoSelect.empty();
+                    distritoSelect.append('<option value="" disabled selected>Seleccionar distrito</option>');
+                    response.forEach(function (distrito) {
+                        var selected = parseInt(distrito.idDistrito) === parseInt(selectedDistritoId) ? 'selected' : '';  
+                        distritoSelect.append(`<option value="${distrito.idDistrito}" ${selected}>${distrito.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los distritos.");
+                }
+            });
+        }
+
         // Función para cargar los jefes dinámicamente
         function cargarJefes(selectedJefeId) {
             $.ajax({
@@ -240,16 +324,48 @@
                 success: function (response) {
                     var jefeSelect = $('#jefeMod');
                     jefeSelect.empty();
-                    jefeSelect.append('<option value="" disabled selected>Seleccionar jefe</option>');
+                    jefeSelect.append('<option value="" disabled selected>Seleccionar representante</option>');
                     response.forEach(function (jefe) {
                         var selected = parseInt(jefe.idPersona) === parseInt(selectedJefeId) ? 'selected' : '';  
                         jefeSelect.append(`<option value="${jefe.idPersona}" ${selected}>${jefe.jefe}</option>`);
                     });
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros.");
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los representantes.");
                 }
             });
+        }
+
+        // Función para deshabilitar los controles
+        function deshabilitarControles(){
+            $('#idInstitucionMod').prop('disabled', true);
+            $('#numDocMod').prop('disabled', true);
+            $('#giroMod').prop('disabled', true);
+            $('#razonSocialMod').prop('disabled', true);
+            $('#direccionMod').prop('disabled', true);
+            $('#correoMod').prop('disabled', true);
+            $('#telMod').prop('disabled', true);
+            $('#paisMod').prop('disabled', true);
+            $('#departamentoMod').prop('disabled', true);
+            $('#provinciaMod').prop('disabled', true);
+            $('#distritoMod').prop('disabled', true);
+            $('#jefeMod').prop('disabled', true);
+        }
+
+        // Función para habilitar los controles
+        function habilitarControles(){
+            $('#idInstitucionMod').prop('disabled', false);
+            $('#numDocMod').prop('disabled', false);
+            $('#giroMod').prop('disabled', false);
+            $('#razonSocialMod').prop('disabled', false);
+            $('#direccionMod').prop('disabled', false);
+            $('#correoMod').prop('disabled', false);
+            $('#telMod').prop('disabled', false);
+            $('#paisMod').prop('disabled', false);
+            $('#departamentoMod').prop('disabled', false);
+            $('#provinciaMod').prop('disabled', false);
+            $('#distritoMod').prop('disabled', false);
+            $('#jefeMod').prop('disabled', false);
         }
 
         // Evento para Ver Institución
@@ -265,14 +381,22 @@
                     } else {
                         $('#modal-title').text("Ver Institucion");
                         $('#formInstitucion')[0].reset();
-                        $('#numDocMod').val(response.numDoc).prop('disabled', true);
-                        $('#giroMod').val(response.giro).prop('disabled', true);
-                        $('#razonSocialMod').val(response.razonSocial).prop('disabled', true);
-                        $('#direccionMod').val(response.direccion).prop('disabled', true);
-                        $('#telMod').val(response.tel).prop('disabled', true);
-                        $('#correoMod').val(response.correo).prop('disabled', true);
-                        $('#idDistrito').val(response.idDistrito).prop('disabled', true);
-                        $('#jefeMod').val(response.jefe).prop('disabled', true);
+                        $('#idInstitucionMod').val(response.numDoc);
+                        $('#numDocMod').val(response.numDoc);
+                        $('#giroMod').val(response.giro);
+                        $('#razonSocialMod').val(response.razonSocial);
+                        $('#direccionMod').val(response.direccion);
+                        $('#correoMod').val(response.correo);
+                        $('#telMod').val(response.tel);
+                        cargarPaises(response.pais);
+                        cargarDepartamentos(response.departamento);
+                        cargarProvincias(response.provincia);
+                        cargarDistritos(response.distrito);
+                        cargarJefes(response.jefe);
+                        deshabilitarControles();
+                        $('#btnCancelar').hide();
+                        $('#btnGuardar').hide();
+                        $('#btnCerrar').show();
                         $('#modalInstitucion').modal('show');
                     }
                 },
@@ -287,82 +411,83 @@
             e.preventDefault();
             $('#modal-title').text("Agregar Institución");
             $('#formInstitucion')[0].reset();
-            $('#numDoc').val('');
-            $('#razonSocial').val('');
-            $('#direccion').val('');
-            $('#tel').val('');
-            $('#correo').val('');
-            $('#idDistrito').val('');
-            $('#idPersona').val('');
-            $('#idTipoDoc').val('');
+            $('#idInstitucionMod').val('');
+            $('#numDocMod').val('');
+            $('#giroMod').val('');
+            $('#razonSocialMod').val('');
+            $('#direccionMod').val('');
+            $('#correoMod').val('');
+            $('#telMod').val('');
+            cargarPaises();
+            cargarDepartamentos();
+            cargarProvincias();
+            cargarDistritos();
+            cargarJefes();
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
             $('#modalInstitucion').modal('show');
         });
-
-        // Enviar formulario para Agregar Institución
         $('#formInstitucion').submit(function (e) {
             e.preventDefault();
-
-            // Datos del formulario
-            const data = {
-                numDoc: $('#numDoc').val(),
-                razonSocial: $('#razonSocial').val(),
-                direccion: $('#direccion').val(),
-                tel: $('#tel').val(),
-                correo: $('#correo').val(),
-                idDistrito: $('#idDistrito').val(),
-                idPersona: $('#idPersona').val(),
-                idTipoDoc: $('#idTipoDoc').val()
-            };
-
-            // Petición AJAX para agregar institución
-            $.ajax({
-                url: '/agregar_institucion',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalInstitucion').modal('hide');
+            if ($('#idInstitucionMod').val() === '') {
+                var data = {
+                    numDoc: $('#numDocMod').val(),
+                    giro: $('#giroMod').val(),
+                    razonSocial: $('#razonSocialMod').val(),
+                    direccion: $('#direccionMod').val(),
+                    correo: $('#correoMod').val(),
+                    tel: $('#telMod').val(),
+                    idDistrito: $('#distritoMod').val(),
+                    idPersona: $('#jefeMod').val()
+                };
+                $.ajax({
+                    url: '/agregar_institucion',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalInstitucion').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la institución.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al agregar la institución.");
-                }
-            });
+                });
+            }
         });
 
         // Evento para Modificar Institución
         $('#tabla-institucion tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_institucion/' + id,
+                url: '/obtener_institucion_por_numdoc/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Modificar Institución");
+                        $('#modal-title').text("Ver Institucion");
                         $('#formInstitucion')[0].reset();
-
-                        // Cargar los datos en los campos del formulario
-                        $('#numDoc').val(response.numDoc).prop('disabled', true);
-                        $('#razonSocial').val(response.razonSocial);
-                        $('#direccion').val(response.direccion);
-                        $('#tel').val(response.tel);
-                        $('#correo').val(response.correo);
-                        $('#idDistrito').val(response.idDistrito);
-                        $('#idPersona').val(response.idPersona);
-                        $('#idTipoDoc').val(response.idTipoDoc);
-
+                        $('#idInstitucionMod').val(response.numDoc);
+                        $('#numDocMod').val(response.numDoc);
+                        $('#giroMod').val(response.giro);
+                        $('#razonSocialMod').val(response.razonSocial);
+                        $('#direccionMod').val(response.direccion);
+                        $('#correoMod').val(response.correo);
+                        $('#telMod').val(response.tel);
+                        cargarPaises(response.pais);
+                        cargarDepartamentos(response.departamento);
+                        cargarProvincias(response.provincia);
+                        cargarDistritos(response.distrito);
+                        cargarJefes(response.jefe);
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
@@ -375,24 +500,18 @@
                 }
             });
         });
-
-        // Enviar formulario para Modificar Institución
         $('#formInstitucion').submit(function (e) {
             e.preventDefault();
-
-            // Datos del formulario
             var data = {
                 numDoc: $('#numDocMod').val(),
-                razonSocial: $('#razonSocial').val(),
-                direccion: $('#direccion').val(),
-                tel: $('#tel').val(),
-                correo: $('#correo').val(),
-                idDistrito: $('#idDistrito').val(),
-                idPersona: $('#idPersona').val(),
-                idTipoDoc: $('#idTipoDoc').val()
+                giro: $('#giroMod').val(),
+                razonSocial: $('#razonSocialMod').val(),
+                direccion: $('#direccionMod').val(),
+                correo: $('#correoMod').val(),
+                tel: $('#telMod').val(),
+                idDistrito: $('#distritoMod').val(),
+                idPersona: $('#jefeMod').val()          
             };
-
-            // Petición AJAX para modificar institución
             $.ajax({
                 url: '/modificar_institucion',
                 type: 'POST',
@@ -413,51 +532,48 @@
             });
         });
 
+        // Evento para Eliminar Institucion
         $('#tabla-institucion tbody').on('click', '.btnEliminar', function () {
-            const id = $(this).data('id');
-            const nombre = $(this).data('nombre');
-
-        // Configurar el modal de confirmación
-            $('#modal-title-confirmar').text('Eliminar Institución');
+            var id = $(this).data('id');
+            var razonsocial= $(this).data('razonsocial');
+            $('#modal-title-confirmar').text('Eliminar Institucion');
             $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar la institución ');
-            $('#nombreInstitucionConfirmar').text(nombre);
+            $('#razonSocialConfirmar').text(razonsocial);
             $('#idInstitucionConfirmar').val(id);
-            $('#confirmarEliminar').data('accion', 'eliminar');
+            $('#confirmarInstitucion').data('accion', 'eliminar');
             $('#modalConfirmar').modal('show');
+            console.log(id);
+            console.log($(this).data('razonsocial'));
         });
 
-        $('#confirmarEliminar').click(function () {
-            const id = $('#idInstitucionConfirmar').val();
-
-            // Realizar petición AJAX para eliminar la institución
+        // Evento para Confirmar
+        $('#confirmarInstitucion').click(function () {
+            var id = $('#idInstitucionConfirmar').val();
+            var accion = $(this).data('accion');
+            var url = '';
+            var mensajeExito = '';
+            var mensajeError = '';
+            if (accion === 'eliminar') {
+                url = '/eliminar_institucion';
+                mensajeExito = 'La institución fue eliminada correctamente';
+                mensajeError = 'Hubo un error al eliminar la institución.';
+            }
             $.ajax({
-                url: `/eliminar_institucion/${id}`,
-                type: 'DELETE',
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ numDoc: id }),
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        $('#modalConfirmar').modal('hide');
+                        mostrarAlerta("success", "Éxito", mensajeExito);
                         table.ajax.reload();
+                        $('#modalConfirmar').modal('hide');
                     }
                 },
-                error: function () {
-                    mostrarAlerta("error", "Error", "No se pudo eliminar la institución.");
-                    $('#modalConfirmar').modal('hide');
-                }
-            });
-        });
-
-        // Evento para Dar de Baja Institución
-        $('#tabla-institucion tbody').on('click', '.btnDarDeBaja', function () {
-            const id = $(this).data('id');
-            $.ajax({
-                url: `/dar_de_baja_institucion/${id}`,
-                type: 'PUT',
-                success: function (response) {
-                    mostrarAlerta("success", "Éxito", response.mensaje);
-                    table.ajax.reload();
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", mensajeError);
                 }
             });
         });

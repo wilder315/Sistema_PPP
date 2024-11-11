@@ -345,8 +345,7 @@
             });
         });
         $('#formUsuario').submit(function (e) {
-            e.preventDefault();
-            
+            e.preventDefault();     
             var data = {
                 idUsuario: $('#idUsuarioMod').val(),
                 username: $('#usernameMod').val(),
@@ -354,7 +353,6 @@
                 estado: $('#estadoUsuarioMod').val(),
                 idTipoUsuario: $('#tipoMod').val(),               
             };
-            console.log($('#idUsuarioMod').val());
             $.ajax({
                 url: '/modificar_usuario',
                 type: 'POST',
