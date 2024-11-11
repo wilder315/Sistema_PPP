@@ -169,3 +169,101 @@ def dar_de_baja_estudiante(idEstudiante):
         return {"error": str(e)}
     finally:
         conexion.close()
+    
+#------------------------ CARLOS DELGADO
+def obtener_estudiantes_por_fecha(): 
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"Error": "No se puedo establecer conexión con la base de datos."}
+    
+    registros_por_fecha = []
+    try: 
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(pp.idSemestre) as total_id, sa.nombre as nombre
+                FROM practicas_preprofesionales as pp
+                INNER JOIN semestre_academico as sa on pp.idSemestre = sa.idSemestre
+                GROUP BY sa.nombre
+                """)
+            rows = cursor.fetchall()
+            
+            registros_por_fecha = [{"total_id": row[0], "nombre": row[1]} for row in rows]
+            
+            
+    except Exception as e:
+        print("Error al obtener los datos:" ,e)
+        return []
+    finally:
+        conexion.close()
+        
+    return registros_por_fecha
+
+def obtener_estadisticas_estudiantes(): 
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"Error": "No se puedo establecer conexión con la base de datos."}
+    
+    estadisticas = {}
+    try: 
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT 
+                (SELECT COUNT(*) FROM practicas_preprofesionales) AS registrados,
+                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 2) AS proceso,
+                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 3) AS espera_informes, 
+                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 4) AS finalizada
+                """  
+            )
+            #obtener los resultados
+            resultado = cursor.fetchone()
+            
+            # asignar los resultados a un diccionario simple
+            estadisticas = {
+                "registrados": resultado[0], 
+                "proceso": resultado[1], 
+                "espera_informes": resultado[2], 
+                "finalizada": resultado[3]
+            }
+            
+    except Exception as e:
+        print("Error al obtener los datos:" ,e)
+        return []
+    finally:
+        conexion.close()
+        
+    return estadisticas
+
+def obtener_ppp_finalizadas(): 
+    conexion = obtener_conexion()
+    if not conexion: 
+        return {"error": "No se pudo establecer conexion con la base de datos."}
+    
+    estado_ppp = []
+    try:
+        with conexion.cursor() as cursor: 
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(fechaFin) as total_con_fecha, 
+                    COUNT(*) - COUNT(fechaFin) AS total_sin_fecha
+                FROM 
+                    practicas_preprofesionales;
+                """
+            )
+            #obtener los resultados
+            resultado = cursor.fetchone()
+            
+            # asignar los resultados a un diccionario simple
+            estado_ppp = {
+                "total_con_fecha": resultado[0], 
+                "total_sin_fecha": resultado[1]
+            }
+        
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+        
+    return estado_ppp

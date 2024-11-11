@@ -9,6 +9,7 @@ from bd import obtener_conexion
 import controladores.controlador_usuario as controlador_usuario
 import controladores.controlador_informeAlumno as controlador_informeAlumno
 import time
+from controladores.controlador_estudiante import obtener_estudiantes_por_fecha, obtener_estadisticas_estudiantes, obtener_ppp_finalizadas
 
 login_attempts = {}
 router_main = Blueprint('router_main', __name__)
@@ -74,7 +75,11 @@ def index():
 
 @router_main.route("/indexga")
 def gestion_academica():
-    return render_template("/gestion_academica/index.html")
+    registros_por_fecha = obtener_estudiantes_por_fecha() or []
+    estadisticas = obtener_estadisticas_estudiantes()
+    ppp_finalizadas = obtener_ppp_finalizadas()
+    return render_template("gestion_academica/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
+
 
 @router_main.route("/indexppp")
 def practicas_pre_profesionales():
