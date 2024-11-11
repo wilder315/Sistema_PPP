@@ -7,7 +7,7 @@ def obtener_usuarios():
     usuarios = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT idUsuario, username, password FROM usuario")
+            cursor.execute("SELECT u.idUsuario, u.username, u.password, u.estado, t.tipo as tipo FROM usuario u INNER JOIN tipo_usuario t ON t.idTipoUsuario = u.idTipoUsuario")
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
 
@@ -19,6 +19,97 @@ def obtener_usuarios():
     finally:
         conexion.close()
     return usuarios
+
+def obtener_usuario_por_id(idUsuario):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}    
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+            "SELECT u.idUsuario, u.username, u.password, u.estado, u.idTipoUsuario FROM usuario u WHERE idUsuario = %s", (idUsuario,))
+            row = cursor.fetchone()
+            if row:
+                columnas = [desc[0] for desc in cursor.description]
+                usuario_dict = dict(zip(columnas, row))
+                return usuario_dict
+            else:
+                return {"error": "Facultad no encontrada"}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def agregar_usuario(username, password, estado, idTipoUsuario):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO usuario (username, password, estado, idTipoUsuario)
+                VALUES (%s, %s, %s, %s)
+            """, (username, password, estado, idTipoUsuario))
+            conexion.commit()
+            return {"mensaje": "Usuario agregado correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def modificar_usuario(idUsuario, username, password, estado, idTipoUsuario):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE usuario
+                SET username = %s, password = %s, estado = %s, idTipoUsuario = %s
+                WHERE idUsuario = %s
+            """, (username, password, estado, idTipoUsuario, idUsuario))
+            conexion.commit()
+            return {"mensaje": "Usuario modificado correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def eliminar_usuario(idUsuario):
+    if not idUsuario:
+        return {"error": "El ID del usuario es requerido."}
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario,))
+            conexion.commit()
+            return {"mensaje": "Usuario eliminada correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def dar_de_baja_usuario(idUsuario):
+    if not idUsuario:
+        return {"error": "El ID del usuario es requerido."}
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("UPDATE usuario SET estado = 'I' WHERE idUsuario = %s", (idUsuario,))
+            conexion.commit()
+            return {"mensaje": "Usuario dada de baja correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
 
 def obtener_usuarios_estudiantes():
     conexion = obtener_conexion()
@@ -80,16 +171,6 @@ def obtener_usuario_por_username(username):
     conexion.close()
     return usuario
 
-def obtener_usuario_por_id(id):
-    conexion = obtener_conexion()
-    usuario = None
-    with conexion.cursor() as cursor:
-        cursor.execute(
-            "SELECT idusuario, username, password, estado, idpersona FROM usuario WHERE idusuario = %s", (id,))
-        usuario = cursor.fetchone()
-    conexion.close()
-    return usuario
-
 def actualizar_token(username,token):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
@@ -98,7 +179,6 @@ def actualizar_token(username,token):
     conexion.commit()
     conexion.close()
 
-##PARA EL APATARDO DE PERFIL
 def obtener_datos_usuario (id):
     conexion = obtener_conexion()
     usuario = None
@@ -109,7 +189,6 @@ def obtener_datos_usuario (id):
     conexion.close()
     return usuario
 
-# Función para actualizar los datos del usuario
 def actualizar_datos_usuario(id, nombres, apellidos, n_documento, correo, telefono):
     conexion = obtener_conexion()
     try:
@@ -122,8 +201,6 @@ def actualizar_datos_usuario(id, nombres, apellidos, n_documento, correo, telefo
         return {"error": str(e)}
     finally:
         conexion.close()
-
-#funciona para recibir datos del estudiante y cargarlo a informe desde el usuario
 
 def obtener_datos_usuario_informe():
     conexion = obtener_conexion()
@@ -141,3 +218,23 @@ def obtener_datos_usuario_informe():
         return {"error": str(e)}
     finally:
         conexion.close()
+
+def obtener_tipoUsuarios():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    tipo_usuarios = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT * FROM tipo_usuario ORDER BY idTipoUsuario ASC")
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            for row in rows:
+                tipo_usuario_dict = dict(zip(column_names, row))
+                tipo_usuarios.append(tipo_usuario_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return tipo_usuarios
+

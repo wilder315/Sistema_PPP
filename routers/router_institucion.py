@@ -15,8 +15,8 @@ def jefe_institucion():
     jefes = controlador_institucion.obtener_jefe(ruc)
     return jsonify(jefes)
 
-@router_institucion.route("/obtener_institucion/<string:numDoc>", methods=["GET"])
-def obtener_institucion(numDoc):
+@router_institucion.route("/obtener_institucion_por_numdoc/<string:numDoc>", methods=["GET"])
+def obtener_institucion_por_numdoc(numDoc):
     institucion = controlador_institucion.obtener_institucion_por_numdoc(numDoc)
     return jsonify(institucion)
 

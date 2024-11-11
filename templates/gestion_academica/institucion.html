@@ -18,18 +18,18 @@
                 <table id="tabla-institucion" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th>RUC</th>
-                            <th>Razón Social</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>Correo</th>
-                            <th>Distrito</th>
-                            <th>Jefe</th>
-                            <th>Tipo Documento</th>
-                            <th>Opciones</th>
+                            <th style="width: 8%" class="text-center">RUC</th>
+                            <th class="text-center">Razón Social</th>
+                            <th style="width: 8%" class="text-center">Teléfono</th>
+                            <th style="width: 13%" class="text-center">Correo</th>
+                            <th style="width: 15%" class="text-center">Representante Legal</th>
+                            <th class="text-center">Ubicación</th>
+                            <th style="width: 12%" class="text-center">Opciones</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -46,50 +46,64 @@
             </div>
             <div class="modal-body">
                 <form id="formInstitucion">
-                    <input type="hidden" id="numDocMod">
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="numDoc" class="form-label">RUC:</label>
-                            <input type="text" class="form-control form-control-sm" id="numDoc" required>
+                            <label for="numDocMod" class="form-label">RUC:</label>
+                            <input type="text" class="form-control form-control-sm" id="numDocMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="razonSocial" class="form-label">Razón Social:</label>
-                            <input type="text" class="form-control form-control-sm" id="razonSocial" required>
+                            <label for="giroMod" class="form-label">Giro:</label>
+                            <input type="text" class="form-control form-control-sm" id="giroMod" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="razonSocialMod" class="form-label">Razón Social:</label>
+                        <input type="text" class="form-control form-control-sm" id="razonSocialMod" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccionMod" class="form-label">Dirección:</label>
+                        <input type="text" class="form-control form-control-sm" id="direccionMod" required>
+                    </div>
+
+                    <div class="row">             
+                        <div class="col-md-6 mb-3">
+                            <label for="correoMod" class="form-label">Correo:</label>
+                            <input type="email" class="form-control form-control-sm" id="correoMod" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telMod" class="form-label">Teléfono:</label>
+                            <input type="text" class="form-control form-control-sm" id="telMod" required>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="direccion" class="form-label">Dirección:</label>
-                            <input type="text" class="form-control form-control-sm" id="direccion" required>
+                            <label for="paisMod" class="form-label">Pais:</label>
+                            <select id="paisMod" class="form-control form-control-sm" required></select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="tel" class="form-label">Teléfono:</label>
-                            <input type="text" class="form-control form-control-sm" id="tel" required>
+                            <label for="departamentoMod" class="form-label">Departamento:</label>
+                            <select id="departamentoMod" class="form-control form-control-sm" required></select>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="correo" class="form-label">Correo:</label>
-                            <input type="email" class="form-control form-control-sm" id="correo" required>
+                            <label for="provinciaMod" class="form-label">Provincia:</label>
+                            <select id="provinciaMod" class="form-control form-control-sm" required></select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="idDistrito" class="form-label">Distrito:</label>
-                            <select id="idDistrito" class="form-control form-control-sm" required></select>
+                            <label for="distritoMod" class="form-label">Distrito:</label>
+                            <select id="distritoMod" class="form-control form-control-sm" required></select>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="idPersona" class="form-label">Jefe:</label>
-                            <select id="idPersona" class="form-control form-control-sm" required></select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="idTipoDoc" class="form-label">Tipo Documento:</label>
-                            <select id="idTipoDoc" class="form-control form-control-sm" required></select>
-                        </div>
+                    <div class="mb-3">
+                        <label for="jefeMod" class="form-label">Representante Legal:</label>
+                        <select id="jefeMod" class="form-control form-control-sm" required></select>
                     </div>
 
                     <div class="text-end">
@@ -137,12 +151,10 @@
 
 <script>
     $(document).ready(function () {
-        // Verificar si la tabla ya está inicializada
         if ($.fn.DataTable.isDataTable('#tabla-institucion')) {
             $('#tabla-institucion').DataTable().clear().destroy();
         }
 
-        // Inicializar DataTable para la tabla de instituciones
         const table = $('#tabla-institucion').DataTable({
             paging: true,
             pageLength: 10,
@@ -185,22 +197,21 @@
             processing: true,
             serverSide: false,
             columns: [
-                { data: "numDoc" },
+                { data: "numDoc", className: 'text-center' },
                 { data: "razonSocial" },
-                { data: "direccion" },
-                { data: "tel" },
+                { data: "tel", className: 'text-center' },
                 { data: "correo" },
-                { data: "distrito" },
                 { data: "jefe" },
-                { data: "tipoDocumento" },
+                { data: "ubicacion" },
                 {
                     data: null,
+                    className: 'text-center',
                     render: function (data, type, row) {
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${row.numDoc}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${row.numDoc}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.numDoc}" title="Eliminar"><i class="fas fa-times"></i></button>
-                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.numDoc}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.numDoc}" data-razonSocial="${row.razonSocial}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.numDoc}" data-razonSocial="${row.razonSocial}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
                 }
@@ -210,7 +221,6 @@
             }
         });
 
-        // Mostrar alerta con SweetAlert
         function mostrarAlerta(tipo, titulo, mensaje) {
             Swal.fire({
                 icon: tipo,
@@ -225,7 +235,7 @@
         $('#tabla-institucion tbody').on('click', '.btnVer', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_institucion/' + id,
+                url: '/obtener_institucion_por_numdoc/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -234,11 +244,11 @@
                     } else {
                         $('#modal-title').text("Ver Institucion");
                         $('#formInstitucion')[0].reset();
-                        $('#numDoc').val(response.numDoc).prop('disabled', true);
-                        $('#razonSocial').val(response.razonSocial).prop('disabled', true);
-                        $('#direccion').val(response.direccion).prop('disabled', true);
-                        $('#tel').val(response.tel).prop('disabled', true);
-                        $('#correo').val(response.correo).prop('disabled', true);
+                        $('#numDocMod').val(response.numDoc).prop('disabled', true);
+                        $('#razonSocialMod').val(response.razonSocial).prop('disabled', true);
+                        $('#direccionMod').val(response.direccion).prop('disabled', true);
+                        $('#telMod').val(response.tel).prop('disabled', true);
+                        $('#correoMod').val(response.correo).prop('disabled', true);
                         $('#idDistrito').val(response.idDistrito).prop('disabled', true);
                         $('#idPersona').val(response.idPersona).prop('disabled', true);
                         $('#idTipoDoc').val(response.idTipoDoc).prop('disabled', true);

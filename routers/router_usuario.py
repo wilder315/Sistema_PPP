@@ -1,12 +1,57 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, render_template
 import controladores.controlador_usuario as controlador_usuario
 
 router_usuario = Blueprint('router_usuario', __name__)
+
+@router_usuario.route("/usuario")
+def usuario():
+    return render_template('gestion_academica/usuario.html')
 
 @router_usuario.route("/datos_usuarios", methods=["GET"])
 def datos_usuarios():
     usuarios = controlador_usuario.obtener_usuarios()
     return jsonify(usuarios)
+
+@router_usuario.route("/datos_tipoUsuarios", methods=["GET"])
+def datos_tipoUsuarios():
+    tipo_usuarios = controlador_usuario.obtener_tipoUsuarios()
+    return jsonify(tipo_usuarios)
+
+@router_usuario.route("/obtener_usuario_por_id/<int:idUsuario>", methods=["GET"])
+def obtener_usuario_por_id(idUsuario):
+    usuarios = controlador_usuario.obtener_usuario_por_id(idUsuario)
+    return jsonify(usuarios)
+
+@router_usuario.route("/agregar_usuario", methods=["POST"])
+def agregar_usuario():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    estado = request.json.get('estado')
+    idTipoUsuario = request.json.get('idTipoUsuario')
+    resultado = controlador_usuario.agregar_usuario(username, password, estado, idTipoUsuario)
+    return jsonify(resultado)
+
+@router_usuario.route("/modificar_usuario", methods=["POST"])
+def modificar_usuario():
+    idUsuario = request.json.get('idUsuario')
+    username = request.json.get('username')
+    password = request.json.get('password')
+    estado = request.json.get('estado')
+    idTipoUsuario = request.json.get('idTipoUsuario')
+    resultado = controlador_usuario.modificar_usuario(idUsuario, username, password, estado, idTipoUsuario)
+    return jsonify(resultado)
+
+@router_usuario.route("/dar_de_baja_usuario", methods=["POST"])
+def dar_de_baja_usuario():
+    idUsuario = request.json.get('idUsuario')
+    resultado = controlador_usuario.dar_de_baja_usuario(idUsuario)
+    return jsonify(resultado)
+
+@router_usuario.route("/eliminar_usuario", methods=["POST"])
+def eliminar_usuario():
+    idUsuario = request.json.get('idUsuario')
+    resultado = controlador_usuario.eliminar_usuario(idUsuario)
+    return jsonify(resultado)
 
 @router_usuario.route("/datos_usuarios_estudiantes", methods=["GET"])
 def datos_usuarios_estudiantes():

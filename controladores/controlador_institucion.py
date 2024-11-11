@@ -10,12 +10,15 @@ def obtener_instituciones():
         with conexion.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT i.numDoc, i.razonSocial, i.direccion, i.tel, i.correo,
-                       d.nombre AS distrito, p.nombre AS jefe, td.nombre AS tipoDocumento
+                SELECT i.numDoc, i.razonSocial, i.tel, i.correo, CONCAT(p.apellidos, ' ', p.nombre) AS jefe, 
+                CONCAT(pa.nombre, ', ', dep.nombre, ', ', pro.nombre, ', ', dis.nombre) AS ubicacion 
                 FROM institucion i
-                JOIN distrito d ON i.idDistrito = d.idDistrito
-                JOIN persona p ON i.idPersona = p.idPersona
-                JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc
+                INNER JOIN persona p ON i.idPersona = p.idPersona
+                INNER JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc
+                INNER JOIN distrito dis on dis.idDistrito = i.idDistrito
+                INNER JOIN provincia pro on pro.idProvincia = dis.idProvincia
+                INNER JOIN departamento dep on dep.idDepartamento = pro.idDepartamento
+                INNER JOIN pais pa on pa.idPais = dep.idPais
             """
             )
             column_names = [desc[0] for desc in cursor.description]
@@ -62,12 +65,15 @@ def obtener_institucion_por_numdoc(numDoc):
         with conexion.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT i.numDoc, i.razonSocial, i.direccion, i.tel, i.correo,
-                       d.nombre AS distrito, p.nombre AS jefe, td.nombre AS tipoDocumento
+                SELECT i.numDoc, i.razonSocial, i.giro, i.direccion, i.tel, i.correo,
+                       i.idDistrito, pro.idProvincia, dep.idDepartamento, pa.idPais, i.idPersona as jefe, i.idTipoDoc
                 FROM institucion i
-                JOIN distrito d ON i.idDistrito = d.idDistrito
-                JOIN persona p ON i.idPersona = p.idPersona
-                JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc WHERE i.numDoc = %s
+                INNER JOIN distrito d ON i.idDistrito = d.idDistrito
+                INNER JOIN provincia pro on pro.idProvincia = d.idProvincia
+                INNER JOIN departamento dep on dep.idDepartamento = pro.idDepartamento
+                INNER JOIN pais pa on pa.idPais = dep.idPais
+                INNER JOIN persona p ON i.idPersona = p.idPersona
+                INNER JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc WHERE i.numDoc = %s
             """
             , (numDoc,))
             row = cursor.fetchone()

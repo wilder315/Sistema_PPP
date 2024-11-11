@@ -1,0 +1,441 @@
+{% extends "/gestion_academica/index.html" %}
+{% block titulo %} Usuario {% endblock %}
+{% block contenido %}
+
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Usuarios</li>
+    </ol>
+</nav>
+
+<div class="container-fluid my-4">
+    <div class="card w-100">
+        <div class="card-header bg-red-usat text-white">Usuarios</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-usuario" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="text-center">ID</th>
+                            <th style="width: 22%" class="text-center">Username</th>
+                            <th class="text-center">Contraseña</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Tipo</th>
+                            <th class="text-center">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL USUARIO -->
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formUsuario">
+                    <input type="hidden" id="idUsuarioMod" name="idUsuarioMod">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="usernameMod" class="form-label">Username:</label>
+                            <input type="text" class="form-control" id="usernameMod" name="usernameMod" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="passwordMod" class="form-label">Contraseña:</label>
+                            <input type="text" class="form-control" id="passwordMod" name="passwordMod" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="estadoUsuarioMod" class="form-label">Estado:</label>
+                            <select class="form-control" id="estadoUsuarioMod" name="estadoUsuarioMod" required>
+                                <option value="" disabled selected>Seleccionar estado</option>
+                                <option value="A">Activo</option>
+                                <option value="I">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipoMod" class="form-label">Tipo de Usuario:</label>
+                            <select class="form-control" id="tipoMod" name="tipoMod" required>
+                                <!-- Opciones de tipos de usuario se cargarán dinámicamente -->
+                            </select>
+                        </div>
+                    </div>
+        
+                    <div class="text-end">
+                        <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                        <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
+                    </div>  
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center fw-bold" id="modal-title-confirmar"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p><span id="texto-confirmar"></span><strong id="nombreUsuarioConfirmar"></strong>?</p>
+                <input type="hidden" id="idUsuarioConfirmar" name="idUsuarioConfirmar">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmarUsuario">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+<script>
+    $(document).ready(function () {
+        if ($.fn.DataTable.isDataTable('#tabla-usuario')) {
+            $('#tabla-usuario').DataTable().clear().destroy();
+        }
+        var table = $('#tabla-usuario').DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 15, 20],
+            info: true,
+            responsive: true,
+            autoWidth: true,
+            searching: true,
+            order: [], 
+            dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
+            buttons: [
+                {
+                    text: '<i class="fas fa-plus"></i> Agregar Nuevo Usuario',
+                    className: 'btnAgregar btn btn-primary mb-2',
+                    action: function (e, dt, node, config) {
+                        e.preventDefault();
+                        $('#formUsuario')[0].reset();
+                        $('#modalUsuario').modal('show');
+                    }
+                },   
+                {
+                    extend: 'collection',
+                    text: '<i class="fas fa-file-export"></i> Exportar/Imprimir',
+                    className: 'btn btn-secondary mb-2',
+                    autoClose: true,
+                    buttons: [
+                        { extend: 'copy', text: '<i class="fas fa-copy"></i> Copiar', className: 'dropdown-item' },
+                        { extend: 'csv', text: '<i class="fas fa-file-csv"></i> CSV', className: 'dropdown-item' },
+                        { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'dropdown-item' },
+                        { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> PDF', className: 'dropdown-item' },
+                        { extend: 'print', text: '<i class="fas fa-print"></i> Imprimir', className: 'dropdown-item' }
+                    ]
+                }
+                
+            ],
+            ajax: {
+                url: '/datos_usuarios',
+                type: 'GET',
+                dataSrc: ''
+            },
+            columns: [
+                { data: "idUsuario", className: 'text-center' },
+                { data: "username" },
+                { data: "password", className: 'text-center' },
+                { data: "estado", className: 'text-center', render: data => data === 'A' ? 'Activo' : 'Inactivo' },
+                { data: "tipo" , className: 'text-center'},
+                {
+                    data: null,
+                    className: 'text-center',
+                    render: function (data) {
+                        return `
+                            <button class="btn btn-primary btn-sm btnVer" data-id="${data.idUsuario}" title="Ver"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-sm btnModificar" data-id="${data.idUsuario}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${data.idUsuario}" data-username="${data.username}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${data.idUsuario}" data-username="${data.username}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
+                        `;
+                    }
+                }
+            ],
+            language: {
+                url: "{{ url_for('static', filename='js/es-ES.json') }}"
+            }
+        });
+
+        // Funcion para mostrar alerta
+        function mostrarAlerta(tipo, titulo, mensaje) {
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                html: mensaje,
+                showConfirmButton: true,
+                timer: 5000
+            });
+        }
+
+        // Función para cargar los tipoUsuarios dinámicamente
+        function cargarTipoUsuarios(selectedTipoUsuarioId) {
+            $.ajax({
+                url: '/datos_tipoUsuarios',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var tipoSelect = $('#tipoMod');
+                    tipoSelect.empty();
+                    tipoSelect.append('<option value="" disabled selected>Seleccionar tipo de usuario</option>');
+                    response.forEach(function (tipoUsuario) {
+                        var selected = tipoUsuario.idTipoUsuario == selectedTipoUsuarioId ? 'selected' : '';
+                        tipoSelect.append(`<option value="${tipoUsuario.idTipoUsuario}" ${selected}>${tipoUsuario.tipo}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los tipos de usuarios.");
+                }
+            });
+        }
+
+        // Función para deshabilitar los controles
+        function deshabilitarControles(){
+            $('#idUsuarioMod').prop('disabled', true);
+            $('#usernameMod').prop('disabled', true);
+            $('#passwordMod').prop('disabled', true);
+            $('#estadoUsuarioMod').prop('disabled', true);
+            $('#tipoMod').prop('disabled', true);
+        }
+
+        // Función para habilitar los controles
+        function habilitarControles(){
+            $('#idUsuarioMod').prop('disabled', false);
+            $('#usernameMod').prop('disabled', false);
+            $('#passwordMod').prop('disabled', false);
+            $('#estadoUsuarioMod').prop('disabled', false);
+            $('#tipoMod').prop('disabled', false);
+        }
+
+        // Evento para Ver Usuario
+        $('#tabla-usuario tbody').on('click', '.btnVer', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '/obtener_usuario_por_id/' + id,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        $('#modal-title').text("Ver Usuario");
+                        $('#formUsuario')[0].reset();
+                        $('#idUsuarioMod').val(response.idUsuario);
+                        $('#usernameMod').val(response.username);
+                        $('#passwordMod').val(response.password);
+                        $('#estadoUsuarioMod').val(response.estado);
+                        cargarTipoUsuarios(response.idTipoUsuario);
+                        deshabilitarControles();
+                        $('#btnCancelar').hide();
+                        $('#btnGuardar').hide();
+                        $('#btnCerrar').show();
+                        $('#modalUsuario').modal('show');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener el usuario.");
+                }
+            });
+        });
+
+        // Evento para Agregar Usuario
+        $(document).on('click', '.btnAgregar', function (e) {
+            e.preventDefault();
+            $('#modal-title').text("Agregar Usuario");
+            $('#formUsuario')[0].reset();
+            $('#idUsuarioMod').val('');
+            $('#usernameMod').val('');
+            $('#passwordMod').val('');
+            $('#estadoUsuarioMod').val('');
+            $('#tipoMod').val('');
+            cargarTipoUsuarios();
+            habilitarControles();
+            $('#btnCancelar').show();
+            $('#btnGuardar').show();
+            $('#btnCerrar').hide();
+            $('#modalUsuario').modal('show');
+        });
+        $('#formUsuario').submit(function (e) {
+            e.preventDefault();
+            if ($('#idUsuarioMod').val() === '') {
+                var data = {
+                    username: $('#usernameMod').val(),
+                    password: $('#passwordMod').val(),
+                    estado: $('#estadoUsuarioMod').val(),
+                    idTipoUsuario: $('#tipoMod').val(),
+                };
+                $.ajax({
+                    url: '/agregar_usuario',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalUsuario').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
+                    }
+                });
+            }
+        });
+
+        // Evento para Modificar Usuario
+        $('#tabla-usuario tbody').on('click', '.btnModificar', function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '/obtener_usuario_por_id/' + id,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        $('#modal-title').text("Modificar Usuario");
+                        $('#formUsuario')[0].reset();
+                        $('#idUsuarioMod').val(response.idUsuario);
+                        $('#usernameMod').val(response.username);
+                        $('#passwordMod').val(response.password);
+                        $('#estadoUsuarioMod').val(response.estado);
+                        cargarTipoUsuarios(response.idTipoUsuario);
+                        habilitarControles();
+                        $('#btnCancelar').show();
+                        $('#btnGuardar').show();
+                        $('#btnCerrar').hide();
+                        $('#modalUsuario').modal('show');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener el usuario.");
+                }
+            });
+        });
+        $('#formUsuario').submit(function (e) {
+            e.preventDefault();
+            
+            var data = {
+                idUsuario: $('#idUsuarioMod').val(),
+                username: $('#usernameMod').val(),
+                password: $('#passwordMod').val(),
+                estado: $('#estadoUsuarioMod').val(),
+                idTipoUsuario: $('#tipoMod').val(),               
+            };
+            console.log($('#idUsuarioMod').val());
+            $.ajax({
+                url: '/modificar_usuario',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", response.mensaje);
+                        table.ajax.reload();
+                        $('#modalUsuario').modal('hide');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al modificar el usuario.");
+                }
+            });
+        });
+
+        // Evento para Eliminar Usuario
+        $('#tabla-usuario tbody').on('click', '.btnEliminar', function () {
+            var id = $(this).data('id');
+            var username = $(this).data('username');
+            $('#modal-title-confirmar').text('Eliminar Usuario');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el usuario ');
+            $('#nombreUsuarioConfirmar').text(username);
+            $('#idUsuarioConfirmar').val(id);
+            $('#confirmarUsuario').data('accion', 'eliminar');
+            $('#modalConfirmar').modal('show');
+        });
+
+        // Evento para Dar de Baja Usuario
+        $('#tabla-usuario tbody').on('click', '.btnDarDeBaja', function () {
+            var id = $(this).data('id');
+            var username = $(this).data('username');
+            $('#modal-title-confirmar').text('Dar de Baja Usuario');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja el usuario ');
+            $('#nombreUsuarioConfirmar').text(username);
+            $('#idUsuarioConfirmar').val(id);
+            $('#confirmarUsuario').data('accion', 'darDeBaja');
+            $('#modalConfirmar').modal('show');
+        });
+
+        // Evento para Confirmar
+        $('#confirmarUsuario').click(function () {
+            var id = $('#idUsuarioConfirmar').val();
+            var accion = $(this).data('accion');
+            var url = '';
+            var mensajeExito = '';
+            var mensajeError = '';
+            if (accion === 'eliminar') {
+                url = '/eliminar_usuario';
+                mensajeExito = 'El usuario fue eliminado correctamente';
+                mensajeError = 'Hubo un error al eliminar el usuario.';
+            } else if (accion === 'darDeBaja') {
+                url = '/dar_de_baja_usuario';
+                mensajeExito = 'El usuario fue dado de baja correctamente';
+                mensajeError = 'Hubo un error al dar de baja el usuario.';
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ idUsuario: id }),
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", mensajeExito);
+                        table.ajax.reload();
+                        $('#modalConfirmar').modal('hide');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", mensajeError);
+                }
+            });
+        });
+        
+    });
+</script>
+{% endblock %}
+{% endblock %}
