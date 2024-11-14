@@ -291,34 +291,6 @@
             $('#btnCerrar').hide();
             $('#modalUsuario').modal('show');
         });
-        $('#formUsuario').submit(function (e) {
-            e.preventDefault();
-            if ($('#idUsuarioMod').val() === '') {
-                var data = {
-                    username: $('#usernameMod').val(),
-                    estado: $('#estadoUsuarioMod').val(),
-                    idTipoUsuario: $('#tipoMod').val(),
-                };
-                $.ajax({
-                    url: '/agregar_usuario',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalUsuario').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
-                    }
-                });
-            }
-        });
 
         // Evento para Modificar Usuario
         $('#tabla-usuario tbody').on('click', '.btnModificar', function () {
@@ -349,32 +321,59 @@
                 }
             });
         });
+
         $('#formUsuario').submit(function (e) {
-            e.preventDefault();     
-            var data = {
-                idUsuario: $('#idUsuarioMod').val(),
-                username: $('#usernameMod').val(),
-                estado: $('#estadoUsuarioMod').val(),
-                idTipoUsuario: $('#tipoMod').val(),               
-            };
-            $.ajax({
-                url: '/modificar_usuario',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalUsuario').modal('hide');
+            e.preventDefault();
+            if ($('#idUsuarioMod').val() === '') {
+                var data = {
+                    username: $('#usernameMod').val(),
+                    estado: $('#estadoUsuarioMod').val(),
+                    idTipoUsuario: $('#tipoMod').val(),
+                };
+                $.ajax({
+                    url: '/agregar_usuario',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalUsuario').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al modificar el usuario.");
-                }
-            });
+                });
+            } else {
+                var data = {
+                    idUsuario: $('#idUsuarioMod').val(),
+                    username: $('#usernameMod').val(),
+                    estado: $('#estadoUsuarioMod').val(),
+                    idTipoUsuario: $('#tipoMod').val(),               
+                };
+                $.ajax({
+                    url: '/modificar_usuario',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalUsuario').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar el usuario.");
+                    }
+                });
+            }
         });
 
         // Evento para Eliminar Usuario

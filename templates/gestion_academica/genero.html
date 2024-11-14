@@ -245,33 +245,6 @@
             $('#btnCerrar').hide();
             $('#modalGenero').modal('show');
         });
-        $('#formGenero').submit(function (e) {
-            e.preventDefault();
-            if ($('#idGeneroMod').val() === '') {
-                var data = {
-                    nombre: $('#nombreGeneroMod').val(),
-                    estado: $('#estadoMod').val(),
-                };
-                $.ajax({
-                    url: '/agregar_genero',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalGenero').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el género.");
-                    }
-                });
-            }
-        });
 
         // Evento para Modificar Genero
         $('#tabla-genero tbody').on('click', '.btnModificar', function () {
@@ -301,31 +274,57 @@
                 }
             });
         });
+
         $('#formGenero').submit(function (e) {
             e.preventDefault();
-            var data = {
-                idGenero: $('#idGeneroMod').val(),
-                nombre: $('#nombreGeneroMod').val(),
-                estado: $('#estadoMod').val(),
-            };
-            $.ajax({
-                url: '/modificar_genero',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalGenero').modal('hide');
+            if ($('#idGeneroMod').val() === '') {
+                var data = {
+                    nombre: $('#nombreGeneroMod').val(),
+                    estado: $('#estadoMod').val(),
+                };
+                $.ajax({
+                    url: '/agregar_genero',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalGenero').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el género.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al modificar el género.");
-                }
-            });
+                });
+            } else {
+                var data = {
+                    idGenero: $('#idGeneroMod').val(),
+                    nombre: $('#nombreGeneroMod').val(),
+                    estado: $('#estadoMod').val(),
+                };
+                $.ajax({
+                    url: '/modificar_genero',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalGenero').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar el género.");
+                    }
+                });
+            }
         });
 
         // Evento para Eliminar Genero

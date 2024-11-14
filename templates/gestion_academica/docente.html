@@ -449,44 +449,6 @@
             $('#btnCerrar').hide();
             $('#modalDocente').modal('show');
         });
-        $('#formDocente').submit(function (e) {
-            e.preventDefault();
-            if ($('#idDocenteMod').val() === '') {
-                var data = {
-                    numDoc: $('#numDocMod').val(),
-                    nombre: $('#nombreDocenteMod').val(),
-                    apellidos: $('#apellidosDocenteMod').val(),
-                    cargo: $('#cargoMod').val(),
-                    tel1: $('#tel1Mod').val(),
-                    tel2: $('#tel2Mod').val(),
-                    correoP: $('#correoPMod').val(),
-                    correoUSAT: $('#correoUSATMod').val(),
-                    estado: $('#estadoDocenteMod').val(),
-                    idGenero: $('#generoMod').val(),
-                    idTipoDoc: $('#tipoDocMod').val(),
-                    idUsuario: $('#usuarioMod').val(),
-                    idEscuela: $('#escuelaMod').val()
-                };
-                $.ajax({
-                    url: '/agregar_docente',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalDocente').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el docente.");
-                    }
-                });
-            }
-        });
 
         // Evento para Modificar Docente
         $('#tabla-docente tbody').on('click', '.btnModificar', function () {
@@ -527,42 +489,79 @@
                 }
             });
         });
+
         $('#formDocente').submit(function (e) {
             e.preventDefault();
-            var data = {
-                idPersona: $('#idDocenteMod').val(),
-                numDoc: $('#numDocMod').val(),
-                nombre: $('#nombreDocenteMod').val(),
-                apellidos: $('#apellidosDocenteMod').val(),
-                cargo: $('#cargoMod').val(),
-                tel1: $('#tel1Mod').val(),
-                tel2: $('#tel2Mod').val(),
-                correoP: $('#correoPMod').val(),
-                correoUSAT: $('#correoUSATMod').val(),
-                estado: $('#estadoDocenteMod').val(),
-                idGenero: $('#generoMod').val(),
-                idTipoDoc: $('#tipoDocMod').val(),
-                idUsuario: $('#usuarioMod').val(),
-                idEscuela: $('#escuelaMod').val()
-            };
-            $.ajax({
-                url: '/modificar_docente',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalDocente').modal('hide');
+            if ($('#idDocenteMod').val() === '') {
+                var data = {
+                    numDoc: $('#numDocMod').val(),
+                    nombre: $('#nombreDocenteMod').val(),
+                    apellidos: $('#apellidosDocenteMod').val(),
+                    cargo: $('#cargoMod').val(),
+                    tel1: $('#tel1Mod').val(),
+                    tel2: $('#tel2Mod').val(),
+                    correoP: $('#correoPMod').val(),
+                    correoUSAT: $('#correoUSATMod').val(),
+                    estado: $('#estadoDocenteMod').val(),
+                    idGenero: $('#generoMod').val(),
+                    idTipoDoc: $('#tipoDocMod').val(),
+                    idUsuario: $('#usuarioMod').val(),
+                    idEscuela: $('#escuelaMod').val()
+                };
+                $.ajax({
+                    url: '/agregar_docente',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalDocente').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el docente.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al modificar el docente.");
-                }
-            });
+                });
+            } else {
+                var data = {
+                    idPersona: $('#idDocenteMod').val(),
+                    numDoc: $('#numDocMod').val(),
+                    nombre: $('#nombreDocenteMod').val(),
+                    apellidos: $('#apellidosDocenteMod').val(),
+                    cargo: $('#cargoMod').val(),
+                    tel1: $('#tel1Mod').val(),
+                    tel2: $('#tel2Mod').val(),
+                    correoP: $('#correoPMod').val(),
+                    correoUSAT: $('#correoUSATMod').val(),
+                    estado: $('#estadoDocenteMod').val(),
+                    idGenero: $('#generoMod').val(),
+                    idTipoDoc: $('#tipoDocMod').val(),
+                    idUsuario: $('#usuarioMod').val(),
+                    idEscuela: $('#escuelaMod').val()
+                };
+                $.ajax({
+                    url: '/modificar_docente',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalDocente').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar el docente.");
+                    }
+                });
+            }
         });
 
         // Evento para Eliminar Docente

@@ -444,44 +444,6 @@
             $('#btnCerrar').hide();
             $('#modalEstudiante').modal('show');
         });
-        $('#formEstudiante').submit(function (e) {
-            e.preventDefault();
-            if ($('#idEstudianteMod').val() === '') {
-                var data = {
-                    numDoc: $('#numDocMod').val(),
-                    nombre: $('#nombreEstudianteMod').val(),
-                    apellidos: $('#apellidosEstudianteMod').val(),
-                    codUniversitario: $('#codUniversitarioMod').val(),
-                    tel1: $('#tel1Mod').val(),
-                    tel2: $('#tel2Mod').val(),
-                    correoP: $('#correoPMod').val(),
-                    correoUSAT: $('#correoUSATMod').val(),
-                    estado: $('#estadoEstudianteMod').val(),
-                    idGenero: $('#generoMod').val(),
-                    idTipoDoc: $('#tipoDocMod').val(),
-                    idUsuario: $('#usuarioMod').val(),
-                    idEscuela: $('#escuelaMod').val()
-                };
-                $.ajax({
-                    url: '/agregar_estudiante',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalEstudiante').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
-                    }
-                });
-            }
-        });
 
         // Evento para Modificar Estudiante
         $('#tabla-estudiante tbody').on('click', '.btnModificar', function () {
@@ -522,42 +484,79 @@
                 }
             });
         });
+        
         $('#formEstudiante').submit(function (e) {
             e.preventDefault();
-            var data = {
-                idPersona: $('#idEstudianteMod').val(),
-                numDoc: $('#numDocMod').val(),
-                nombre: $('#nombreEstudianteMod').val(),
-                apellidos: $('#apellidosEstudianteMod').val(),
-                codUniversitario: $('#codUniversitarioMod').val(),
-                tel1: $('#tel1Mod').val(),
-                tel2: $('#tel2Mod').val(),
-                correoP: $('#correoPMod').val(),
-                correoUSAT: $('#correoUSATMod').val(),
-                estado: $('#estadoEstudianteMod').val(),
-                idGenero: $('#generoMod').val(),
-                idTipoDoc: $('#tipoDocMod').val(),
-                idUsuario: $('#usuarioMod').val(),
-                idEscuela: $('#escuelaMod').val()
-            };
-            $.ajax({
-                url: '/modificar_estudiante',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalEstudiante').modal('hide');
+            if ($('#idEstudianteMod').val() === '') {
+                var data = {
+                    numDoc: $('#numDocMod').val(),
+                    nombre: $('#nombreEstudianteMod').val(),
+                    apellidos: $('#apellidosEstudianteMod').val(),
+                    codUniversitario: $('#codUniversitarioMod').val(),
+                    tel1: $('#tel1Mod').val(),
+                    tel2: $('#tel2Mod').val(),
+                    correoP: $('#correoPMod').val(),
+                    correoUSAT: $('#correoUSATMod').val(),
+                    estado: $('#estadoEstudianteMod').val(),
+                    idGenero: $('#generoMod').val(),
+                    idTipoDoc: $('#tipoDocMod').val(),
+                    idUsuario: $('#usuarioMod').val(),
+                    idEscuela: $('#escuelaMod').val()
+                };
+                $.ajax({
+                    url: '/agregar_estudiante',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalEstudiante').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al modificar el estudiante.");
-                }
-            });
+                });
+            } else {
+                var data = {
+                    idPersona: $('#idEstudianteMod').val(),
+                    numDoc: $('#numDocMod').val(),
+                    nombre: $('#nombreEstudianteMod').val(),
+                    apellidos: $('#apellidosEstudianteMod').val(),
+                    codUniversitario: $('#codUniversitarioMod').val(),
+                    tel1: $('#tel1Mod').val(),
+                    tel2: $('#tel2Mod').val(),
+                    correoP: $('#correoPMod').val(),
+                    correoUSAT: $('#correoUSATMod').val(),
+                    estado: $('#estadoEstudianteMod').val(),
+                    idGenero: $('#generoMod').val(),
+                    idTipoDoc: $('#tipoDocMod').val(),
+                    idUsuario: $('#usuarioMod').val(),
+                    idEscuela: $('#escuelaMod').val()
+                };
+                $.ajax({
+                    url: '/modificar_estudiante',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalEstudiante').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar el estudiante.");
+                    }
+                }); 
+            }
         });
 
         // Evento para Eliminar Estudiante
