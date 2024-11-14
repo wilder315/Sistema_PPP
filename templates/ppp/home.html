@@ -289,17 +289,38 @@
         function cerrarSesion() {
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '/login';
+            fetch('/logout', {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Hubo un error al cerrar sesión. Inténtalo de nuevo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cerrar sesión:', error);
+                alert('Hubo un problema al cerrar sesión.');
+            });
         }
+
         document.addEventListener('DOMContentLoaded', function () {
             var fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
             let usuario = localStorage.getItem('username') || sessionStorage.getItem('username');
-            if (fotoBase64) {
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                alert('Debes iniciar sesión para acceder a esta página.');
+                window.location.href = '/login';
+            } else {
+                if (fotoBase64) {
                 document.getElementById('github-profile-pic').src = 'data:image/jpeg;base64,' + fotoBase64;
             }
             if (usuario) {
                 document.getElementById('usernamenav').textContent = usuario;
             }
+            }         
         });
     </script>
     {% block scripts %}{% endblock %}

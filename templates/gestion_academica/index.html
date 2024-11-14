@@ -25,7 +25,6 @@
         flex-direction: column; 
         justify-content: center; 
         align-items: center;
-        main-height: 100%;  
         border-radius: 10px; 
         position: relative; 
         margin-bottom: 1px; /* Espacio inferior entre cajas */
@@ -211,6 +210,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
 
     <script>
+        
         // Verifica los datos en la consola
         console.log("Datos de registrosPorFecha:", {{ registrosPorFecha | tojson }});
         console.log("Datos de ppp_finalizadas:", {{ ppp_finalizadas | tojson }});
