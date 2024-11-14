@@ -231,6 +231,102 @@
             });
         }
 
+        // Función para cargar país, departamento, provincia, distrito según respuesta
+        function cargarPaisesRespuesta(selectedPaisId) {
+            $.ajax({
+                url: '/datos_paises',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var paisSelect = $('#paisMod');
+                    paisSelect.empty();
+                    paisSelect.append('<option value="" disabled selected>Seleccionar país</option>');
+                    response.forEach(function (pais) {
+                        var selected = parseInt(pais.idPais) === parseInt(selectedPaisId) ? 'selected' : '';  
+                        paisSelect.append(`<option value="${pais.idPais}" ${selected}>${pais.nombre}</option>`);
+                    });
+
+                    // Verificar si se pasó un país seleccionado y cargar sus departamentos
+                    if (selectedPaisId) {
+                        cargarDepartamentosRespuesta(selectedPaisId); // Cargar departamentos según el país seleccionado
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los países.");
+                }
+            });
+        }
+
+        function cargarDepartamentosRespuesta(idPais, selectedDepartamentoId = null) {
+            $.ajax({
+                url: `/datos_departamentos/${idPais}`,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var departamentoSelect = $('#departamentoMod');
+                    departamentoSelect.empty();
+                    departamentoSelect.append('<option value="" disabled selected>Seleccionar departamento</option>');
+                    response.forEach(function (departamento) {
+                        var selected = parseInt(departamento.idDepartamento) === parseInt(selectedDepartamentoId) ? 'selected' : '';  
+                        departamentoSelect.append(`<option value="${departamento.idDepartamento}" ${selected}>${departamento.nombre}</option>`);
+                    });
+
+                    // Verificar si se pasó un departamento seleccionado y cargar sus provincias
+                    if (selectedDepartamentoId) {
+                        cargarProvinciasRespuesta(selectedDepartamentoId); // Cargar provincias según el departamento seleccionado
+                    }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los departamentos.");
+                }
+            });
+    }
+
+        function cargarProvinciasRespuesta(idDepartamento, selectedProvinciaId = null) {
+            $.ajax({
+                url: `/datos_provincias/${idDepartamento}`,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var provinciaSelect = $('#provinciaMod');
+                    provinciaSelect.empty();
+                    provinciaSelect.append('<option value="" disabled selected>Seleccionar provincia</option>');
+                    response.forEach(function (provincia) {
+                        var selected = parseInt(provincia.idProvincia) === parseInt(selectedProvinciaId) ? 'selected' : '';  
+                        provinciaSelect.append(`<option value="${provincia.idProvincia}" ${selected}>${provincia.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar las provincias.");
+                }
+            });
+        }
+        $('#provinciaMod').on('change', function () {
+            var idProvincia = $(this).val();
+            $('#distritoMod').prop('disabled', false);
+            cargarDistritosRespuesta(idProvincia);
+        });
+        function cargarDistritosRespuesta(idProvincia, selectedDistritoId = null) {
+            $.ajax({
+                url: `/datos_distritos/${idProvincia}`,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var distritoSelect = $('#distritoMod');
+                    distritoSelect.empty();
+                    distritoSelect.append('<option value="" disabled selected>Seleccionar distrito</option>');
+                    response.forEach(function (distrito) {
+                        var selected = parseInt(distrito.idDistrito) === parseInt(selectedDistritoId) ? 'selected' : '';  
+                        distritoSelect.append(`<option value="${distrito.idDistrito}" ${selected}>${distrito.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los distritos.");
+                }
+            });
+        }
+        
+
         // Función para cargar los países dinámicamente
         function cargarPaises(selectedPaisId) {
             $.ajax({
@@ -388,10 +484,24 @@
                         $('#direccionMod').val(response.direccion);
                         $('#correoMod').val(response.correo);
                         $('#telMod').val(response.tel);
-                        cargarPaises(response.pais);
-                        cargarDepartamentos(response.departamento);
-                        cargarProvincias(response.provincia);
-                        cargarDistritos(response.distrito);
+                        // Cargar país y luego departamentos, provincias y distritos en secuencia
+                        cargarPaises();
+                        cargarPaisesRespuesta(response.pais); // Carga países y selecciona el correspondiente
+                        $('#paisMod').val(response.pais);
+                        $('#paisMod').trigger('change');
+
+                        // Al cargar países se selecciona y carga departamentos, luego provincias, y finalmente distritos
+                        $('#departamentoMod').on('loaded', function() {
+                            $('#departamentoMod').val(response.departamento);
+                            $('#departamentoMod').trigger('change');
+                        });
+                        $('#provinciaMod').on('loaded', function() {
+                            $('#provinciaMod').val(response.provincia);
+                            $('#provinciaMod').trigger('change');
+                        });
+                        $('#distritoMod').on('loaded', function() {
+                            $('#distritoMod').val(response.distrito);
+                        });
                         cargarJefes(response.jefe);
                         deshabilitarControles();
                         $('#btnCancelar').hide();
@@ -418,10 +528,7 @@
             $('#direccionMod').val('');
             $('#correoMod').val('');
             $('#telMod').val('');
-            cargarPaises();
-            cargarDepartamentos();
-            cargarProvincias();
-            cargarDistritos();
+            cargarPaisesRespuesta();
             cargarJefes();
             habilitarControles();
             $('#btnCancelar').show();

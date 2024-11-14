@@ -24,19 +24,19 @@ def datos_paises():
     paises = controlador_institucion.obtener_paises()
     return jsonify(paises)
 
-@router_institucion.route("/datos_departamentos", methods=["GET"])
-def datos_departamentos():
-    departamentos = controlador_institucion.obtener_departamentos()
+@router_institucion.route("/datos_departamentos/<int:idPais>", methods=["GET"])
+def datos_departamentos(idPais):
+    departamentos = controlador_institucion.obtener_departamentos(idPais)
     return jsonify(departamentos)
 
-@router_institucion.route("/datos_provincias", methods=["GET"])
-def datos_provincias():
-    provincias = controlador_institucion.obtener_provincias()
+@router_institucion.route("/datos_provincias/<int:idDepartamento>", methods=["GET"])
+def datos_provincias(idDepartamento):
+    provincias = controlador_institucion.obtener_provincias(idDepartamento)
     return jsonify(provincias)
 
-@router_institucion.route("/datos_distritos", methods=["GET"])
-def datos_distritos():
-    distritos = controlador_institucion.obtener_distritos()
+@router_institucion.route("/datos_distritos/<int:idProvincia>", methods=["GET"])
+def datos_distritos(idProvincia):
+    distritos = controlador_institucion.obtener_distritos(idProvincia)
     return jsonify(distritos)
 
 @router_institucion.route("/obtener_institucion_por_numdoc/<string:numDoc>", methods=["GET"])

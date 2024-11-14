@@ -1,4 +1,7 @@
 from bd import obtener_conexion
+import hashlib
+import random
+import string
 
 def obtener_usuarios():
     conexion = obtener_conexion()
@@ -27,7 +30,22 @@ def obtener_usuario_por_id(idUsuario):
     try:
         with conexion.cursor() as cursor:
             cursor.execute(
-            "SELECT u.idUsuario, u.username, u.password, u.estado, u.idTipoUsuario FROM usuario u WHERE idUsuario = %s", (idUsuario,))
+            """SELECT 
+                u.idUsuario, 
+                u.username, 
+                u.password, 
+                u.estado, 
+                u.idTipoUsuario,
+                CASE u.idTipoUsuario
+                    WHEN '3' THEN 'Practicante'
+                    WHEN '2' THEN 'Docente de Apoyo PPP'
+                    WHEN '1' THEN 'Director de Escuela'
+                    WHEN '4' THEN 'Jefe Directo'
+                    ELSE 'Otro'
+                END AS tipoUsuario
+            FROM 
+                usuario u
+            WHERE u.idUsuario = %s""", (idUsuario,))
             row = cursor.fetchone()
             if row:
                 columnas = [desc[0] for desc in cursor.description]
@@ -40,25 +58,39 @@ def obtener_usuario_por_id(idUsuario):
     finally:
         conexion.close()
 
-def agregar_usuario(username, password, estado, idTipoUsuario):
+def generar_contraseña():
+    letras = random.choices(string.ascii_letters, k=3)
+    numeros = random.choices(string.digits, k=3)
+    contraseña = ''.join(letras + numeros)
+    random.shuffle(list(contraseña))
+    return ''.join(contraseña)
+
+def agregar_usuario(username, estado, idTipoUsuario):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
+    
     try:
+        contraseña_generada = generar_contraseña()
+        h = hashlib.sha256()
+        h.update(contraseña_generada.encode('utf-8'))
+        password_cifrada = h.hexdigest()
+        
         with conexion.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO usuario (username, password, estado, idTipoUsuario)
                 VALUES (%s, %s, %s, %s)
-            """, (username, password, estado, idTipoUsuario))
+            """, (username, password_cifrada, estado, idTipoUsuario))
             conexion.commit()
-            return {"mensaje": "Usuario agregado correctamente"}
+            
+        return {"mensaje": "Usuario agregado correctamente", "contraseña": contraseña_generada}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
     finally:
         conexion.close()
 
-def modificar_usuario(idUsuario, username, password, estado, idTipoUsuario):
+def modificar_usuario(idUsuario, username, estado, idTipoUsuario):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -66,9 +98,9 @@ def modificar_usuario(idUsuario, username, password, estado, idTipoUsuario):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE usuario
-                SET username = %s, password = %s, estado = %s, idTipoUsuario = %s
+                SET username = %s, estado = %s, idTipoUsuario = %s
                 WHERE idUsuario = %s
-            """, (username, password, estado, idTipoUsuario, idUsuario))
+            """, (username, estado, idTipoUsuario, idUsuario))
             conexion.commit()
             return {"mensaje": "Usuario modificado correctamente"}
     except Exception as e:

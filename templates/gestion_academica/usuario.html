@@ -20,7 +20,6 @@
                         <tr>
                             <th class="text-center">ID</th>
                             <th style="width: 22%" class="text-center">Username</th>
-                            <th class="text-center">Contraseña</th>
                             <th class="text-center">Estado</th>
                             <th class="text-center">Tipo</th>
                             <th class="text-center">Opciones</th>
@@ -48,13 +47,9 @@
                     <input type="hidden" id="idUsuarioMod" name="idUsuarioMod">
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="mb-3">
                             <label for="usernameMod" class="form-label">Username:</label>
                             <input type="text" class="form-control" id="usernameMod" name="usernameMod" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="passwordMod" class="form-label">Contraseña:</label>
-                            <input type="text" class="form-control" id="passwordMod" name="passwordMod" required>
                         </div>
                     </div>
                     
@@ -74,8 +69,9 @@
                             </select>
                         </div>
                     </div>
-        
+
                     <div class="text-end">
+                        <button type="button" class="btn btn-primary" id="btnVerContraseña">Ver Contraseña</button>
                         <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
@@ -165,9 +161,23 @@
             columns: [
                 { data: "idUsuario", className: 'text-center' },
                 { data: "username" },
-                { data: "password", className: 'text-center' },
                 { data: "estado", className: 'text-center', render: data => data === 'A' ? 'Activo' : 'Inactivo' },
-                { data: "tipo" , className: 'text-center'},
+                { data: "tipo" , className: 'text-center', 
+                    render: function(data) {
+                        switch(data) {
+                            case 'P':
+                                return 'Practicante';
+                            case 'DAP':
+                                return 'Docente de Apoyo PPP';
+                            case 'DE':
+                                return 'Director de Escuela';
+                            case 'JD':
+                                return 'Jefe Directo';
+                            default:
+                                return 'Otro';
+                        }
+                    } 
+                },
                 {
                     data: null,
                     className: 'text-center',
@@ -222,7 +232,6 @@
         function deshabilitarControles(){
             $('#idUsuarioMod').prop('disabled', true);
             $('#usernameMod').prop('disabled', true);
-            $('#passwordMod').prop('disabled', true);
             $('#estadoUsuarioMod').prop('disabled', true);
             $('#tipoMod').prop('disabled', true);
         }
@@ -231,7 +240,6 @@
         function habilitarControles(){
             $('#idUsuarioMod').prop('disabled', false);
             $('#usernameMod').prop('disabled', false);
-            $('#passwordMod').prop('disabled', false);
             $('#estadoUsuarioMod').prop('disabled', false);
             $('#tipoMod').prop('disabled', false);
         }
@@ -251,10 +259,10 @@
                         $('#formUsuario')[0].reset();
                         $('#idUsuarioMod').val(response.idUsuario);
                         $('#usernameMod').val(response.username);
-                        $('#passwordMod').val(response.password);
                         $('#estadoUsuarioMod').val(response.estado);
                         cargarTipoUsuarios(response.idTipoUsuario);
                         deshabilitarControles();
+                        $('#btnVerContraseña').show();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
@@ -274,7 +282,6 @@
             $('#formUsuario')[0].reset();
             $('#idUsuarioMod').val('');
             $('#usernameMod').val('');
-            $('#passwordMod').val('');
             $('#estadoUsuarioMod').val('');
             $('#tipoMod').val('');
             cargarTipoUsuarios();
@@ -289,7 +296,6 @@
             if ($('#idUsuarioMod').val() === '') {
                 var data = {
                     username: $('#usernameMod').val(),
-                    password: $('#passwordMod').val(),
                     estado: $('#estadoUsuarioMod').val(),
                     idTipoUsuario: $('#tipoMod').val(),
                 };
@@ -329,7 +335,6 @@
                         $('#formUsuario')[0].reset();
                         $('#idUsuarioMod').val(response.idUsuario);
                         $('#usernameMod').val(response.username);
-                        $('#passwordMod').val(response.password);
                         $('#estadoUsuarioMod').val(response.estado);
                         cargarTipoUsuarios(response.idTipoUsuario);
                         habilitarControles();
@@ -349,7 +354,6 @@
             var data = {
                 idUsuario: $('#idUsuarioMod').val(),
                 username: $('#usernameMod').val(),
-                password: $('#passwordMod').val(),
                 estado: $('#estadoUsuarioMod').val(),
                 idTipoUsuario: $('#tipoMod').val(),               
             };

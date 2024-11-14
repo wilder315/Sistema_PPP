@@ -192,7 +192,7 @@ def obtener_paises():
         conexion.close()
     return paises
 
-def obtener_departamentos():
+def obtener_departamentos(idPais):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."} 
@@ -202,9 +202,9 @@ def obtener_departamentos():
             cursor.execute(
                 """
                 SELECT d.idDepartamento, d.nombre
-                FROM departamento d 
+                FROM departamento d WHERE d.idPais = %s
                 ORDER BY d.nombre ASC
-            """
+            """, (idPais,)
             )
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
@@ -218,7 +218,7 @@ def obtener_departamentos():
         conexion.close()
     return departamentos
 
-def obtener_provincias():
+def obtener_provincias(idDepartamento):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."} 
@@ -228,9 +228,9 @@ def obtener_provincias():
             cursor.execute(
                 """
                 SELECT p.idProvincia, p.nombre
-                FROM provincia p 
+                FROM provincia p WHERE p.idDepartamento = %s
                 ORDER BY p.nombre ASC
-            """
+            """, (idDepartamento,)
             )
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
@@ -244,7 +244,7 @@ def obtener_provincias():
         conexion.close()
     return provincias
 
-def obtener_distritos():
+def obtener_distritos(idProvincia):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."} 
@@ -254,9 +254,9 @@ def obtener_distritos():
             cursor.execute(
                 """
                 SELECT d.idDistrito, d.nombre
-                FROM distrito d 
+                FROM distrito d WHERE d.idProvincia = %s
                 ORDER BY d.nombre ASC
-            """
+            """, (idProvincia,)
             )
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()

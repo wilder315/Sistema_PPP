@@ -25,20 +25,18 @@ def obtener_usuario_por_id(idUsuario):
 @router_usuario.route("/agregar_usuario", methods=["POST"])
 def agregar_usuario():
     username = request.json.get('username')
-    password = request.json.get('password')
     estado = request.json.get('estado')
     idTipoUsuario = request.json.get('idTipoUsuario')
-    resultado = controlador_usuario.agregar_usuario(username, password, estado, idTipoUsuario)
+    resultado = controlador_usuario.agregar_usuario(username, estado, idTipoUsuario)
     return jsonify(resultado)
 
 @router_usuario.route("/modificar_usuario", methods=["POST"])
 def modificar_usuario():
     idUsuario = request.json.get('idUsuario')
     username = request.json.get('username')
-    password = request.json.get('password')
     estado = request.json.get('estado')
     idTipoUsuario = request.json.get('idTipoUsuario')
-    resultado = controlador_usuario.modificar_usuario(idUsuario, username, password, estado, idTipoUsuario)
+    resultado = controlador_usuario.modificar_usuario(idUsuario, username, estado, idTipoUsuario)
     return jsonify(resultado)
 
 @router_usuario.route("/dar_de_baja_usuario", methods=["POST"])
