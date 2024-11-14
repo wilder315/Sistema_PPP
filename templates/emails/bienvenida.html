@@ -1,58 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <style>
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            font-family: Arial, sans-serif;
-        }
-        .header {
-            background-color: #003366;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .content {
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: #666;
-        }
-        .logo {
-            max-width: 150px;
-            margin-bottom: 20px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>¡Bienvenido al Sistema de PPP - USAT!</h1>
-        </div>
-        <div class="content">
-            <h2>Hola {{ nombre }} {{ apellidos }},</h2>
-            <p>Te damos la bienvenida al Sistema de Prácticas Pre-Profesionales de la USAT.</p>
-            {% if codigo %}
-            <p>Tu código universitario es: <strong>{{ codigo }}</strong></p>
-            {% endif %}
-            <p>En este sistema podrás:</p>
-            <ul>
-                <li>Gestionar tus prácticas pre-profesionales</li>
-                <li>Subir documentos importantes</li>
-                <li>Hacer seguimiento de tu progreso</li>
-                <li>Comunicarte con tu supervisor</li>
-            </ul>
-            <p>Si tienes alguna duda, no dudes en contactarnos.</p>
-        </div>
-        <div class="footer">
-            <p>Universidad Católica Santo Toribio de Mogrovejo</p>
-            <p>Sistema de Prácticas Pre-Profesionales</p>
-        </div>
-    </div>
+    <h1>Bienvenido, {{ nombre }} {{ apellidos }}</h1>
+    <p>Te damos la bienvenida al Sistema de Prácticas Pre-Profesionales.</p>
+    <p>Estos son tus datos de acceso:</p>
+    <ul>
+        <li><strong>Usuario:</strong> {{ codigo }}</li>
+        <li><strong>Contraseña:</strong> {{ contrasena }}</li>  <!-- Aquí se debe mostrar la contraseña -->
+    </ul>
+    <p>Te recomendamos cambiar tu contraseña una vez que ingreses al sistema.</p>
+    <p>Atentamente,<br>Equipo de Prácticas Pre-Profesionales</p>
 </body>
 </html>

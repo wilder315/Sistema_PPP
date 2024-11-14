@@ -38,10 +38,7 @@ def enviar_correo_masivo():
                 "message": "El asunto y contenido son requeridos"
             }), 400
 
-        resultado = controlador.enviar_correo_masivo(
-            asunto=asunto,
-            contenido=contenido
-        )
+        resultado = controlador.enviar_correo_masivo(asunto=asunto, contenido=contenido)
         return jsonify(resultado)
     except Exception as e:
         return jsonify({
