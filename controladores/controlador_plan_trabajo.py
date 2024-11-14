@@ -22,7 +22,7 @@ def obtener_plan_trabajo():
     
     return plan_trabajo
 
-def agregar_tipopractica(semana, fechaInicio, fechaFin, actividades, horas, idInforme):
+def agregar_plan_trabajo(semana, fechaInicio, fechaFin, actividades, horas, idInforme):
     #validaciones 
     if not semana or not fechaInicio or not fechaFin or not actividades or not horas or not idInforme: 
         return {"error": "Todos los campos son requeridos."}
