@@ -106,15 +106,16 @@ def index():
 
 @router_main.route("/indexga")
 def gestion_academica():
-    registros_por_fecha = obtener_estudiantes_por_fecha() or []
-    estadisticas = obtener_estadisticas_estudiantes()
-    ppp_finalizadas = obtener_ppp_finalizadas()
-    return render_template("gestion_academica/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
+    
+    return render_template("gestion_academica/index.html")
 
 
 @router_main.route("/indexppp")
 def practicas_pre_profesionales():
-    return render_template("/ppp/index.html")
+    registros_por_fecha = obtener_estudiantes_por_fecha() or []
+    estadisticas = obtener_estadisticas_estudiantes()
+    ppp_finalizadas = obtener_ppp_finalizadas()
+    return render_template("/ppp/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
 
 @router_main.route('/home')
 def home():
