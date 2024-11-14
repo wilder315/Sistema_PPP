@@ -1,7 +1,10 @@
 from bd import obtener_conexion
-import hashlib
-import random
-import string
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.backends import default_backend
+import hashlib, random, string, base64, os
+
+AES_KEY = b'\xe3\x93\xafR\x81\x12\xe5\xa3\x0b\xedH\xfb\xab\xf8J\x92\xae\x18\xbf\x9c\xef\x1e\xe7\xb1'
 
 def obtener_usuarios():
     conexion = obtener_conexion()
@@ -65,24 +68,60 @@ def generar_contraseña():
     random.shuffle(list(contraseña))
     return ''.join(contraseña)
 
-def agregar_usuario(username, estado, idTipoUsuario):
+def cifrar_contraseña(password):
+    iv = os.urandom(16)
+    cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    padder = padding.PKCS7(128).padder()
+    padded_password = padder.update(password.encode()) + padder.finalize()
+    encrypted_password = encryptor.update(padded_password) + encryptor.finalize()
+    return base64.b64encode(iv + encrypted_password).decode()
+
+def descifrar_contraseña(encrypted_password):
+    encrypted_data = base64.b64decode(encrypted_password)
+    iv = encrypted_data[:16]
+    encrypted_password = encrypted_data[16:]
+    cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    decrypted_padded_password = decryptor.update(encrypted_password) + decryptor.finalize()
+    unpadder = padding.PKCS7(128).unpadder()
+    decrypted_password = unpadder.update(decrypted_padded_password) + unpadder.finalize()
+    return decrypted_password.decode()
+
+def actualizar_contraseña(id_usuario, nueva_password_cifrada):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-    
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE usuario
+                SET password = %s
+                WHERE idUsuario = %s
+            """, (nueva_password_cifrada, id_usuario))
+            conexion.commit()
+            return {"mensaje": "Contraseña actualizada correctamente."}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+
+def agregar_usuario(username, estado, idTipoUsuario):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
     try:
         contraseña_generada = generar_contraseña()
-        h = hashlib.sha256()
-        h.update(contraseña_generada.encode('utf-8'))
-        password_cifrada = h.hexdigest()
+        password_cifrada = cifrar_contraseña(contraseña_generada)
         
         with conexion.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO usuario (username, password, estado, idTipoUsuario)
                 VALUES (%s, %s, %s, %s)
             """, (username, password_cifrada, estado, idTipoUsuario))
-            conexion.commit()
-            
+            conexion.commit()         
         return {"mensaje": "Usuario agregado correctamente", "contraseña": contraseña_generada}
     except Exception as e:
         conexion.rollback()
