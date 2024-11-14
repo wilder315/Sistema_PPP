@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, make_response, session
+from flask import Blueprint, render_template, request, redirect, jsonify, make_response, session, url_for, flash
 from werkzeug.utils import secure_filename
 from bd import obtener_conexion
 from bd import obtener_conexion
+from functools import wraps
 import controladores.controlador_usuario as controlador_usuario
 import controladores.controlador_informeAlumno as controlador_informeAlumno
-import time, hashlib
+import time
 from controladores.controlador_estudiante import obtener_estudiantes_por_fecha, obtener_estadisticas_estudiantes, obtener_ppp_finalizadas
 
 login_attempts = {}
@@ -18,6 +19,16 @@ AES_KEY = b'\xe3\x93\xafR\x81\x12\xe5\xa3\x0b\xedH\xfb\xab\xf8J\x92\xae\x18\xbf\
 def login():
     return render_template("/dashboard/login.html")
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Verificar si el usuario ha iniciado sesión
+        if 'user_id' not in session:
+            flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
+            return redirect(url_for('router_main.login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @router_main.route("/procesar_login", methods=["POST"])
 def procesar_login():
     try:
@@ -27,59 +38,23 @@ def procesar_login():
                 'logeo': False,
                 'mensaje': 'El servicio se encuentra inactivo.'
             }), 500
-
         username = request.json.get('username')
         password = request.json.get('password')
         usuario = controlador_usuario.obtener_usuario_con_tipopersona_por_username(username)
-
-        # Inicializar intentos de login
-        if username not in login_attempts:
-            login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
-
-        # Verificar si el usuario está bloqueado
-        if login_attempts[username]['attempts'] >= 3 and (time.time() - login_attempts[username]['last_attempt_time']) < 300:
-            return jsonify({'mensaje': 'Cuenta bloqueada. Intente de nuevo más tarde.', 'logeo': False})
-
-        # Validar existencia del usuario
         if usuario is None:
             return jsonify({'mensaje': 'El usuario no existe', 'logeo': False})
         elif usuario[2] == "I":
             return jsonify({'mensaje': 'El usuario está inactivo', 'logeo': False})
-
-        # Obtener contraseña cifrada desde la base de datos
-        password_db = usuario[3]
-
-        # Verificar contraseña con SHA-256 (para usuarios antiguos)
-        h = hashlib.sha256()
-        h.update(password.encode('utf-8'))
-        password_hash = h.hexdigest()
-
         try:
-            # Intentar descifrar con AES (para usuarios nuevos)
-            password_descifrada = controlador_usuario.descifrar_contraseña(password_db)
-            es_aes = True
-        except Exception:
-            # No se pudo descifrar, significa que es un hash SHA-256
-            password_descifrada = None
-            es_aes = False
-
-        # Validar contraseña
-        if password_hash == password_db or password == password_descifrada:
-            # Restablecer intentos de login
+            password_almacenada = controlador_usuario.descifrar_contraseña(usuario[3])
+        except Exception as e:
+            return jsonify({'mensaje': f'Error al descifrar la contraseña: {str(e)}', 'logeo': False})
+        if password == password_almacenada:
             login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
-
-            # Si la verificación fue con SHA-256, actualizar la contraseña con AES
-            if not es_aes:
-                nueva_password_cifrada = controlador_usuario.cifrar_contraseña(password)
-                controlador_usuario.actualizar_contraseña(usuario[0], nueva_password_cifrada)
-
-            # Obtener datos del usuario
             persona = controlador_usuario.obtener_datos_usuario(usuario[0])
             nombre = persona[0].split()[0]
             apellido = persona[1].split()[0]
             foto = persona[2]
-
-            # Iniciar sesión
             session['user_id'] = usuario[0]
             return jsonify({
                 'logeo': True,
@@ -87,16 +62,15 @@ def procesar_login():
                 'apellido': apellido,
                 'foto': foto
             })
-
         else:
-            # Incrementar intentos de login
+            if username not in login_attempts:
+                login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
             login_attempts[username]['attempts'] += 1
             login_attempts[username]['last_attempt_time'] = time.time()
-            return jsonify({'mensaje': 'La contraseña es incorrecta', 'logeo': False})
 
+            return jsonify({'mensaje': 'La contraseña es incorrecta', 'logeo': False})
     except Exception as e:
         return jsonify({'mensaje': f'Error al procesar el login: {str(e)}', 'logeo': False})
-
 
 # Principal
 
