@@ -136,31 +136,39 @@
                 <ul class="sidebar-nav">
                     <li class="sidebar-header">
                         Módulo de Prácticas Pre Profesionales
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}">
-                            <i class="far fa-file fa-lg"></i>
-                            <span class="align-middle">Informe Inicial Estudiante</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEmpresa') }}">
-                            <i class="fas fa-file fa-lg"></i>
-                            <span class="align-middle">Informe Inicial Empresa</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEstudiante') }}">
-                            <i class="far fa-file-alt fa-lg"></i>
-                            <span class="align-middle">Informe Final Estudiante</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEmpresa') }}">
-                            <i class="fas fa-file-alt fa-lg"></i>
-                            <span class="align-middle">Informe Final Empresa</span>
-                        </a>
-                    </li>        
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="#" data-bs-toggle="collapse" data-bs-target="#informesDropdown" aria-expanded="false" aria-controls="informesDropdown">
+                                <i class="fas fa-file-alt fa-lg"></i>
+                                <span class="align-middle">Informes</span>
+                            </a>
+                            <ul class="collapse sidebar-submenu" id="informesDropdown">
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}">
+                                        <i class="far fa-file fa-lg"></i>
+                                        <span class="align-middle">Informe Inicial Estudiante</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEmpresa') }}">
+                                        <i class="fas fa-file fa-lg"></i>
+                                        <span class="align-middle">Informe Inicial Empresa</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEstudiante') }}">
+                                        <i class="far fa-file-alt fa-lg"></i>
+                                        <span class="align-middle">Informe Final Estudiante</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEmpresa') }}">
+                                        <i class="fas fa-file-alt fa-lg"></i>
+                                        <span class="align-middle">Informe Final Empresa</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}">
                             <i class="fas fa-graduation-cap fa-lg"></i>
