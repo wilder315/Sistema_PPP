@@ -152,6 +152,11 @@ def semestre():
 def usuario():
     return render_template('gestion_academica/usuario.html')
 
+@router_main.route("/linea_desarrollo")
+@login_required
+def linea_desarrollo():
+    return render_template('gestion_academica/linea_desarrollo.html')
+
 # Módulo de Prácticas Pre Profesionales
 
 @router_main.route('/ppp_registro')

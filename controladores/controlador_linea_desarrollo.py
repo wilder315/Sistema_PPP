@@ -22,6 +22,25 @@ def obtener_lineas_desarrollo():
     
     return lineas_desarrollo
 
+def obtener_linea_desarrollo_por_id(idLinea):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}    
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT * FROM linea_desarrollo WHERE idLinea = %s", (idLinea,))
+            row = cursor.fetchone()
+            if row:
+                columnas = [desc[0] for desc in cursor.description]
+                linea_desarrollo_dict = dict(zip(columnas, row))
+                return linea_desarrollo_dict
+            else:
+                return {"error": "Facultad no encontrada"}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
 
 def agregar_linea_desarrollo(nombre, estado, idEscuela):
     #validaciones 
@@ -43,4 +62,57 @@ def agregar_linea_desarrollo(nombre, estado, idEscuela):
         conexion.rollback()
         return {"error": str(e)}
     finally: 
+        conexion.close()
+
+def modificar_linea_desarrollo(idLinea, nombre, estado, idEscuela):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE linea_desarrollo 
+                SET nombre = %s, estado = %s, idEscuela = %s 
+                WHERE idLinea = %s
+            """, (nombre, estado, idEscuela, idLinea))
+            conexion.commit()
+            return {"mensaje": "Línea de desarrollo modificada correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def eliminar_linea_desarrollo(idLinea):
+    if not idLinea:
+        return {"error": "El ID de la Línea es requerido."}
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM linea_desarrollo WHERE idLinea = %s", (idLinea,))
+            conexion.commit()
+            return {"mensaje": "Linea de desarrollo eliminada correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def dar_de_baja_linea_desarrollo(idLinea):
+    if not idLinea:
+        return {"error": "El ID de la Línea es requerido."}
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("UPDATE linea_desarrollo SET estado = 'I' WHERE idLinea = %s", (idLinea,))
+            conexion.commit()
+            return {"mensaje": "Línea de desarrollo dado de baja correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
         conexion.close()
