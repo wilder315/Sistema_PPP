@@ -89,7 +89,6 @@ def index():
 @router_main.route("/indexga")
 @login_required
 def gestion_academica():
-    
     return render_template("gestion_academica/index.html")
 
 

@@ -18,13 +18,13 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tabla-facultad" class="table table-striped tabla-facultades" style="width:100%">
+                <table id="table-linea" class="table table-striped table-lineaes" style="width:100%">
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
                             <th class="text-center">Nombre</th>
-                            <th class="text-center">Estado</th>
                             <th class="text-center">Escuela</th>
+                            <th class="text-center">Estado</th>
                             <th class="text-center">Opciones</th>
                         </tr>
                     </thead>
@@ -38,7 +38,7 @@
 </div>
 
 <!-- MODAL FACULTAD -->
-<div class="modal fade" id="modalFacultad" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalLineaDesarrollo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -46,15 +46,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formFacultad">
-                    <input type="hidden" id="idFacultadMod" name="idFacultadMod">
+                <form id="formLineaDesarrollo">
+                    <input type="hidden" id="idLineaMod" name="idLineaMod">
                     <div class="mb-3">
-                        <label for="nombreFacultadMod" class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="nombreFacultadMod" name="nombreFacultadMod" required>
+                        <label for="nombreLineaMod" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombreLineaMod" name="nombreLineaMod" required>
                     </div>
                     <div class="mb-3">
-                        <label for="abreviaturaFacultadMod" class="form-label">Abreviatura:</label>
-                        <input type="text" class="form-control" id="abreviaturaFacultadMod" name="abreviaturaFacultadMod" required>
+                        <label for="escuelaLineaMod" class="form-label">Escuela:</label>
+                        <select class="form-control" id="escuelaLineaMod" name="escuelaLineaMod" required>
+                            <option value="" disabled selected>Seleccionar escuela</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="estadoMod" class="form-label">Estado:</label>
@@ -84,12 +86,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p><span id="texto-confirmar"></span><strong id="nombreFacultadConfirmar"></strong>?</p>
-                <input type="hidden" id="idFacultadConfirmar" name="idFacultadConfirmar">
+                <p><span id="texto-confirmar"></span><strong id="nombreLineaConfirmar"></strong>?</p>
+                <input type="hidden" id="idLineaConfirmar" name="idLineaConfirmar">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="confirmarFacultad">Aceptar</button>
+                <button type="button" class="btn btn-success" id="confirmarLinea">Aceptar</button>
             </div>
         </div>
     </div>
@@ -108,10 +110,10 @@
 
 <script>
     $(document).ready(function () {
-        if ($.fn.DataTable.isDataTable('#tabla-facultad')) {
-            $('#tabla-facultad').DataTable().clear().destroy();
+        if ($.fn.DataTable.isDataTable('#table-linea')) {
+            $('#table-linea').DataTable().clear().destroy();
         }
-        var table = $('#tabla-facultad').DataTable({
+        var table = $('#table-linea').DataTable({
             paging: true,
             pageLength: 10,
             lengthMenu: [5, 10, 15, 20],
@@ -123,12 +125,12 @@
             dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
             buttons: [
                 {
-                    text: '<i class="fas fa-plus"></i> Agregar Nueva Facultad   ',
+                    text: '<i class="fas fa-plus"></i> Agregar Nueva Linea de desarrollo  ',
                     className: 'btnAgregar btn btn-primary mb-2',
                     action: function (e, dt, node, config) {
                         e.preventDefault();
-                        $('#formFacultad')[0].reset();
-                        $('#modalFacultad').modal('show');
+                        $('#formLinea')[0].reset();
+                        $('#modalLinea').modal('show');
                     }
                 },   
                 {
@@ -147,16 +149,16 @@
                 
             ],
             ajax: {
-                url: "/datos_facultades",
+                url: "/datos_lineas_desarrollo",
                 type: "GET",
                 dataSrc: ""
             },
             processing: true,
             serverSide: false,
             columns: [
-                { data: "idFacultad", className: 'text-center' },
+                { data: "idLinea", className: 'text-center' },
                 { data: "nombre"},
-                { data: "abreviatura", className: 'text-center'},
+                { data: "Escuela", className: 'text-center'},
                 { 
                     data: "estado",
                     className: 'text-center',
@@ -169,10 +171,10 @@
                     className: 'text-center',
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-primary btn-sm btnVer" data-id="${row.idFacultad}" title="Ver"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idFacultad}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idFacultad}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
-                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idFacultad}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
+                            <button class="btn btn-primary btn-sm btnVer" data-id="${row.idLinea}" title="Ver"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idLinea}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idLinea}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idLinea}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
                 }
@@ -193,44 +195,64 @@
             });
         }
 
+        function cargarEscuelas(selectedEscuelaId) {
+            $.ajax({
+                url: '/datos_escuelas',
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (response) {
+                    var escuelaSelect = $('#escuelaLineaMod');
+                    escuelaSelect.empty();
+                    escuelaSelect.append('<option value="" disabled selected>Seleccionar escuela</option>');
+                    response.forEach(function (escuela) {
+                        var selected = escuela.idEscuela == selectedEscuelaId ? 'selected' : '';
+                        escuelaSelect.append(`<option value="${escuela.idEscuela}" ${selected}>${escuela.nombre}</option>`);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar las escuelas.");
+                }
+            });
+        }
+
         // Función para deshabilitar los controles
         function deshabilitarControles(){
-            $('#idFacultadMod').prop('disabled', true);
-            $('#nombreFacultadMod').prop('disabled', true);
-            $('#abreviaturaFacultadMod').prop('disabled', true);
+            $('#idLineaMod').prop('disabled', true);
+            $('#nombreLineaMod').prop('disabled', true);
+            $('#escuelaLineaMod').prop('disabled', true);
             $('#estadoMod').prop('disabled', true);
         }
 
         // Función para habilitar los controles
         function habilitarControles(){
-            $('#idFacultadMod').prop('disabled', false);
-            $('#nombreFacultadMod').prop('disabled', false);
-            $('#abreviaturaFacultadMod').prop('disabled', false);
+            $('#idLineaMod').prop('disabled', false);
+            $('#nombreEscuelaMod').prop('disabled', false);
+            $('#escuelaLineaMod').prop('disabled', false);
             $('#estadoMod').prop('disabled', false);
         }
 
-        // Evento para Ver Facultad
-        $('#tabla-facultad tbody').on('click', '.btnVer', function () {
+        // Evento para Ver Linea de desarrollo
+        $('#table-linea tbody').on('click', '.btnVer', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_facultad_por_id/' + id,
+                url: '/obtener_linea_desarrollo_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Ver Facultad");
-                        $('#formFacultad')[0].reset();
-                        $('#idFacultadMod').val(response.idFacultad);
-                        $('#nombreFacultadMod').val(response.nombre);
-                        $('#abreviaturaFacultadMod').val(response.abreviatura);
+                        $('#modal-title').text("Ver Linea de desarrollo");
+                        $('#formLineaDesarrollo')[0].reset();
+                        $('#idLineadMod').val(response.idLinea);
+                        $('#nombreLineaMod').val(response.nombre);
                         $('#estadoMod').val(response.estado);
+                        cargarEscuelas(response.idEscuela);
                         deshabilitarControles();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
-                        $('#modalFacultad').modal('show');
+                        $('#modalLineaDesarrollo').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
@@ -243,49 +265,49 @@
         $(document).on('click', '.btnAgregar', function (e) {
             e.preventDefault();
             $('#modal-title').text("Agregar Facultad");
-            $('#formFacultad')[0].reset();
-            $('#idFacultadMod').val('');
-            $('#nombreFacultadMod').val('');
-            $('#abreviaturaFacultadMod').val('');
+            $('#formLinea')[0].reset();
+            $('#idLineaMod').val('');
+            $('#nombreLineaMod').val('');
+            $('#escuelaLineaMod').val('');
             $('#estadoMod').val('');
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
-            $('#modalFacultad').modal('show');
+            $('#modalLinea').modal('show');
         });
 
         // Evento para Modificar Facultad
-        $('#tabla-facultad tbody').on('click', '.btnModificar', function () {
+        $('#table-linea tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_facultad_por_id/' + id,
+                url: '/obtener_linea_desarrollo_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Modificar Facultad");
-                        $('#formFacultad')[0].reset();
-                        $('#idFacultadMod').val(response.idFacultad);
-                        $('#nombreFacultadMod').val(response.nombre);
-                        $('#abreviaturaFacultadMod').val(response.abreviatura);
+                        $('#modal-title').text("Modificar Linea de desarrollo");
+                        $('#formLinea')[0].reset();
+                        $('#idLineaMod').val(response.idLineaMod);
+                        $('#nombreLineaMod').val(response.nombre);
+                        $('#escuelaLineaMod').val(response.Escuela);
                         $('#estadoMod').val(response.estado);
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
-                        $('#modalFacultad').modal('show');
+                        $('#modalLinea').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al obtener la facultad.");
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener la linea de desarrollo.");
                 }
             });
         });
 
-        $('#formFacultad').submit(function (e) {
+        $('#formLinea').submit(function (e) {
             e.preventDefault();
             if ($('#idFacultadMod').val() === '') {
                 var data = {
@@ -304,7 +326,7 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalFacultad').modal('hide');
+                            $('#modalLinea').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
@@ -329,7 +351,7 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalFacultad').modal('hide');
+                            $('#modalLinea').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
@@ -340,7 +362,7 @@
         });
 
         // Evento para Eliminar Facultad
-        $('#tabla-facultad tbody').on('click', '.btnEliminar', function () {
+        $('#table-linea tbody').on('click', '.btnEliminar', function () {
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
             $('#modal-title-confirmar').text('Eliminar Facultad');
@@ -352,7 +374,7 @@
         });
 
         // Evento para Dar de Baja Facultad
-        $('#tabla-facultad tbody').on('click', '.btnDarDeBaja', function () {
+        $('#table-linea tbody').on('click', '.btnDarDeBaja', function () {
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
             $('#modal-title-confirmar').text('Dar de Baja Facultad');
@@ -398,6 +420,8 @@
                 }
             });
         });
+
+        
 
     });
 </script>

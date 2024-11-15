@@ -1,4 +1,21 @@
 {% extends "gestion_academica/home.html" %}
+
+<head>  
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://unpkg.com/ionicons@5.5.2/dist/css/ionicons.min.css">
+
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
+</head> 
 {% block titulo %} Inicio {% endblock %}
 {% block contenido %}
 
@@ -8,7 +25,7 @@
         flex-direction: column; 
         justify-content: center; 
         align-items: center;
-        main-height: 100%;  
+        max-height: 100%;  
         border-radius: 10px; 
         position: relative; 
         margin-bottom: 1px; /* Espacio inferior entre cajas */
@@ -78,130 +95,5 @@
     <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jquery.vmap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
 
-    <script>
-        // Verifica los datos en la consola
-        console.log("Datos de registrosPorFecha:", {{ registrosPorFecha | tojson }});
-        console.log("Datos de ppp_finalizadas:", {{ ppp_finalizadas | tojson }});
     
-    /**# Gráfico de lineas */   
-        var registrosPorFecha = {{ registrosPorFecha | tojson}}; 
-
-        var nombres = registrosPorFecha.map(r => r.nombre); // Eje x: nombres de los semestres
-        var total_ids = registrosPorFecha.map(r => r.total_id); // Eje y: total de estudiantes registrados
-    
-        var ctxRevenue = document.getElementById('revenue-chart-canvas').getContext('2d');
-        var revenueChart = new Chart(ctxRevenue, {
-            type: 'line',
-            data: {
-                labels: nombres, // Eje x
-                datasets: [{
-                    label: 'Estudiantes Registrados por Semestre Académico',
-                    data: total_ids, // Eje y
-                    borderColor: 'rgba(60,141,188,0.8)',
-                    backgroundColor: 'rgba(60,141,188,0.4)',
-                    fill: true, 
-                    tension: 0.4,
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'category',
-                        title: {
-                            display: true,
-                            text: 'Ciclo'
-                        },
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 7
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Cantidad de Estudiantes'
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) { return Number.isInteger(value) ? value : null; }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                }
-            }
-        });
-        
-
-    /**# Gráfico de Torta */
-        const totalConFecha = {{ ppp_finalizadas['total_con_fecha']}}; 
-        const totalSinFecha = {{ ppp_finalizadas['total_sin_fecha']}}; 
-
-        //Configuración el gráfico usando Chart.js
-        const ctx = document.getElementById('donutChart').getContext('2d');
-        const donutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Prácticas Finalizadas', 'Prácticas Iniciadas'],
-                datasets: [{
-                    label: 'Prácticas Preprofesionales',
-                    data: [totalConFecha, totalSinFecha],
-                    backgroundColor: [
-                        'rgba(0, 123, 255, 0.7)',  // Azul fuerte para 'Con Fecha'
-                        'rgba(255, 165, 0, 0.7)'   // Anaranjado para 'Sin Fecha'
-                    ],
-                    borderColor: [
-                        'rgba(0, 123, 255, 1)',
-                        'rgba(255, 165, 0, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.raw;
-                            }
-                        }
-                    },
-                    datalabels: {
-                        color: '#fff',
-                        font: {
-                            size: 22,
-                            weight: 'bold'
-                        },
-                        formatter: (value, ctx) => {
-                            return value; // Muestra el valor directamente en el gráfico
-                        }
-                    }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
-
-        
-    </script>
 {% endblock %}
