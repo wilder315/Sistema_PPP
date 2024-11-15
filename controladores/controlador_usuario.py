@@ -61,6 +61,14 @@ def obtener_usuario_por_id(idUsuario):
     finally:
         conexion.close()
 
+def generar_username(nombre, apellidos):
+    nombre_parts = nombre.strip().split()
+    apellido_parts = apellidos.strip().split()
+    inicial_nombre = nombre_parts[0][0].lower()
+    primer_apellido = apellido_parts[0].lower()
+    username = f"{inicial_nombre}{primer_apellido}"
+    return username
+
 def generar_contraseña():
     letras = random.choices(string.ascii_letters, k=3)
     numeros = random.choices(string.digits, k=3)
@@ -107,7 +115,6 @@ def actualizar_contraseña(id_usuario, nueva_password_cifrada):
     finally:
         conexion.close()
 
-
 def agregar_usuario(username, estado, idTipoUsuario):
     conexion = obtener_conexion()
     if not conexion:
@@ -115,14 +122,16 @@ def agregar_usuario(username, estado, idTipoUsuario):
     try:
         contraseña_generada = generar_contraseña()
         password_cifrada = cifrar_contraseña(contraseña_generada)
-        
         with conexion.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO usuario (username, password, estado, idTipoUsuario)
                 VALUES (%s, %s, %s, %s)
             """, (username, password_cifrada, estado, idTipoUsuario))
-            conexion.commit()         
-        return {"mensaje": "Usuario agregado correctamente", "contraseña": contraseña_generada}
+            conexion.commit()
+            cursor.execute("SELECT LAST_INSERT_ID()")
+            idUsuario = cursor.fetchone()[0]
+
+        return {"mensaje": "Usuario agregado correctamente", "idUsuario": idUsuario, "contraseña": contraseña_generada}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
