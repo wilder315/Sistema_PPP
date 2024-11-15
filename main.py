@@ -1,5 +1,6 @@
-from flask import Flask
-from routers.router_main import router_main  # Importa el Blueprint
+from flask import Flask, session, redirect, url_for, request
+from datetime import timedelta
+from routers.router_main import router_main
 from routers.router_facultad import router_facultad
 from routers.router_estudiante import router_estudiante
 from routers.router_docente import router_docente
@@ -17,12 +18,23 @@ from routers.router_usuario import router_usuario
 from routers.router_tipoPracticas import router_tipoPracticas
 from routers.router_informeAlumno import router_informeAlumno
 from routers.router_email import router_email
+from routers.router_tipoInforme import router_tipoInforme
+from routers.router_plan_trabajo import router_plan_trabajo
+from routers.router_objetivo import router_objetivo
 
 app = Flask(__name__)
 app.debug = False
 app.secret_key = 'super-secret'
+app.config['SESSION_PERMANENT'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 
-# Registra el Blueprint
+@app.before_request
+def verificar_autenticacion():
+    rutas_permitidas = ['/login', '/procesar_login', '/static']
+    if not any(ruta in request.path for ruta in rutas_permitidas):
+        if 'user_id' not in session:
+            return redirect(url_for('router_main.login'))
+
 app.register_blueprint(router_main)
 app.register_blueprint(router_facultad)
 app.register_blueprint(router_estudiante)
@@ -41,6 +53,9 @@ app.register_blueprint(router_usuario)
 app.register_blueprint(router_tipoPracticas)
 app.register_blueprint(router_informeAlumno)
 app.register_blueprint(router_email)
+app.register_blueprint(router_tipoInforme)
+app.register_blueprint(router_plan_trabajo)
+app.register_blueprint(router_objetivo)
 
 
 if __name__ == "__main__":

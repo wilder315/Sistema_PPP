@@ -536,39 +536,6 @@
             $('#btnCerrar').hide();
             $('#modalInstitucion').modal('show');
         });
-        $('#formInstitucion').submit(function (e) {
-            e.preventDefault();
-            if ($('#idInstitucionMod').val() === '') {
-                var data = {
-                    numDoc: $('#numDocMod').val(),
-                    giro: $('#giroMod').val(),
-                    razonSocial: $('#razonSocialMod').val(),
-                    direccion: $('#direccionMod').val(),
-                    correo: $('#correoMod').val(),
-                    tel: $('#telMod').val(),
-                    idDistrito: $('#distritoMod').val(),
-                    idPersona: $('#jefeMod').val()
-                };
-                $.ajax({
-                    url: '/agregar_institucion',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalInstitucion').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar la institución.");
-                    }
-                });
-            }
-        });
 
         // Evento para Modificar Institución
         $('#tabla-institucion tbody').on('click', '.btnModificar', function () {
@@ -607,36 +574,68 @@
                 }
             });
         });
+
         $('#formInstitucion').submit(function (e) {
             e.preventDefault();
-            var data = {
-                numDoc: $('#numDocMod').val(),
-                giro: $('#giroMod').val(),
-                razonSocial: $('#razonSocialMod').val(),
-                direccion: $('#direccionMod').val(),
-                correo: $('#correoMod').val(),
-                tel: $('#telMod').val(),
-                idDistrito: $('#distritoMod').val(),
-                idPersona: $('#jefeMod').val()          
-            };
-            $.ajax({
-                url: '/modificar_institucion',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response.error) {
-                        mostrarAlerta("error", "Error", response.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", response.mensaje);
-                        table.ajax.reload();
-                        $('#modalInstitucion').modal('hide');
+            if ($('#idInstitucionMod').val() === '') {
+                var data = {
+                    numDoc: $('#numDocMod').val(),
+                    giro: $('#giroMod').val(),
+                    razonSocial: $('#razonSocialMod').val(),
+                    direccion: $('#direccionMod').val(),
+                    correo: $('#correoMod').val(),
+                    tel: $('#telMod').val(),
+                    idDistrito: $('#distritoMod').val(),
+                    idPersona: $('#jefeMod').val()
+                };
+                $.ajax({
+                    url: '/agregar_institucion',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalInstitucion').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la institución.");
                     }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al modificar la institución.");
-                }
-            });
+                });
+            } else {
+                var data = {
+                    numDoc: $('#numDocMod').val(),
+                    giro: $('#giroMod').val(),
+                    razonSocial: $('#razonSocialMod').val(),
+                    direccion: $('#direccionMod').val(),
+                    correo: $('#correoMod').val(),
+                    tel: $('#telMod').val(),
+                    idDistrito: $('#distritoMod').val(),
+                    idPersona: $('#jefeMod').val()          
+                };
+                $.ajax({
+                    url: '/modificar_institucion',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalInstitucion').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar la institución.");
+                    }
+                });
+            }
         });
 
         // Evento para Eliminar Institucion

@@ -193,6 +193,12 @@
                             <span class="align-middle">Envío de Correos</span>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.linea_desarrollo') }}">
+                            <i class="fas fa-chart-line fa-lg"></i>
+                            <span class="align-middle">Línea de Desarrollo</span>
+                        </a>
+                    </li>
 
                     <li class="sidebar-header">
                         Reportes
@@ -282,15 +288,27 @@
     <script>
         feather.replace()
     </script>
-
-    <!-- Script Inline para Cerrar Sesión -->
     <script>
         function cerrarSesion() {
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '/login';
+            fetch('/logout', {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Hubo un error al cerrar sesión. Inténtalo de nuevo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cerrar sesión:', error);
+                alert('Hubo un problema al cerrar sesión.');
+            });
         }
-
+        
         document.addEventListener('DOMContentLoaded', function () {
             var fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
             let usuario = localStorage.getItem('username') || sessionStorage.getItem('username');
