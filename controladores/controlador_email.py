@@ -10,7 +10,7 @@ class ControladorEmail:
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    def generar_contraseña(self, longitud=12):
+    def generar_contrasena(self, longitud=12):
         """Genera una contraseña aleatoria robusta con letras, dígitos y caracteres especiales"""
         caracteres = string.ascii_letters + string.digits + "@#$%&*"
         return ''.join(random.choice(caracteres) for _ in range(longitud))
@@ -54,19 +54,8 @@ class ControladorEmail:
                 }
 
             # Generar una contraseña aleatoria
-            contrasena = self.generar_contraseña()
+            contrasena = self.generar_contrasena()
             print("Contraseña generada:", contrasena)  # Verificar que la contraseña se genera correctamente
-
-            # Cifrar la contraseña
-            password_cifrada = cifrar_contraseña(contrasena)
-
-            # Guardar la contraseña en la base de datos
-            guardado_exitoso = self.guardar_credenciales(id_persona, password_cifrada)
-            if not guardado_exitoso:
-                return {
-                    "success": False,
-                    "message": "Error al guardar la contraseña en la base de datos"
-                }
 
             # Enviar el correo de bienvenida con la contraseña generada
             envio_exitoso = self.email_service.enviar_correo_bienvenida(
@@ -97,24 +86,3 @@ class ControladorEmail:
                 "success": False,
                 "message": f"Error en el proceso: {str(e)}"
             }
-    
-    def guardar_credenciales(self, id_persona, password_cifrada):
-        """Guarda la contraseña cifrada del estudiante en la base de datos"""
-        conexion = obtener_conexion()
-        if not conexion:
-            return False
-        try:
-            with conexion.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE usuario
-                    SET password = %s
-                    WHERE idUsuario = %s
-                """, (password_cifrada, id_persona))
-                conexion.commit()
-                return True
-        except Exception as e:
-            self.logger.error(f"Error al guardar credenciales: {str(e)}")
-            conexion.rollback()
-            return False
-        finally:
-            conexion.close()

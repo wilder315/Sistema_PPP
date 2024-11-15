@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='login/css/owl.carousel.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='login/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='login/css/style.css') }}">
+    <script src="{{ url_for('static', filename='login/js/login.js') }}"></script>
 
     <title>USAT - Iniciar Sesión</title>
     <style>
@@ -215,26 +216,9 @@
 
     <script>
         function cerrarSesion() {
-            fetch('/logout', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.logout) {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    window.location.href = '/login';
-                } else {
-                    alert('Error al cerrar sesión. Inténtalo de nuevo.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un problema al cerrar sesión.');
-            });
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
         }
     </script>
 

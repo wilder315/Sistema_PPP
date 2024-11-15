@@ -15,7 +15,6 @@ AES_KEY = b'\xe3\x93\xafR\x81\x12\xe5\xa3\x0b\xedH\xfb\xab\xf8J\x92\xae\x18\xbf\
 # Login
 
 @router_main.route("/")
-
 @router_main.route("/login", methods=["GET", "POST"])
 def login():
     return render_template("/dashboard/login.html")
@@ -23,6 +22,7 @@ def login():
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # Verificar si el usuario ha iniciado sesión
         if 'user_id' not in session:
             flash('Por favor, inicia sesión para acceder a esta página.', 'warning')
             return redirect(url_for('router_main.login', next=request.url))
@@ -56,7 +56,6 @@ def procesar_login():
             apellido = persona[1].split()[0]
             foto = persona[2]
             session['user_id'] = usuario[0]
-            session.permanent = True
             return jsonify({
                 'logeo': True,
                 'nombre': nombre,
@@ -73,28 +72,19 @@ def procesar_login():
     except Exception as e:
         return jsonify({'mensaje': f'Error al procesar el login: {str(e)}', 'logeo': False})
 
-@router_main.route('/logout')
-def logout():
-    session.clear()
-    flash('Sesión cerrada exitosamente.', 'success')
-    return redirect(url_for('router_main.login'))
-
 # Principal
 
 @router_main.route("/index")
-@login_required
 def index():
     return render_template("/dashboard/index.html")
 
 @router_main.route("/indexga")
-@login_required
 def gestion_academica():
     
     return render_template("gestion_academica/index.html")
 
 
 @router_main.route("/indexppp")
-@login_required
 def practicas_pre_profesionales():
     registros_por_fecha = obtener_estudiantes_por_fecha() or []
     estadisticas = obtener_estadisticas_estudiantes()
@@ -102,113 +92,88 @@ def practicas_pre_profesionales():
     return render_template("/ppp/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
 
 @router_main.route('/home')
-@login_required
 def home():
     return render_template('home.html')
 
 @router_main.route('/perfil')
-@login_required
 def perfil():
     return render_template('perfil.html')
 
 # Módulo de Gestión Académica
 
 @router_main.route("/docente")
-@login_required
 def docente():
     return render_template('/gestion_academica/docente.html')  
 
 @router_main.route("/escuela")
-@login_required
 def escuela():
     return render_template('/gestion_academica/escuela.html')
 
 @router_main.route('/estudiante')
-@login_required
 def estudiante():
     return render_template('/gestion_academica/estudiante.html')
 
 @router_main.route("/facultad")
-@login_required
 def facultad():
     return render_template('gestion_academica/facultad.html') 
 
 @router_main.route("/genero")
-@login_required
 def genero():
     return render_template('gestion_academica/genero.html') 
 
 @router_main.route("/institucion")
-@login_required
 def institucion():
     return render_template('gestion_academica/institucion.html') 
 
 @router_main.route("/semestre")
-@login_required
 def semestre():
     return render_template('gestion_academica/semestre.html')
 
 @router_main.route("/usuario")
-@login_required
 def usuario():
     return render_template('gestion_academica/usuario.html')
-
-@router_main.route("/linea_desarrollo")
-@login_required
-def linea_desarrollo():
-    return render_template('gestion_academica/linea_desarrollo.html')
 
 # Módulo de Prácticas Pre Profesionales
 
 @router_main.route('/ppp_registro')
-@login_required
 def ppp_registro():
     return render_template('ppp_registro.html')
 
 @router_main.route("/InformeInicialEstudiante")
-@login_required
 def informeInicialEstudiante():
     return render_template('ppp/informeInicialEstudiante.html') 
 
 @router_main.route("/InformeInicialEmpresa")
-@login_required
 def informeInicialEmpresa():
     return render_template('ppp/informeInicialEmpresa.html') 
 
 @router_main.route("/InformeFinalEstudiante")
-@login_required
 def informeFinalEstudiante():
     return render_template('ppp/informeFinalEstudiante.html') 
 
 @router_main.route("/InformeFinalEmpresa")
-@login_required
 def informeFinalEmpresa():
     return render_template('ppp/informeFinalEmpresa.html')
 
 @router_main.route("/practicas")
-@login_required
 def ppp():
     return render_template('ppp/ppp_registro.html')
 
 @router_main.route("/InformesPorAlumno")
-@login_required
 def InformesAlumno():
     return render_template('ppp/InformesAlumno.html')
 
 @router_main.route("/horas-practica")
-@login_required
 def horas_practica():
     return render_template('ppp/informeHorasPractica.html')
 
 @router_main.route("/horas-practica-escuela")
-@login_required
 def horas_practica_escuela():
     return render_template('ppp/informeHorasPracticaEscuela.html')
 
 
 
 @router_main.route("/datos_horas_practica")
-@login_required
 def datos_horas_practica():
     try:
         datos = controlador_informeAlumno.obtener_reporte_horas_practicas()
@@ -219,7 +184,6 @@ def datos_horas_practica():
         return jsonify({"error": str(e)}), 500
     
 @router_main.route("/datos_horas_practica_escuela")
-@login_required
 def datos_horas_practica_escuela():
     try:
         datos = controlador_informeAlumno.obtener_resumen_horas_por_escuela()
@@ -231,12 +195,10 @@ def datos_horas_practica_escuela():
     
     
 @router_main.route("/practicas-terminadas")
-@login_required
 def practicas_terminadas():
     return render_template('ppp/informePracticasTerminadas.html')
 
 @router_main.route("/datos_practicas_terminadas")
-@login_required
 def datos_practicas_terminadas():
     try:
         # Obtener mes y año de los parámetros de la URL
@@ -260,12 +222,10 @@ def datos_practicas_terminadas():
         return jsonify({"error": str(e)}), 500
     
 @router_main.route("/dashboard-tendencias")
-@login_required
 def dashboard_tendencias():
     return render_template('ppp/dashboardTendencias.html')
 
 @router_main.route("/datos_dashboard_tendencias")
-@login_required
 def datos_dashboard_tendencias():
     try:
         datos = controlador_informeAlumno.obtener_dashboard_tendencias_escuela()

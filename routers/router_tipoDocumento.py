@@ -8,8 +8,3 @@ router_tipoDocumento = Blueprint('router_tipoDocumento', __name__)
 def datos_tipoDocumento():
     tipoDocumentos = controlador_tipoDocumento.obtener_tipoDocumento()
     return jsonify(tipoDocumentos)
-
-@router_tipoDocumento.route("/datos_tipoDocumentosEstudiante", methods=["GET"])
-def datos_tipoDocumentosEstudiante():
-    tipoDocumentos = controlador_tipoDocumento.obtener_tipoDocumentoEstudiante()
-    return jsonify(tipoDocumentos)

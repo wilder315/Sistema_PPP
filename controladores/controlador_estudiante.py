@@ -95,7 +95,6 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
             """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
             
-            
             # Enviar correo de bienvenida
             email_service = EmailService()
             envio_exitoso = email_service.enviar_correo_bienvenida(
@@ -103,11 +102,16 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
                 apellidos=apellidos,
                 correo_destino=correoP,
                 codigo=codUniversitario
-            )  
-            return {"mensaje": "Estudiante agregado correctamente"}
+            )
+
+           
+            
     except Exception as e:
         conexion.rollback()
-        return {"error": str(e)}
+        return {
+            "success": False,
+            "error": str(e)
+        }
     finally:
         conexion.close()
 

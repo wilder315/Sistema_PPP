@@ -65,15 +65,3 @@ def datos_usuarios_docentes():
 def obtener_datos_usuario_informe():
     usuario_informe = controlador_usuario.obtener_datos_usuario_informe()
     return jsonify(usuario_informe)
-
-@router_usuario.route('/descifrar_contraseña', methods=['POST'])
-def descifrar_contraseña():
-    try:
-        data = request.json
-        password_cifrada = data.get('passwordCifrada')
-        if not password_cifrada:
-            return jsonify({'error': 'No se proporcionó la contraseña cifrada.'})
-        password_descifrada = controlador_usuario.descifrar_contraseña(password_cifrada)
-        return jsonify({'password': password_descifrada})
-    except Exception as e:
-        return jsonify({'error': f'Error al descifrar la contraseña: {str(e)}'})

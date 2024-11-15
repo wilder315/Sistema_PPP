@@ -254,6 +254,34 @@
             $('#btnCerrar').hide();
             $('#modalFacultad').modal('show');
         });
+        $('#formFacultad').submit(function (e) {
+            e.preventDefault();
+            if ($('#idFacultadMod').val() === '') {
+                var data = {
+                    nombre: $('#nombreFacultadMod').val(),
+                    abreviatura: $('#abreviaturaFacultadMod').val(),
+                    estado: $('#estadoMod').val(),
+                };
+                $.ajax({
+                    url: '/agregar_facultad',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalFacultad').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la facultad.");
+                    }
+                });
+            }
+        });
 
         // Evento para Modificar Facultad
         $('#tabla-facultad tbody').on('click', '.btnModificar', function () {
@@ -284,59 +312,32 @@
                 }
             });
         });
-
         $('#formFacultad').submit(function (e) {
             e.preventDefault();
-            if ($('#idFacultadMod').val() === '') {
-                var data = {
-                    nombre: $('#nombreFacultadMod').val(),
-                    abreviatura: $('#abreviaturaFacultadMod').val(),
-                    estado: $('#estadoMod').val(),
-                };
-                $.ajax({
-                    url: '/agregar_facultad',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalFacultad').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar la facultad.");
+            var data = {
+                idFacultad: $('#idFacultadMod').val(),
+                nombre: $('#nombreFacultadMod').val(),
+                abreviatura: $('#abreviaturaFacultadMod').val(),
+                estado: $('#estadoMod').val(),
+            };
+            $.ajax({
+                url: '/modificar_facultad',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", response.mensaje);
+                        table.ajax.reload();
+                        $('#modalFacultad').modal('hide');
                     }
-                });
-            } else {
-                var data = {
-                    idFacultad: $('#idFacultadMod').val(),
-                    nombre: $('#nombreFacultadMod').val(),
-                    abreviatura: $('#abreviaturaFacultadMod').val(),
-                    estado: $('#estadoMod').val(),
-                };
-                $.ajax({
-                    url: '/modificar_facultad',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalFacultad').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar la facultad.");
-                    }
-                });
-            }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al modificar la facultad.");
+                }
+            });
         });
 
         // Evento para Eliminar Facultad

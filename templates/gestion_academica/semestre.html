@@ -273,6 +273,35 @@
             $('#btnCerrar').hide();
             $('#modalSemestre').modal('show');
         });
+        $('#formSemestre').submit(function (e) {
+            e.preventDefault();
+            if ($('#idSemestreMod').val() === '') {
+                var data = {
+                    nombre: $('#nombreSemestreMod').val(),
+                    fechaInicio: $('#fechaInicioMod').val(),
+                    fechaFin: $('#fechaFinMod').val(),
+                    estado: $('#estadoMod').val(),
+                };
+                $.ajax({
+                    url: '/agregar_semestre',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalSemestre').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la semestre.");
+                    }
+                });
+            }
+        });
 
         // Evento para Modificar Semestre
         $('#tabla-semestre tbody').on('click', '.btnModificar', function () {
@@ -304,61 +333,33 @@
                 }
             });
         });
-
         $('#formSemestre').submit(function (e) {
             e.preventDefault();
-            if ($('#idSemestreMod').val() === '') {
-                var data = {
-                    nombre: $('#nombreSemestreMod').val(),
-                    fechaInicio: $('#fechaInicioMod').val(),
-                    fechaFin: $('#fechaFinMod').val(),
-                    estado: $('#estadoMod').val(),
-                };
-                $.ajax({
-                    url: '/agregar_semestre',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalSemestre').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar la semestre.");
+            var data = {
+                idSemestre: $('#idSemestreMod').val(),
+                nombre: $('#nombreSemestreMod').val(),
+                fechaInicio: $('#fechaInicioMod').val(),
+                fechaFin: $('#fechaFinMod').val(),
+                estado: $('#estadoMod').val(),
+            };
+            $.ajax({
+                url: '/modificar_semestre',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", response.mensaje);
+                        table.ajax.reload();
+                        $('#modalSemestre').modal('hide');
                     }
-                });
-            } else {
-                var data = {
-                    idSemestre: $('#idSemestreMod').val(),
-                    nombre: $('#nombreSemestreMod').val(),
-                    fechaInicio: $('#fechaInicioMod').val(),
-                    fechaFin: $('#fechaFinMod').val(),
-                    estado: $('#estadoMod').val(),
-                };
-                $.ajax({
-                    url: '/modificar_semestre',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalSemestre').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar la semestre.");
-                    }
-                });
-            }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al modificar la semestre.");
+                }
+            });
         });
 
         // Evento para Eliminar Semestre

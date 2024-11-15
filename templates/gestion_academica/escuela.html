@@ -289,6 +289,36 @@
             $('#btnCerrar').hide();
             $('#modalEscuela').modal('show');
         });
+        $('#formEscuela').submit(function (e) {
+            e.preventDefault();
+            if ($('#idEscuelaMod').val() === '') {
+                var data = {
+                    nombre: $('#nombreEscuelaMod').val(),
+                    abreviatura: $('#abreviaturaEscuelaMod').val(),
+                    estado: $('#estadoEscuelaMod').val(),
+                    hRequeridas: $('#horasEscuelaMod').val(),
+                    idFacultad: $('#facultadEscuelaMod').val()
+                };
+                $.ajax({
+                    url: '/agregar_escuela',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.error) {
+                            mostrarAlerta("error", "Error", response.error);
+                        } else {
+                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            table.ajax.reload();
+                            $('#modalEscuela').modal('hide');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la escuela.");
+                    }
+                });
+            }
+        });
 
         // Evento para Modificar Escuela
         $('#tabla-escuela tbody').on('click', '.btnModificar', function () {
@@ -321,63 +351,34 @@
                 }
             });
         });
-
         $('#formEscuela').submit(function (e) {
             e.preventDefault();
-            if ($('#idEscuelaMod').val() === '') {
-                var data = {
-                    nombre: $('#nombreEscuelaMod').val(),
-                    abreviatura: $('#abreviaturaEscuelaMod').val(),
-                    estado: $('#estadoEscuelaMod').val(),
-                    hRequeridas: $('#horasEscuelaMod').val(),
-                    idFacultad: $('#facultadEscuelaMod').val()
-                };
-                $.ajax({
-                    url: '/agregar_escuela',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalEscuela').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar la escuela.");
+            var data = {
+                idEscuela: $('#idEscuelaMod').val(),
+                nombre: $('#nombreEscuelaMod').val(),
+                abreviatura: $('#abreviaturaEscuelaMod').val(),
+                estado: $('#estadoEscuelaMod').val(),
+                hRequeridas: $('#horasEscuelaMod').val(),
+                idFacultad: $('#facultadEscuelaMod').val()
+            };
+            $.ajax({
+                url: '/modificar_escuela',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if (response.error) {
+                        mostrarAlerta("error", "Error", response.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", response.mensaje);
+                        table.ajax.reload();
+                        $('#modalEscuela').modal('hide');
                     }
-                });
-            } else {
-                var data = {
-                    idEscuela: $('#idEscuelaMod').val(),
-                    nombre: $('#nombreEscuelaMod').val(),
-                    abreviatura: $('#abreviaturaEscuelaMod').val(),
-                    estado: $('#estadoEscuelaMod').val(),
-                    hRequeridas: $('#horasEscuelaMod').val(),
-                    idFacultad: $('#facultadEscuelaMod').val()
-                };
-                $.ajax({
-                    url: '/modificar_escuela',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalEscuela').modal('hide');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar la escuela.");
-                    }
-                });
-            }
+                },
+                error: function (xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al modificar la escuela.");
+                }
+            });
         });
 
         // Evento para Eliminar Escuela
