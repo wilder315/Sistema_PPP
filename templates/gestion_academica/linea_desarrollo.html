@@ -1,12 +1,12 @@
 {% extends "/gestion_academica/index.html" %}
-{% block titulo %} Genero {% endblock %}
+{% block titulo %} Línea de desarrollo {% endblock %}
 {% block contenido %}
 
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Géneros</li>
+        <li class="breadcrumb-item active" aria-current="page">Línea de desarrollo</li>
     </ol>
 </nav>
 
@@ -14,16 +14,17 @@
     <div class="card w-100">
         <div class="card-header bg-red-usat text-white" id="headingOne" data-bs-toggle="collapse"
         data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-            Géneros
+            Líneas de desarrollo
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tabla-genero" class="table table-striped tabla-generos" style="width:100%">
+                <table id="tabla-facultad" class="table table-striped tabla-facultades" style="width:100%">
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
                             <th class="text-center">Nombre</th>
                             <th class="text-center">Estado</th>
+                            <th class="text-center">Escuela</th>
                             <th class="text-center">Opciones</th>
                         </tr>
                     </thead>
@@ -36,8 +37,8 @@
     </div>
 </div>
 
-<!-- MODAL GENERO -->
-<div class="modal fade" id="modalGenero" tabindex="-1" aria-hidden="true">
+<!-- MODAL FACULTAD -->
+<div class="modal fade" id="modalFacultad" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -45,11 +46,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formGenero">
-                    <input type="hidden" id="idGeneroMod" name="idGeneroMod">
+                <form id="formFacultad">
+                    <input type="hidden" id="idFacultadMod" name="idFacultadMod">
                     <div class="mb-3">
-                        <label for="nombreGeneroMod" class="form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="nombreGeneroMod" name="nombreGeneroMod" required>
+                        <label for="nombreFacultadMod" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombreFacultadMod" name="nombreFacultadMod" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="abreviaturaFacultadMod" class="form-label">Abreviatura:</label>
+                        <input type="text" class="form-control" id="abreviaturaFacultadMod" name="abreviaturaFacultadMod" required>
                     </div>
                     <div class="mb-3">
                         <label for="estadoMod" class="form-label">Estado:</label>
@@ -79,12 +84,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p><span id="texto-confirmar"></span><strong id="nombreGeneroConfirmar"></strong>?</p>
-                <input type="hidden" id="idGeneroConfirmar" name="idGeneroConfirmar">
+                <p><span id="texto-confirmar"></span><strong id="nombreFacultadConfirmar"></strong>?</p>
+                <input type="hidden" id="idFacultadConfirmar" name="idFacultadConfirmar">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="confirmarGenero">Aceptar</button>
+                <button type="button" class="btn btn-success" id="confirmarFacultad">Aceptar</button>
             </div>
         </div>
     </div>
@@ -103,10 +108,10 @@
 
 <script>
     $(document).ready(function () {
-        if ($.fn.DataTable.isDataTable('#tabla-genero')) {
-            $('#tabla-genero').DataTable().clear().destroy();
+        if ($.fn.DataTable.isDataTable('#tabla-facultad')) {
+            $('#tabla-facultad').DataTable().clear().destroy();
         }
-        var table = $('#tabla-genero').DataTable({
+        var table = $('#tabla-facultad').DataTable({
             paging: true,
             pageLength: 10,
             lengthMenu: [5, 10, 15, 20],
@@ -118,12 +123,12 @@
             dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
             buttons: [
                 {
-                    text: '<i class="fas fa-plus"></i> Agregar Nuevo Genero   ',
+                    text: '<i class="fas fa-plus"></i> Agregar Nueva Facultad   ',
                     className: 'btnAgregar btn btn-primary mb-2',
                     action: function (e, dt, node, config) {
                         e.preventDefault();
-                        $('#formGenero')[0].reset();
-                        $('#modalGenero').modal('show');
+                        $('#formFacultad')[0].reset();
+                        $('#modalFacultad').modal('show');
                     }
                 },   
                 {
@@ -142,15 +147,16 @@
                 
             ],
             ajax: {
-                url: "/datos_generos",
+                url: "/datos_facultades",
                 type: "GET",
                 dataSrc: ""
             },
             processing: true,
             serverSide: false,
             columns: [
-                { data: "idGenero", className: 'text-center' },
-                { data: "nombre", className: 'text-center'},
+                { data: "idFacultad", className: 'text-center' },
+                { data: "nombre"},
+                { data: "abreviatura", className: 'text-center'},
                 { 
                     data: "estado",
                     className: 'text-center',
@@ -163,10 +169,10 @@
                     className: 'text-center',
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-primary btn-sm btnVer" data-id="${row.idGenero}" title="Ver"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idGenero}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idGenero}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
-                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idGenero}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
+                            <button class="btn btn-primary btn-sm btnVer" data-id="${row.idFacultad}" title="Ver"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idFacultad}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idFacultad}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idFacultad}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
                 }
@@ -189,101 +195,106 @@
 
         // Función para deshabilitar los controles
         function deshabilitarControles(){
-            $('#idGeneroMod').prop('disabled', true);
-            $('#nombreGeneroMod').prop('disabled', true);
+            $('#idFacultadMod').prop('disabled', true);
+            $('#nombreFacultadMod').prop('disabled', true);
+            $('#abreviaturaFacultadMod').prop('disabled', true);
             $('#estadoMod').prop('disabled', true);
         }
 
         // Función para habilitar los controles
         function habilitarControles(){
-            $('#idGeneroMod').prop('disabled', false);
-            $('#nombreGeneroMod').prop('disabled', false);
+            $('#idFacultadMod').prop('disabled', false);
+            $('#nombreFacultadMod').prop('disabled', false);
+            $('#abreviaturaFacultadMod').prop('disabled', false);
             $('#estadoMod').prop('disabled', false);
         }
 
-        // Evento para Ver Genero
-        $('#tabla-genero tbody').on('click', '.btnVer', function () {
+        // Evento para Ver Facultad
+        $('#tabla-facultad tbody').on('click', '.btnVer', function () {
             var id = $(this).data('id');
-            console.log(id);
             $.ajax({
-                url: '/obtener_genero_por_id/' + id,
+                url: '/obtener_facultad_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Ver Género");
-                        $('#formGenero')[0].reset();
-                        $('#idGeneroMod').val(response.idGenero);
-                        $('#nombreGeneroMod').val(response.nombre);
+                        $('#modal-title').text("Ver Facultad");
+                        $('#formFacultad')[0].reset();
+                        $('#idFacultadMod').val(response.idFacultad);
+                        $('#nombreFacultadMod').val(response.nombre);
+                        $('#abreviaturaFacultadMod').val(response.abreviatura);
                         $('#estadoMod').val(response.estado);
                         deshabilitarControles();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
-                        $('#modalGenero').modal('show');
+                        $('#modalFacultad').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al obtener el género.");
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener la facultad.");
                 }
             });
         });
 
-        // Evento para Agregar Genero
+        // Evento para Agregar Facultad
         $(document).on('click', '.btnAgregar', function (e) {
             e.preventDefault();
-            $('#modal-title').text("Agregar Género");
-            $('#formGenero')[0].reset();
-            $('#idGeneroMod').val('');
-            $('#nombreGeneroMod').val('');
+            $('#modal-title').text("Agregar Facultad");
+            $('#formFacultad')[0].reset();
+            $('#idFacultadMod').val('');
+            $('#nombreFacultadMod').val('');
+            $('#abreviaturaFacultadMod').val('');
             $('#estadoMod').val('');
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
-            $('#modalGenero').modal('show');
+            $('#modalFacultad').modal('show');
         });
 
-        // Evento para Modificar Genero
-        $('#tabla-genero tbody').on('click', '.btnModificar', function () {
+        // Evento para Modificar Facultad
+        $('#tabla-facultad tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_genero_por_id/' + id,
+                url: '/obtener_facultad_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Modificar Género");
-                        $('#formGenero')[0].reset();
-                        $('#idGeneroMod').val(response.idGenero);
-                        $('#nombreGeneroMod').val(response.nombre);
+                        $('#modal-title').text("Modificar Facultad");
+                        $('#formFacultad')[0].reset();
+                        $('#idFacultadMod').val(response.idFacultad);
+                        $('#nombreFacultadMod').val(response.nombre);
+                        $('#abreviaturaFacultadMod').val(response.abreviatura);
                         $('#estadoMod').val(response.estado);
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
-                        $('#modalGenero').modal('show');
+                        $('#modalFacultad').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al obtener el género.");
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener la facultad.");
                 }
             });
         });
 
-        $('#formGenero').submit(function (e) {
+        $('#formFacultad').submit(function (e) {
             e.preventDefault();
-            if ($('#idGeneroMod').val() === '') {
+            if ($('#idFacultadMod').val() === '') {
                 var data = {
-                    nombre: $('#nombreGeneroMod').val(),
+                    nombre: $('#nombreFacultadMod').val(),
+                    abreviatura: $('#abreviaturaFacultadMod').val(),
                     estado: $('#estadoMod').val(),
                 };
                 $.ajax({
-                    url: '/agregar_genero',
+                    url: '/agregar_facultad',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -293,21 +304,22 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalGenero').modal('hide');
+                            $('#modalFacultad').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el género.");
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar la facultad.");
                     }
                 });
             } else {
                 var data = {
-                    idGenero: $('#idGeneroMod').val(),
-                    nombre: $('#nombreGeneroMod').val(),
+                    idFacultad: $('#idFacultadMod').val(),
+                    nombre: $('#nombreFacultadMod').val(),
+                    abreviatura: $('#abreviaturaFacultadMod').val(),
                     estado: $('#estadoMod').val(),
                 };
                 $.ajax({
-                    url: '/modificar_genero',
+                    url: '/modificar_facultad',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -317,61 +329,61 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalGenero').modal('hide');
+                            $('#modalFacultad').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar el género.");
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar la facultad.");
                     }
                 });
             }
         });
 
-        // Evento para Eliminar Genero
-        $('#tabla-genero tbody').on('click', '.btnEliminar', function () {
+        // Evento para Eliminar Facultad
+        $('#tabla-facultad tbody').on('click', '.btnEliminar', function () {
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
-            $('#modal-title-confirmar').text('Eliminar Género');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el género ');
-            $('#nombreGeneroConfirmar').text(nombre);
-            $('#idGeneroConfirmar').val(id);
-            $('#confirmarGenero').data('accion', 'eliminar');
+            $('#modal-title-confirmar').text('Eliminar Facultad');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar la facultad ');
+            $('#nombreFacultadConfirmar').text(nombre);
+            $('#idFacultadConfirmar').val(id);
+            $('#confirmarFacultad').data('accion', 'eliminar');
             $('#modalConfirmar').modal('show');
         });
 
-        // Evento para Dar de Baja Genero
-        $('#tabla-genero tbody').on('click', '.btnDarDeBaja', function () {
+        // Evento para Dar de Baja Facultad
+        $('#tabla-facultad tbody').on('click', '.btnDarDeBaja', function () {
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
-            $('#modal-title-confirmar').text('Dar de Baja Género');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja el género ');
-            $('#nombreGeneroConfirmar').text(nombre);
-            $('#idGeneroConfirmar').val(id);
-            $('#confirmarGenero').data('accion', 'darDeBaja');
+            $('#modal-title-confirmar').text('Dar de Baja Facultad');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja la facultad ');
+            $('#nombreFacultadConfirmar').text(nombre);
+            $('#idFacultadConfirmar').val(id);
+            $('#confirmarFacultad').data('accion', 'darDeBaja');
             $('#modalConfirmar').modal('show');
         });
 
         // Evento para Confirmar
-        $('#confirmarGenero').click(function () {
-            var id = $('#idGeneroConfirmar').val();
+        $('#confirmarFacultad').click(function () {
+            var id = $('#idFacultadConfirmar').val();
             var accion = $(this).data('accion');
             var url = '';
             var mensajeExito = '';
             var mensajeError = '';
             if (accion === 'eliminar') {
-                url = '/eliminar_genero';
-                mensajeExito = 'El género fue eliminado correctamente';
-                mensajeError = 'Hubo un error al eliminar el género.';
+                url = '/eliminar_facultad';
+                mensajeExito = 'La facultad fue eliminado correctamente';
+                mensajeError = 'Hubo un error al eliminar la facultad.';
             } else if (accion === 'darDeBaja') {
-                url = '/dar_de_baja_genero';
-                mensajeExito = 'El género fue dado de baja correctamente';
-                mensajeError = 'Hubo un error al dar de baja el género.';
+                url = '/dar_de_baja_facultad';
+                mensajeExito = 'La facultad fue dado de baja correctamente';
+                mensajeError = 'Hubo un error al dar de baja la facultad.';
             }
             $.ajax({
                 url: url,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ idGenero: id }),
+                data: JSON.stringify({ idFacultad: id }),
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);

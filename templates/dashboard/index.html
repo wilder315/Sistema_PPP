@@ -197,7 +197,21 @@
         function cerrarSesion() {
             localStorage.clear();
             sessionStorage.clear();
-            window.location.href = '/login';
+            fetch('/logout', {
+                method: 'GET',
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Hubo un error al cerrar sesión. Inténtalo de nuevo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cerrar sesión:', error);
+                alert('Hubo un problema al cerrar sesión.');
+            });
         }
 
         document.addEventListener('DOMContentLoaded', function () {

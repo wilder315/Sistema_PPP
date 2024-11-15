@@ -33,16 +33,9 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="{{ url_for('static', filename='login/libs/sweetalert2/sweetalert2.js') }}"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
     <script>
         feather.replace()
-    </script>
-
-    <script>
-        function cerrarSesion() {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = '/login';
-        }
     </script>
     {% block scripts %}
     
