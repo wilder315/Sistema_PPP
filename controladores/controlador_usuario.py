@@ -211,6 +211,26 @@ def obtener_usuarios_estudiantes():
         conexion.close()
     return usuarios
 
+def obtener_usuarios_jefe():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    usuarios = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT idUsuario, username, password FROM usuario where idTipoUsuario = 2")
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                usuario_dict = dict(zip(column_names, row))
+                usuarios.append(usuario_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return usuarios
+
 def obtener_usuarios_docentes():
     conexion = obtener_conexion()
     if not conexion:

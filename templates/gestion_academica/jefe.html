@@ -1,46 +1,43 @@
-{% extends "/gestion_academica/index.html" %}
-{% block titulo %} Gestión de Estudiantes {% endblock %}
+{% extends "/gestion_academica/index.html"%}
+{% block titulo %}Gestión de Jefes Directos{% endblock %}
 {% block contenido %}
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
-        <li class="breadcrumb-item active"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Estudiantes</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Jefes</li>
     </ol>
 </nav>
 
+<!-- Cards para mostrar los resultados de la búsqueda -->
 <div class="container-fluid my-4">
-    <div class="card w-100" id="card_estudiantes">
-        <div class="card-header bg-red-usat text-white" id="headingOne" data-bs-toggle="collapse"
-            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-            Estudiantes
+    <div class="card w-100" id="card_jefes">
+        <div class="card-header bg-red-usat text-white">
+            Jefes
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tabla-estudiante" class="table table-striped tabla-estudiantes" style="width:100%">
+                <table id="tabla-jefe" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
                             <th style="text-align:center">N° Documento</th>
                             <th style="text-align:center">Apellidos</th>
                             <th style="text-align:center">Nombre</th>
-                            <th style="text-align:center">Código Universitario</th>
                             <th style="width: 15%; text-align:center">Correo Personal</th>
-                            <th style="text-align:center">Correo USAT</th>
                             <th style="text-align:center">Teléfono</th>
+                            <th style="text-align: center">Cargo</th>
                             <th style="text-align:center">Opciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Los datos de los estudiantes se cargarán dinámicamente aquí -->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MODAL ESTUDIANTE -->
-<div class="modal fade" id="modalEstudiante" tabindex="-1" aria-hidden="true">
+<!-- Modal para agregar un nuevo jefé -->
+<div class="modal fade" id="modalJefe" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -48,28 +45,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="formEstudiante">
-                    <input type="hidden" id="idEstudianteMod" name="idEstudianteMod">
+                <form id="formJefe">
+                    <input type="hidden" id="idJefeMod" name="idJefeMod">
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">N° Documento:</label>
                             <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required>
-                        </div>
+                        </div> 
                         <div class="col-md-6 mb-3">
-                            <label for="codUniversitarioMod" class="form-label">Código Universitario:</label>
-                            <input type="text" class="form-control" id="codUniversitarioMod" name="codUniversitarioMod" required>
+                            <label for="tipoDocMod" class="form-label">Tipo de Documento:</label>
+                            <select class="form-control" id="tipoDocMod" name="idTipoDocMod" required>
+                                <option value="" disabled selected>Seleccionar tipo de documento</option>
+                                <!-- Los valores del tipo de documento se cargarán dinámicamente -->
+                            </select>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="apellidosEstudianteMod" class="form-label">Apellidos:</label>
-                            <input type="text" class="form-control" id="apellidosEstudianteMod" name="apellidosEstudianteMod" required>
+                            <label for="apellidosJefeMod" class="form-label">Apellidos:</label>
+                            <input type="text" class="form-control" id="apellidosJefeMod" name="apellidosJefeMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="nombreEstudianteMod" class="form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="nombreEstudianteMod" name="nombreEstudianteMod" required>
+                            <label for="nombreJefeMod" class="form-label">Nombre:</label>
+                            <input type="text" class="form-control" id="nombreJefeMod" name="nombreJefeMod" required>
                         </div>
                     </div>
                     <div class="row">
@@ -78,31 +78,22 @@
                             <input type="email" class="form-control" id="correoPMod" name="correoPMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="correoUSATMod" class="form-label">Correo USAT:</label>
-                            <input type="email" class="form-control" id="correoUSATMod" name="correoUSATMod" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono 1:</label>
                             <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="tel2Mod" class="form-label">Teléfono 2 (opcional):</label>
-                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="9">
-                        </div>
+                        
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="estadoEstudianteMod" class="form-label">Estado:</label>
-                            <select class="form-control" id="estadoEstudianteMod" name="estadoEstudianteMod" required>
+                            <label for="estadoJefeMod" class="form-label">Estado:</label>
+                            <select class="form-control" id="estadoJefeMod" name="estadoJefeMod" required>
                                 <option value="" disabled selected>Seleccionar estado</option>
                                 <option value="A">Activo</option>
                                 <option value="I">Inactivo</option>
                             </select>
                         </div>
+
                         <div class="col-md-6 mb-3">
                             <label for="generoMod" class="form-label">Género:</label>
                             <select class="form-control" id="generoMod" name="idGeneroMod" required>
@@ -114,12 +105,10 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="tipoDocMod" class="form-label">Tipo de Documento:</label>
-                            <select class="form-control" id="tipoDocMod" name="idTipoDocMod" required>
-                                <option value="" disabled selected>Seleccionar tipo de documento</option>
-                                <!-- Los valores del tipo de documento se cargarán dinámicamente -->
-                            </select>
+                            <label for="cargoMod" class="form-label">Cargo:</label>
+                            <input type="text" class="form-control" id="cargoMod" name="cargoMod" required>
                         </div>
+
                         <div class="col-md-6 mb-3">
                             <label for="usuarioMod" class="form-label">Usuario:</label>
                             <div class="input-group">
@@ -128,18 +117,12 @@
                                     <i class="fas fa-magic"></i>
                                 </button>
                             </div>
-                        </div>                        
+                        </div>
+                        
                     </div>
 
-                    <div class="mb-3">
-                        <label for="escuelaMod" class="form-label">Escuela:</label>
-                        <select class="form-control" id="escuelaMod" name="idEscuelaMod" required>
-                            <option value="" disabled selected>Seleccionar escuela</option>
-                            <!-- Los valores de escuela se cargarán dinámicamente -->
-                        </select>
-                    </div>
 
-                    <div class="text-end">
+                    <div class="text-end mt-10">
                         <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
@@ -150,6 +133,7 @@
     </div>
 </div>
 
+<!-- MODAL CONFIRMAR -->
 <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -159,18 +143,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <p><span id="texto-confirmar"></span><strong id="nombreEstudianteConfirmar"></strong> y su respectivo usuario?</p>
-                <input type="hidden" id="idEstudianteConfirmar" name="idEstudianteConfirmar">
+                <p><span id="texto-confirmar"></span><strong id="nombreJefeConfirmar"></strong> y su respectivo usuario?</p>
+                <input type="hidden" id="idJefeConfirmar" name="idJefeConfirmar">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="confirmarEstudiante">Aceptar</button>
+                <button type="button" class="btn btn-success" id="confirmarJefe">Aceptar</button>
             </div>
         </div>
     </div>
 </div>
 
 {% block scripts %}
+<!-- Librerías externas -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/dataTables.buttons.min.js"></script>
@@ -180,13 +165,18 @@
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        if ($.fn.DataTable.isDataTable('#tabla-estudiante')) {
-            $('#tabla-estudiante').DataTable().clear().destroy();
+<!-- Script principal -->
+<Script> 
+    $(document).ready(function() {
+        // Destruir si existe una tabla --Funciona....
+        if ($.fn.DataTable.isDataTable('#tabla-jefe')) {
+            $('#tabla-jefe').DataTable().clear().destroy();
         }
-        var table = $('#tabla-estudiante').DataTable({
+    
+        // Llenado de la tabla --Funciona.....
+        var table = $('#tabla-jefe').DataTable({
             paging: true,
             pageLength: 10,
             lengthMenu: [5, 10, 15, 20],
@@ -194,18 +184,18 @@
             responsive: true,
             autoWidth: true,
             searching: true,
-            order: [], 
+            order: [],
             dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
             buttons: [
                 {
-                    text: '<i class="fas fa-plus"></i> Agregar Nuevo Estudiante',
+                    text: '<i class="fas fa-plus"></i> Agregar Nuevo Jefe',
                     className: 'btnAgregar btn btn-primary mb-2',
                     action: function (e, dt, node, config) {
                         e.preventDefault();
-                        $('#formEstudiante')[0].reset();
-                        $('#modalEstudiante').modal('show');
+                        $('#formJefe')[0].reset();
+                        $('#modalJefe').modal('show');
                     }
-                },   
+                },
                 {
                     extend: 'collection',
                     text: '<i class="fas fa-file-export"></i> Exportar/Imprimir',
@@ -219,10 +209,9 @@
                         { extend: 'print', text: '<i class="fas fa-print"></i> Imprimir', className: 'dropdown-item' }
                     ]
                 }
-                
             ],
             ajax: {
-                url: "/datos_estudiantes",
+                url: "/datoss_jefes",
                 type: "GET",
                 dataSrc: ""
             },
@@ -230,12 +219,11 @@
             serverSide: false,
             columns: [
                 { data: "numDoc", className: 'text-center' },
-                { data: "apellidos"},
-                { data: "nombre" },           
-                { data: "codUniversitario", className: 'text-center' },
-                { data: "correoP",},
-                { data: "correoUSAT",},
+                { data: "apellidos" },
+                { data: "nombre" },
+                { data: "correoP" },
                 { data: "tel1", className: 'text-center' },
+                { data: "cargo" },
                 {
                     data: null,
                     className: 'text-center',
@@ -253,8 +241,8 @@
                 url: "{{ url_for('static', filename='js/es-ES.json') }}"
             }
         });
-
-        // Funcion para mostrar alerta
+    
+        // Función para mostrar alerta --- Funciona .....
         function mostrarAlerta(tipo, titulo, mensaje) {
             Swal.fire({
                 icon: tipo,
@@ -264,14 +252,14 @@
                 timer: 5000
             });
         }
-
-        // Función para cargar los géneros dinámicamente
-        function cargarGeneros(selectedGeneroId) {
+    
+        // Función para cargar géneros dinámicamente -- Funciona....
+        function cargarGeneros(selectedGeneroId = null) {
             $.ajax({
-                url: '/datos_generos',
+                url: '/datos_generos',  // Asegúrate de que esta URL sea correcta
                 type: 'GET',
                 contentType: 'application/json',
-                success: function (response) {
+                success: function(response) {
                     var generoSelect = $('#generoMod');
                     generoSelect.empty();
                     generoSelect.append('<option value="" disabled selected>Seleccionar género</option>');
@@ -280,16 +268,16 @@
                         generoSelect.append(`<option value="${genero.idGenero}" ${selected}>${genero.nombre}</option>`);
                     });
                 },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros.");
+                error: function(xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros"); 
                 }
             });
         }
-
-        // Función para cargar los tipoDocumentos dinámicamente
+    
+        // Función para cargar tipos de documentos dinámicamente -- Funciona.....
         function cargarTipoDocumentos(selectedTipoDocId) {
             $.ajax({
-                url: '/datos_tipoDocumentosEstudiante',
+                url: '/datos_tipoDocumentos',
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -307,31 +295,10 @@
             });
         }
 
-        // Función para cargar las escuelas dinámicamente
-        function cargarEscuelas(selectedEscuelaId) {
-            $.ajax({
-                url: '/datos_escuelas',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var escuelaSelect = $('#escuelaMod');
-                    escuelaSelect.empty();
-                    escuelaSelect.append('<option value="" disabled selected>Seleccionar escuela</option>');
-                    response.forEach(function (escuela) {
-                        var selected = escuela.idEscuela == selectedEscuelaId ? 'selected' : '';
-                        escuelaSelect.append(`<option value="${escuela.idEscuela}" ${selected}>${escuela.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar las escuelas.");
-                }
-            });
-        }
-
-        // Función para cargar los usuarios dinámicamente
+        //Función para cargar los usuarios dinamicamente -- Funciona....
         function cargarUsuarios(selectedUsuarioId) {
             $.ajax({
-                url: '/datos_usuarios_estudiantes',
+                url: '/datos_usuarios_jefe',
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -349,107 +316,94 @@
             });
         }
 
-        // Función para deshabilitar los controles
-        function deshabilitarControles(){
-            $('#idEstudianteMod').prop('disabled', true);
-            $('#numDocMod').prop('disabled', true);
-            $('#nombreEstudianteMod').prop('disabled', true);
-            $('#apellidosEstudianteMod').prop('disabled', true);
-            $('#codUniversitarioMod').prop('disabled', true);
-            $('#tel1Mod').prop('disabled', true);
-            $('#tel2Mod').prop('disabled', true);
+        //Funcion para deshabilitar los controladores -- Funciona...
+        function deshabilitarControladores() {
+            $('#numDocMod').prop('disabled', true); 
+            $('#apellidosJefeMod').prop('disabled', true);
+            $('#nombreJefeMod').prop('disabled', true);
             $('#correoPMod').prop('disabled', true);
-            $('#correoUSATMod').prop('disabled', true);
-            $('#estadoEstudianteMod').prop('disabled', true);
+            $('#tel1Mod').prop('disabled', true);
+            $('#cargoMod').prop('disabled', true); 
             $('#generoMod').prop('disabled', true);
             $('#tipoDocMod').prop('disabled', true);
-            $('#usuarioMod').prop('disabled', true);
-            $('#escuelaMod').prop('disabled', true);
         }
 
-        // Función para habilitar los controles
-        function habilitarControles(){
-            $('#idEstudianteMod').prop('disabled', false);
+        //Funcion para habilitar los controladores -- Funciona....
+        function habilitarControladores() {
             $('#numDocMod').prop('disabled', false);
-            $('#nombreEstudianteMod').prop('disabled', false);
-            $('#apellidosEstudianteMod').prop('disabled', false);
-            $('#codUniversitarioMod').prop('disabled', false);
-            $('#tel1Mod').prop('disabled', false);
-            $('#tel2Mod').prop('disabled', false);
+            $('#apellidosJefeMod').prop('disabled', false);
+            $('#nombreJefeMod').prop('disabled', false);
             $('#correoPMod').prop('disabled', false);
-            $('#correoUSATMod').prop('disabled', false);
-            $('#estadoEstudianteMod').prop('disabled', false);
+            $('#tel1Mod').prop('disabled', false);
+            $('#cargoMod').prop('disabled', false);
             $('#generoMod').prop('disabled', false);
             $('#tipoDocMod').prop('disabled', false);
-            $('#usuarioMod').prop('disabled', false);
-            $('#escuelaMod').prop('disabled', false);
         }
 
-        // Evento para Ver Estudiante
-        $('#tabla-estudiante tbody').on('click', '.btnVer', function () {
+        //Evento para ver jefe
+        $('#tabla-jefe tbody').on('click', '.btnVer', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_estudiante_por_id/' + id,
+                url: '/obtener_jefe_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Ver Estudiante");
-                        $('#formEstudiante')[0].reset();
-                        $('#idEstudianteMod').val(response.idPersona);
+
+                        $('#modal-title').text("Ver Jefe");
+                        $('#formJefe')[0].reset();
+
+                        //cargar los datos del jefe en los campos...
+                        $('#idJefeMod').val(response.idPersona);
                         $('#numDocMod').val(response.numDoc);
-                        $('#nombreEstudianteMod').val(response.nombre);
-                        $('#apellidosEstudianteMod').val(response.apellidos);
-                        $('#codUniversitarioMod').val(response.codUniversitario);
+                        $('#nombreJefeMod').val(response.nombre);
+                        $('#apellidosJefeMod').val(response.apellidos);
                         $('#tel1Mod').val(response.tel1);
-                        $('#tel2Mod').val(response.tel2 ? response.tel2 : '');
                         $('#correoPMod').val(response.correoP);
-                        $('#correoUSATMod').val(response.correoUSAT);
-                        $('#estadoEstudianteMod').val(response.estado);
+                        $('#cargoMod').val(response.cargo);
+                        $('#estadoJefeMod').val(response.estado);
+                        //cargar valores dinamicos en selects...
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
-                        cargarEscuelas(response.idEscuela);
-                        deshabilitarControles();
+                        deshabilitarControladores();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
-                        $('#modalEstudiante').modal('show');
+                        $('#modalJefe').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al obtener el estudiante.");
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener al jefe"); 
                 }
             });
         });
 
-        // Evento para Agregar Estudiante
+        //Evento para agregar jefe  -- Funciona....
         $(document).on('click', '.btnAgregar', function (e) {
             e.preventDefault();
-            $('#modal-title').text("Agregar Estudiante");
-            $('#formEstudiante')[0].reset();
-            $('#idEstudianteMod').val('');
-            $('#estadoEstudianteMod').val('');
+            $('#modal-title').text("Agregar Jefe");
+            $('#formJefe')[0].reset();
+            $('#idJefeMod').val('');
+            $('#estadoJefeMod').val('');
             $('#generoMod').val('');
+            $('#tel1Mod').val('');
             $('#tipoDocMod').val('');
-            $('#usuarioMod').val('');
-            $('#escuelaMod').val('');
+            $('#cardoMod').val('');
             cargarGeneros();
             cargarTipoDocumentos();
-            cargarEscuelas();
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
-            $('#modalEstudiante').modal('show');
+            $('#modalJefe').modal('show');
         });
 
-        // Evento para Generar Usuario
+        //Evento para generar usuario --Funciona...
         $(document).on('click', '#btnGenerarUsuario', function () {
-            const nombre = $('#nombreEstudianteMod').val();
-            const apellidos = $('#apellidosEstudianteMod').val();
+            const nombre = $('#nombreJefeMod').val();
+            const apellidos = $('#apellidosJefeMod').val();
             if (nombre && apellidos) {
                 const inicialNombre = nombre.charAt(0).toLowerCase();
                 const primerApellido = apellidos.split(' ')[0].toLowerCase();
@@ -459,52 +413,48 @@
                 mostrarAlerta('warning', 'Atención', 'Debe ingresar el nombre y los apellidos antes de generar el usuario.');
             }
         });
-  
 
-        // Evento para Modificar Estudiante
-        $('#tabla-estudiante tbody').on('click', '.btnModificar', function () {
+        // Evento para Modificar Jefe
+        $('#tabla-jefe tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_estudiante_por_id_modificar/' + id,
+                url: '/obtener_jefe_por_id_modificar/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Modificar Estudiante");
-                        $('#formEstudiante')[0].reset();
-                        $('#idEstudianteMod').val(response.idPersona);
+                        $('#modal-title').text("Modificar Jefe");
+                        $('#formJefe')[0].reset();
+                        $('#idJefeMod').val(response.idPersona);
                         $('#numDocMod').val(response.numDoc);
-                        $('#nombreEstudianteMod').val(response.nombre);
-                        $('#apellidosEstudianteMod').val(response.apellidos);
-                        $('#codUniversitarioMod').val(response.codUniversitario);
+                        $('#nombreJefeMod').val(response.nombre);
+                        $('#apellidosJefeMod').val(response.apellidos);
                         $('#tel1Mod').val(response.tel1);
-                        $('#tel2Mod').val(response.tel2 ? response.tel2 : '');
                         $('#correoPMod').val(response.correoP);
-                        $('#correoUSATMod').val(response.correoUSAT);
-                        $('#estadoEstudianteMod').val(response.estado);
+                        $('#cargoMod').val(response.cargo);
+                        $('#estadoJefeMod').val(response.estado);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
-                        cargarEscuelas(response.idEscuela);
-                        habilitarControles();
+                        habilitarControladores();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
-                        $('#modalEstudiante').modal('show');
+                        $('#modalJefe').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al obtener el estudiante.");
+                    mostrarAlerta("error", "Error", "Hubo un error al obtener el Jefe.");
                 }
             });
         });
-        
-        //
-        $('#formEstudiante').submit(async function (e) {
+
+
+        // Evento para guardar o modificar Jefe -- EXITO....
+        $('#formJefe').submit(async function (e) {
             e.preventDefault();
-            if ($('#idEstudianteMod').val() === '') {
+            if ($('#idJefeMod').val() === '') {  // Si no hay idJefeMod, es un nuevo jefe
                 const username = $('#usuarioMod').val().trim();
                 const estadoUsuario = 'A';
                 const idTipoUsuario = 3;
@@ -513,6 +463,7 @@
                     return;
                 }
                 try {
+                    // Crear nuevo usuario
                     const usuarioResponse = await $.ajax({
                         url: '/agregar_usuario',
                         type: 'POST',
@@ -523,64 +474,59 @@
                             idTipoUsuario: idTipoUsuario
                         })
                     });
+
                     if (usuarioResponse.error) {
                         mostrarAlerta("error", "Error al crear usuario", usuarioResponse.error);
                         return;
                     }
                     const idUsuario = usuarioResponse.idUsuario;
+                    // Crear nuevo jefe
                     const data = {
                         numDoc: $('#numDocMod').val(),
-                        nombre: $('#nombreEstudianteMod').val(),
-                        apellidos: $('#apellidosEstudianteMod').val(),
-                        codUniversitario: $('#codUniversitarioMod').val(),
+                        nombre: $('#nombreJefeMod').val(),
+                        apellidos: $('#apellidosJefeMod').val(),
                         tel1: $('#tel1Mod').val(),
-                        tel2: $('#tel2Mod').val(),
                         correoP: $('#correoPMod').val(),
-                        correoUSAT: $('#correoUSATMod').val(),
-                        estado: $('#estadoEstudianteMod').val(),
+                        cargo: $('#cargoMod').val(),
+                        estado: $('#estadoJefeMod').val(),
                         idGenero: $('#generoMod').val(),
                         idTipoDoc: $('#tipoDocMod').val(),
-                        idUsuario: idUsuario,
-                        idEscuela: $('#escuelaMod').val()
+                        idUsuario: idUsuario
                     };
-                    const estudianteResponse = await $.ajax({
-                        url: '/agregar_estudiante',
+
+                    const jefeResponse = await $.ajax({
+                        url: '/agregar_jefe',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify(data)
+                        data: JSON.stringify(data) 
                     });
-
-                    if (estudianteResponse.error) {
-                        mostrarAlerta("error", "Error al crear estudiante", estudianteResponse.error);
+                    //console.log('valor de idTipoDoc', $('#tipoDocMod').val()); 
+                    if (jefeResponse.error) {
+                        mostrarAlerta("error", "Error al crear jefe", jefeResponse.error);
                     } else {
-                        mostrarAlerta("success", "Éxito", estudianteResponse.mensaje);
-                        $('#modalEstudiante').modal('hide');
-                        table.ajax.reload();
+                        mostrarAlerta("success", "Éxito", jefeResponse.mensaje);
+                        $('#modalJefe').modal('hide');
+                        table.ajax.reload();  // Recargar la tabla de jefes
                     }
                 } catch (error) {
                     mostrarAlerta("error", "Error", "Hubo un problema al guardar los datos.");
                     console.error(error);
                 }
-            } else {
+            } else {  // Si ya existe un idJefeMod, es una actualización
                 const data = {
-                    idPersona: $('#idEstudianteMod').val(),
+                    idPersona: $('#idJefeMod').val(),
                     numDoc: $('#numDocMod').val(),
-                    nombre: $('#nombreEstudianteMod').val(),
-                    apellidos: $('#apellidosEstudianteMod').val(),
-                    codUniversitario: $('#codUniversitarioMod').val(),
+                    nombre: $('#nombreJefeMod').val(),
+                    apellidos: $('#apellidosJefeMod').val(),
                     tel1: $('#tel1Mod').val(),
-                    tel2: $('#tel2Mod').val(),
                     correoP: $('#correoPMod').val(),
-                    correoUSAT: $('#correoUSATMod').val(),
-                    estado: $('#estadoEstudianteMod').val(),
+                    cargo: $('#cargoMod').val(),
+                    estado: $('#estadoJefeMod').val(),
                     idGenero: $('#generoMod').val(),
-                    idTipoDoc: $('#tipoDocMod').val(),
-                    idUsuario: $('#usuarioMod').val(),
-                    idEscuela: $('#escuelaMod').val()
+                    idTipoDoc: $('#tipoDocMod').val()
                 };
-
                 $.ajax({
-                    url: '/modificar_estudiante',
+                    url: '/modificar_jefe',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -589,62 +535,71 @@
                             mostrarAlerta("error", "Error", response.error);
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalEstudiante').modal('hide');
+                            table.ajax.reload();  // Recargar la tabla de jefes
+                            $('#modalJefe').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar el estudiante.");
+                        mostrarAlerta("error", "Error", "Hubo un error al modificar el Jefe.");
                     }
                 });
             }
         });
 
-        // Evento para Eliminar Estudiante
-        $('#tabla-estudiante tbody').on('click', '.btnEliminar', function () {
+        // Llamar a la función de carga de tipos de documentos y géneros cuando se muestra el modal -- Funciona...
+        $('#modalJefe').on('show.bs.modal', function() {
+            cargarGeneros();  // Cargar géneros
+            cargarTipoDocumentos();  // Cargar tipos de documento
+        });
+
+
+        // Evento para Eliminar Jefe
+        $('#tabla-jefe tbody').on('click', '.btnEliminar', function () {
             var id = $(this).data('id');
             var nombreCompleto = $(this).data('apellidos') + " " + $(this).data('nombre');
-            $('#modal-title-confirmar').text('Eliminar Estudiante');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el estudiante ');
-            $('#nombreEstudianteConfirmar').text(nombreCompleto);
-            $('#idEstudianteConfirmar').val(id);
-            $('#confirmarEstudiante').data('accion', 'eliminar');
+            $('#modal-title-confirmar').text('Eliminar Jefe');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el Jefe ');
+            $('#nombreJefeConfirmar').text(nombreCompleto);
+            $('#idJefeConfirmar').val(id);
+            $('#confirmarJefe').data('accion', 'eliminar');
             $('#modalConfirmar').modal('show');
         });
 
-        // Evento para Dar de Baja Estudiante
-        $('#tabla-estudiante tbody').on('click', '.btnDarDeBaja', function () {
+        // Evento para Dar de Baja Jefe
+        $('#tabla-jefe tbody').on('click', '.btnDarDeBaja', function () {
             var id = $(this).data('id');
             var nombreCompleto = $(this).data('apellidos') + " " + $(this).data('nombre');
-            $('#modal-title-confirmar').text('Dar de Baja Estudiante');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja al estudiante ');
-            $('#nombreEstudianteConfirmar').text(nombreCompleto);
-            $('#idEstudianteConfirmar').val(id);
-            $('#confirmarEstudiante').data('accion', 'darDeBaja');
+            $('#modal-title-confirmar').text('Dar de Baja Jefe');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja al jefe ');
+            $('#nombreJefeConfirmar').text(nombreCompleto);
+            $('#idJefeConfirmar').val(id);
+            $('#confirmarJefe').data('accion', 'darDeBaja');
             $('#modalConfirmar').modal('show');
         });
 
-        // Evento para Confirmar
-        $('#confirmarEstudiante').click(function () {
-            var id = $('#idEstudianteConfirmar').val();
+
+        //Confirmar eliminación de jefe 
+        $('#confirmarJefe').click(function () {
+            var id = $('#idJefeConfirmar').val();
             var accion = $(this).data('accion');
             var url = '';
             var mensajeExito = '';
             var mensajeError = '';
             if (accion === 'eliminar') {
-                url = '/eliminar_estudiante';
-                mensajeExito = 'El estudiante fue eliminado correctamente';
-                mensajeError = 'Hubo un error al eliminar el estudiante.';
+                url = '/eliminar_jefe';
+                mensajeExito = 'El jefe fue eliminado correctamente';
+                mensajeError = 'Hubo un error al eliminar al jefe.';
+                
             } else if (accion === 'darDeBaja') {
-                url = '/dar_de_baja_estudiante';
-                mensajeExito = 'El estudiante fue dado de baja correctamente';
-                mensajeError = 'Hubo un error al dar de baja el estudiante.';
+                url = '/dar_de_baja_jefe';
+                mensajeExito = 'Al jefe fue dado de baja correctamente';
+                mensajeError = 'Hubo un error al dar de baja al jefe.';
             }
             $.ajax({
                 url: url,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ idEstudiante: id }),
+                data: JSON.stringify({ idJefe: id }),
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
@@ -661,6 +616,10 @@
         });
 
     });
-</script>
+
+
+</Script>
+
+
 {% endblock %}
 {% endblock %}

@@ -128,6 +128,11 @@ def escuela():
 def estudiante():
     return render_template('/gestion_academica/estudiante.html')
 
+@router_main.route('/jefe')
+@login_required
+def jefe(): 
+    return render_template('/gestion_academica/jefe.html')
+
 @router_main.route("/facultad")
 @login_required
 def facultad():

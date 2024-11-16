@@ -21,6 +21,7 @@ from routers.router_email import router_email
 from routers.router_tipoInforme import router_tipoInforme
 from routers.router_plan_trabajo import router_plan_trabajo
 from routers.router_objetivo import router_objetivo
+from routers.router_jefe import router_jefe
 
 app = Flask(__name__)
 app.debug = False
@@ -56,6 +57,7 @@ app.register_blueprint(router_email)
 app.register_blueprint(router_tipoInforme)
 app.register_blueprint(router_plan_trabajo)
 app.register_blueprint(router_objetivo)
+app.register_blueprint(router_jefe)
 
 
 if __name__ == "__main__":
