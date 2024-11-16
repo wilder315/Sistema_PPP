@@ -8,7 +8,7 @@ def obtener_lineas_desarrollo():
     lineas_desarrollo = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM linea_desarrollo ORDER BY nombre")
+            cursor.execute("SELECT ld.idLinea, ld.nombre, ld.estado, e.nombre as Escuela FROM linea_desarrollo ld inner join escuela e on ld.idEscuela = e.idEscuela ORDER BY ld.nombre")
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
 
@@ -35,7 +35,7 @@ def obtener_linea_desarrollo_por_id(idLinea):
                 linea_desarrollo_dict = dict(zip(columnas, row))
                 return linea_desarrollo_dict
             else:
-                return {"error": "Facultad no encontrada"}
+                return {"error": "Linea de desarrollo no encontrada"}
     except Exception as e:
         return {"error": str(e)}
     finally:
@@ -54,7 +54,7 @@ def agregar_linea_desarrollo(nombre, estado, idEscuela):
         with conexion.cursor() as cursor:  
             cursor.execute("""
                 INSERT INTO linea_desarrollo (nombre, estado, idEscuela)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s)
             """, (nombre, estado, idEscuela))
             conexion.commit()
             return {"mensaje": "Plan trabajo agregado correctamente"}
