@@ -129,8 +129,8 @@
                     className: 'btnAgregar btn btn-primary mb-2',
                     action: function (e, dt, node, config) {
                         e.preventDefault();
-                        $('#formLinea')[0].reset();
-                        $('#modalLinea').modal('show');
+                        $('#formLineaDesarrollo')[0].reset();
+                        $('#modalLineaDesarrollo').modal('show');
                     }
                 },   
                 {
@@ -264,17 +264,17 @@
         // Evento para Agregar Facultad
         $(document).on('click', '.btnAgregar', function (e) {
             e.preventDefault();
-            $('#modal-title').text("Agregar Facultad");
-            $('#formLinea')[0].reset();
+            $('#modal-title').text("Agregar Linea de Desarrollo");
+            $('#formLineaDesarrollo')[0].reset();
             $('#idLineaMod').val('');
             $('#nombreLineaMod').val('');
-            $('#escuelaLineaMod').val('');
+            cargarEscuelas();
             $('#estadoMod').val('');
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
-            $('#modalLinea').modal('show');
+            $('#modalLineaDesarrollo').modal('show');
         });
 
         // Evento para Modificar Facultad
@@ -289,16 +289,16 @@
                         mostrarAlerta("error", "Error", response.error);
                     } else {
                         $('#modal-title').text("Modificar Linea de desarrollo");
-                        $('#formLinea')[0].reset();
-                        $('#idLineaMod').val(response.idLineaMod);
+                        $('#formLineaDesarrollo')[0].reset();
+                        $('#idLineaMod').val(response.idLinea);
                         $('#nombreLineaMod').val(response.nombre);
-                        $('#escuelaLineaMod').val(response.Escuela);
+                        cargarEscuelas(response.idEscuela);
                         $('#estadoMod').val(response.estado);
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
-                        $('#modalLinea').modal('show');
+                        $('#modalLineaDesarrollo').modal('show');
                     }
                 },
                 error: function (xhr, status, error) {
@@ -307,16 +307,16 @@
             });
         });
 
-        $('#formLinea').submit(function (e) {
+        $('#formLineaDesarrollo').submit(function (e) {
             e.preventDefault();
-            if ($('#idFacultadMod').val() === '') {
+            if ($('#idLineaMod').val() === '') {
                 var data = {
-                    nombre: $('#nombreFacultadMod').val(),
-                    abreviatura: $('#abreviaturaFacultadMod').val(),
+                    nombre: $('#nombreLineaMod').val(),
+                    idEscuela: $('#escuelaLineaMod').val(),
                     estado: $('#estadoMod').val(),
                 };
                 $.ajax({
-                    url: '/agregar_facultad',
+                    url: '/agregar_linea_desarrollo',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -326,7 +326,7 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalLinea').modal('hide');
+                            $('#modalLineaDesarrollo').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
@@ -335,13 +335,13 @@
                 });
             } else {
                 var data = {
-                    idFacultad: $('#idFacultadMod').val(),
-                    nombre: $('#nombreFacultadMod').val(),
-                    abreviatura: $('#abreviaturaFacultadMod').val(),
+                    idLinea: $('#idLineaMod').val(),
+                    nombre: $('#nombreLineaMod').val(),
+                    idEscuela: $('#escuelaLineaMod').val(),
                     estado: $('#estadoMod').val(),
                 };
                 $.ajax({
-                    url: '/modificar_facultad',
+                    url: '/modificar_linea_desarrollo',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -351,7 +351,7 @@
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
                             table.ajax.reload();
-                            $('#modalLinea').modal('hide');
+                            $('#modalLineaDesarrollo').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
@@ -365,11 +365,11 @@
         $('#table-linea tbody').on('click', '.btnEliminar', function () {
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
-            $('#modal-title-confirmar').text('Eliminar Facultad');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar la facultad ');
-            $('#nombreFacultadConfirmar').text(nombre);
-            $('#idFacultadConfirmar').val(id);
-            $('#confirmarFacultad').data('accion', 'eliminar');
+            $('#modal-title-confirmar').text('Eliminar Linea de desarrollo');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar la línea de desarrollo ');
+            $('#nombreLineaConfirmar').text(nombre);
+            $('#idLineaConfirmar').val(id);
+            $('#confirmarLinea').data('accion', 'eliminar');
             $('#modalConfirmar').modal('show');
         });
 
@@ -378,34 +378,34 @@
             var id = $(this).data('id');
             var nombre = $(this).data('nombre');
             $('#modal-title-confirmar').text('Dar de Baja Facultad');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja la facultad ');
-            $('#nombreFacultadConfirmar').text(nombre);
-            $('#idFacultadConfirmar').val(id);
-            $('#confirmarFacultad').data('accion', 'darDeBaja');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas dar de baja la línea de desarrollo ');
+            $('#nombreLineaConfirmar').text(nombre);
+            $('#idLineaConfirmar').val(id);
+            $('#confirmarLinea').data('accion', 'darDeBaja');
             $('#modalConfirmar').modal('show');
         });
 
         // Evento para Confirmar
-        $('#confirmarFacultad').click(function () {
-            var id = $('#idFacultadConfirmar').val();
+        $('#confirmarLinea').click(function () {
+            var id = $('#idLineaConfirmar').val();
             var accion = $(this).data('accion');
             var url = '';
             var mensajeExito = '';
             var mensajeError = '';
             if (accion === 'eliminar') {
-                url = '/eliminar_facultad';
-                mensajeExito = 'La facultad fue eliminado correctamente';
-                mensajeError = 'Hubo un error al eliminar la facultad.';
+                url = '/eliminar_linea_desarrollo';
+                mensajeExito = 'La Línea de desarrollo fue eliminado correctamente';
+                mensajeError = 'Hubo un error al eliminar la Linea de desarrollo.';
             } else if (accion === 'darDeBaja') {
-                url = '/dar_de_baja_facultad';
-                mensajeExito = 'La facultad fue dado de baja correctamente';
-                mensajeError = 'Hubo un error al dar de baja la facultad.';
+                url = '/dar_de_baja_linea_desarrollo';
+                mensajeExito = 'La Línea de desarrollo fue dada de baja correctamente';
+                mensajeError = 'Hubo un error al dar de baja la línea de desarrollo.';
             }
             $.ajax({
                 url: url,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ idFacultad: id }),
+                data: JSON.stringify({ idLinea: id }),
                 success: function (response) {
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
