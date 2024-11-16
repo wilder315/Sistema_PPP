@@ -1,113 +1,94 @@
 from bd import obtener_conexion
 
-def obtener_informeInicial():
+def obtener_instituciones():
     conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    
-    generos = []
+    instituciones = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT idInforme FROM Informe")
-            column_names = [desc[0] for desc in cursor.description]
-            rows = cursor.fetchall()
-
-            for row in rows:
-                genero_dict = dict(zip(column_names, row))
-                generos.append(genero_dict)
+            cursor.execute("SELECT numDoc, razonSocial FROM institucion")
+            instituciones = cursor.fetchall()
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Error al obtener instituciones: {e}")
     finally:
         conexion.close()
-    
-    return generos
+    return instituciones
 
-def obtener_genero_por_id(idGenero):
+
+def obtener_responsable_institucion(numDoc):
     conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}    
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM genero WHERE idGenero = %s", (idGenero,))
+            cursor.execute("""
+                SELECT 
+    institucion.razonSocial AS Institucion,
+    persona.nombre,
+    persona.apellidos,
+    persona.cargo
+FROM 
+    institucion
+JOIN 
+    persona ON institucion.idPersona = persona.idPersona
+WHERE
+	institucion.numDoc = %s
+            """, (numDoc,))
             row = cursor.fetchone()
             if row:
-                columnas = [desc[0] for desc in cursor.description]
-                genero_dict = dict(zip(columnas, row))
-                return genero_dict
+                return {
+                    "success": True,
+                    "nombre_responsable": row[0],
+                    "apellido_responsable": row[1],
+                    "cargo_responsable": row[2]
+                }
             else:
-                return {"error": "Genero no encontrado"}
+                return {"success": False, "message": "No se encontró el responsable para la institución seleccionada."}
     except Exception as e:
-        return {"error": str(e)}
+        return {"success": False, "error": str(e)}
     finally:
         conexion.close()
 
-def agregar_genero(nombre, estado):
+def agregar_informe_inicial(idPractica, objetivos, plan_trabajo):
     conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            # Usar 'P' para Pendiente y 'A' para Aprobado (1 carácter)
+            estado = 'P'  # El informe inicial empieza como Pendiente
+
+            # Insertar el informe en la tabla 'informe'
             cursor.execute("""
-                INSERT INTO genero (nombre, estado) 
+                INSERT INTO informe (estado, idTipoInforme)
                 VALUES (%s, %s)
-            """, (nombre, estado))
+            """, (estado, 1))  # idTipoInforme = 1 para Informe Inicial
+
+            # Obtener el ID del informe recién insertado
+            idInforme = cursor.lastrowid
+
+            # Insertar los objetivos en la tabla 'objetivos'
+            for objetivo in objetivos:
+                cursor.execute("""
+                    INSERT INTO objetivos (descripcion, idInforme)
+                    VALUES (%s, %s)
+                """, (objetivo, idInforme))
+
+            # Insertar el plan de trabajo en la tabla 'plan_trabajo'
+            for plan in plan_trabajo:
+                semana = plan['semana']
+                fecha_inicio = plan['fecha_inicio']
+                fecha_fin = plan['fecha_fin']
+                actividades = plan['actividad']
+                horas = plan['horas']
+
+                cursor.execute("""
+                    INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (semana, fecha_inicio, fecha_fin, actividades, horas, idInforme))
+
+            # Confirmar los cambios
             conexion.commit()
-            return {"mensaje": "Genero agregado correctamente"}
+            return {"success": True, "message": "Informe inicial agregado correctamente"}
     except Exception as e:
         conexion.rollback()
-        return {"error": str(e)}
+        return {"success": False, "error": str(e)}
     finally:
         conexion.close()
 
-def modificar_genero(idGenero, nombre, estado):
-    conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                UPDATE genero 
-                SET nombre = %s, estado = %s 
-                WHERE idGenero = %s
-            """, (nombre, estado, idGenero))
-            conexion.commit()
-            return {"mensaje": "Genero modificado correctamente"}
-    except Exception as e:
-        conexion.rollback()
-        return {"error": str(e)}
-    finally:
-        conexion.close()
 
-def eliminar_genero(idGenero):
-    if not idGenero:
-        return {"error": "El ID del genero es requerido."}
-    conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM genero WHERE idGenero = %s", (idGenero,))
-            conexion.commit()
-            return {"mensaje": "Genero eliminado correctamente"}
-    except Exception as e:
-        conexion.rollback()
-        return {"error": str(e)}
-    finally:
-        conexion.close()
-
-def dar_de_baja_genero(idGenero):
-    if not idGenero:
-        return {"error": "El ID del genero es requerido."}
-    conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("UPDATE genero SET estado = 'I' WHERE idGenero = %s", (idGenero,))
-            conexion.commit()
-            return {"mensaje": "Genero dado de baja correctamente"}
-    except Exception as e:
-        conexion.rollback()
-        return {"error": str(e)}
-    finally:
-        conexion.close()

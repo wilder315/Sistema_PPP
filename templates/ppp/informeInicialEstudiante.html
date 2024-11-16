@@ -45,7 +45,7 @@
             Informe Inicial de Prácticas Pre Profesionales (Estudiante)
         </div>
         <div class="card-body scrollable">
-            <form action="" method="POST">
+            <form id="form-informe">
                 <!-- Encabezado -->
                 <div class="row">
                     <div class="col-md-6">
@@ -66,21 +66,21 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="nombre" class="form-label">Nombres:</label>
-                                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ session['nombre'] }}" readonly>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="apellidos" class="form-label">Apellidos:</label>
-                                            <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+                                            <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ session['apellidos'] }}" readonly>
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <label for="codigo" class="form-label">Código del Estudiante:</label>
-                                            <input type="text" class="form-control" id="codigo" name="codigo" required>
+                                            <input type="text" class="form-control" id="codigo" name="codigo" value="{{ session['codigo'] }}" readonly>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="semestre" class="form-label">Semestre Académico:</label>
-                                            <input type="text" class="form-control" id="semestre" name="semestre" required>
+                                            <input type="text" class="form-control" id="semestre" name="semestre" value="{{ session['semestre'] }}" readonly>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -91,22 +91,27 @@
                                 <fieldset>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <label for="empresa" class="form-label">Nombre de la Empresa:</label>
-                                            <input type="text" class="form-control" id="empresa" name="empresa" required>
+                                            <label for="institucion" class="form-label">Nombre de la Institución:</label>
+                                            <select class="form-control" id="institucion" name="institucion" required>
+                                                <option value="" selected disabled>Seleccione una institución</option>
+                                                {% for institucion in instituciones %}
+                                                <option value="{{ institucion['numDoc'] }}">{{ institucion['razonSocial'] }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="nombre_responsable" class="form-label">Nombre del Responsable:</label>
-                                            <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" required>
+                                            <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" readonly>
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <label for="apellido_responsable" class="form-label">Apellido del Responsable:</label>
-                                            <input type="text" class="form-control" id="apellido_responsable" name="apellido_responsable" required>
+                                            <input type="text" class="form-control" id="apellido_responsable" name="apellido_responsable" readonly>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="cargo_responsable" class="form-label">Cargo:</label>
-                                            <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required>
+                                            <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -214,28 +219,30 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Función para agregar una nueva fila de objetivo a la tabla de objetivos
-    document.getElementById('agregarObjetivo').addEventListener('click', function() {
-        var nuevaFila = `<tr>
+    $(document).ready(function() {
+        cargarInstituciones();
+    });
+
+    // Agregar nueva fila de objetivo
+    $('#agregarObjetivo').on('click', function() {
+        const nuevaFila = `<tr>
             <td><input type="text" class="form-control" name="numero_objetivo[]" placeholder="#" required></td>
             <td><input type="text" class="form-control" name="objetivo[]" placeholder="Descripción del objetivo" required></td>
             <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
         </tr>`;
-        document.querySelector('#tabla-objetivos tbody').insertAdjacentHTML('beforeend', nuevaFila);
+        $('#tabla-objetivos tbody').append(nuevaFila);
     });
 
-    // Función para eliminar filas seleccionadas de la tabla de objetivos
-    document.getElementById('eliminarObjetivo').addEventListener('click', function() {
-        const checkboxes = document.querySelectorAll('.seleccionar-objetivo:checked');
-        checkboxes.forEach(checkbox => {
-            checkbox.closest('tr').remove();
-        });
+    // Eliminar filas seleccionadas de objetivos
+    $('#eliminarObjetivo').on('click', function() {
+        $('.seleccionar-objetivo:checked').closest('tr').remove();
     });
 
-    // Función para agregar una nueva fila de plan de trabajo a la tabla
-    document.getElementById('agregarPlanTrabajo').addEventListener('click', function() {
-        var nuevaFila = `<tr>
+    // Agregar nueva fila de plan de trabajo
+    $('#agregarPlanTrabajo').on('click', function() {
+        const nuevaFila = `<tr>
             <td><input type="text" class="form-control" name="semana[]" placeholder="Semana" required></td>
             <td>
                 <input type="date" class="form-control" name="fecha_inicio[]" required>
@@ -245,16 +252,122 @@
             <td><input type="number" class="form-control" name="horas[]" placeholder="Horas" required></td>
             <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
         </tr>`;
-        document.querySelector('#tabla-plan-trabajo tbody').insertAdjacentHTML('beforeend', nuevaFila);
+        $('#tabla-plan-trabajo tbody').append(nuevaFila);
     });
 
-    // Función para eliminar filas seleccionadas de la tabla de plan de trabajo
-    document.getElementById('eliminarPlanTrabajo').addEventListener('click', function() {
-        const checkboxes = document.querySelectorAll('.seleccionar-plan:checked');
-        checkboxes.forEach(checkbox => {
-            checkbox.closest('tr').remove();
+    // Eliminar filas seleccionadas del plan de trabajo
+    $('#eliminarPlanTrabajo').on('click', function() {
+        $('.seleccionar-plan:checked').closest('tr').remove();
+    });
+
+    // Enviar el formulario con AJAX y mostrar alerta de éxito
+    $(document).ready(function() {
+        cargarInstituciones();
+    });
+
+    // Enviar el formulario con AJAX y mostrar alerta de éxito
+    $('#form-informe').on('submit', function(event) {
+        event.preventDefault(); // Evita el envío automático del formulario
+
+        const formData = $(this).serialize();
+
+        $.ajax({
+            url: "{{ url_for('router_informe.agregar_informe') }}",
+            type: 'POST',
+            data: formData,
+            dataType: 'json', // Indicamos que esperamos una respuesta JSON
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message || 'El informe inicial ha sido guardado correctamente.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'No se pudo guardar el informe.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al procesar la solicitud. Verifica tu conexión e intenta de nuevo.',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         });
     });
+
+    // Obtener datos del responsable de la institución seleccionada
+    $('#institucion').on('change', function() {
+        const numDoc = $(this).val();
+
+        if (numDoc) {
+            $.ajax({
+                url: `/informe/get_institucion_responsable/${numDoc}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#nombre_responsable').val(response.nombre_responsable);
+                        $('#apellido_responsable').val(response.apellido_responsable);
+                        $('#cargo_responsable').val(response.cargo_responsable);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'No se encontraron datos para la institución seleccionada.',
+                            confirmButtonText: 'Aceptar'
+                        });
+                        $('#nombre_responsable, #apellido_responsable, #cargo_responsable').val('');
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al obtener los datos del responsable.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                    $('#nombre_responsable, #apellido_responsable, #cargo_responsable').val('');
+                }
+            });
+        }
+    });
+
+    // Cargar instituciones en el select
+    function cargarInstituciones(selectedInstitucionId) {
+        $.ajax({
+            url: '/datos_instituciones',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                const institucionSelect = $('#institucion');
+                institucionSelect.empty();
+                institucionSelect.append('<option value="" disabled selected>Seleccione una institución</option>');
+
+                response.forEach(institucion => {
+                    const selected = parseInt(institucion.numDoc) === parseInt(selectedInstitucionId) ? 'selected' : '';
+                    institucionSelect.append(`<option value="${institucion.numDoc}" ${selected}>${institucion.razonSocial}</option>`);
+                });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al cargar las instituciones.',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+    }
 </script>
+
 
 {% endblock %}
