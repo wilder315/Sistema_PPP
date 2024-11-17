@@ -10,19 +10,6 @@ def mostrar_formulario_masivo():
     """Muestra la interfaz para envío masivo de correos"""
     return render_template('emails/envio_masivo.html')
 
-# Ruta API para envío automático de bienvenida
-@router_email.route('/api/email/bienvenida/<int:id_persona>', methods=['POST'])
-def enviar_correo_bienvenida(id_persona):
-    """API para enviar correo de bienvenida automático"""
-    try:
-        resultado = controlador.enviar_correo_bienvenida_automatico(id_persona)
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": f"Error al enviar correo de bienvenida: {str(e)}"
-        }), 500
-
 # Ruta API para envío masivo
 @router_email.route('/api/email/masivo', methods=['POST'])
 def enviar_correo_masivo():

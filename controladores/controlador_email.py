@@ -10,111 +10,70 @@ class ControladorEmail:
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-    def generar_contraseña(self, longitud=12):
-        """Genera una contraseña aleatoria robusta con letras, dígitos y caracteres especiales"""
-        caracteres = string.ascii_letters + string.digits + "@#$%&*"
-        return ''.join(random.choice(caracteres) for _ in range(longitud))
 
-    def obtener_datos_estudiante(self, id_persona):
-        """Obtiene datos de un estudiante específico"""
+    def obtener_todos_estudiantes_activos(self):
+        """Obtiene lista de todos los estudiantes activos"""
         conexion = obtener_conexion()
         if not conexion:
             return None
         try:
             with conexion.cursor() as cursor:
                 cursor.execute("""
-                    SELECT nombre, apellidos, correoP, correoUSAT, codUniversitario
+                    SELECT nombre, apellidos, correoP, correoUSAT
                     FROM persona 
-                    WHERE idPersona = %s AND estado = 'A'
-                """, (id_persona,))
-                row = cursor.fetchone()
-                if row:
-                    return {
+                    WHERE estado = 'A'
+                    ORDER BY apellidos, nombre
+                """)
+                estudiantes = []
+                for row in cursor.fetchall():
+                    estudiantes.append({
                         'nombre': row[0],
                         'apellidos': row[1],
                         'correoP': row[2],
-                        'correoUSAT': row[3],
-                        'codUniversitario': row[4]
-                    }
-                return None
+                        'correoUSAT': row[3]
+                    })
+                return estudiantes
         except Exception as e:
-            self.logger.error(f"Error al obtener datos del estudiante: {str(e)}")
+            self.logger.error(f"Error al obtener estudiantes: {str(e)}")
             return None
         finally:
             conexion.close()
 
-    def enviar_correo_bienvenida_automatico(self, id_persona):
-        """Envía correo de bienvenida automático al registrar estudiante"""
+    def enviar_correo_masivo(self, asunto, contenido):
+        """Envía correo masivo a todos los estudiantes activos"""
         try:
-            estudiante = self.obtener_datos_estudiante(id_persona)
-            if not estudiante:
+            estudiantes = self.obtener_todos_estudiantes_activos()
+            
+            if not estudiantes:
                 return {
                     "success": False,
-                    "message": "No se encontró el estudiante"
+                    "message": "No se encontraron estudiantes activos"
                 }
 
-            # Generar una contraseña aleatoria
-            contrasena = self.generar_contraseña()
-            print("Contraseña generada:", contrasena)  # Verificar que la contraseña se genera correctamente
+            correos_exitosos = 0
+            correos_fallidos = 0
 
-            # Cifrar la contraseña
-            password_cifrada = cifrar_contraseña(contrasena)
+            for estudiante in estudiantes:
+                envio_exitoso = self.email_service.enviar_correo_masivo(
+                    correo_destino=estudiante['correoP'],
+                    asunto=asunto,
+                    contenido=contenido
+                )
+                
+                if envio_exitoso:
+                    correos_exitosos += 1
+                else:
+                    correos_fallidos += 1
 
-            # Guardar la contraseña en la base de datos
-            guardado_exitoso = self.guardar_credenciales(id_persona, password_cifrada)
-            if not guardado_exitoso:
-                return {
-                    "success": False,
-                    "message": "Error al guardar la contraseña en la base de datos"
-                }
-
-            # Enviar el correo de bienvenida con la contraseña generada
-            envio_exitoso = self.email_service.enviar_correo_bienvenida(
-                nombre=estudiante['nombre'],
-                apellidos=estudiante['apellidos'],
-                correo_destino=estudiante['correoP'],
-                codigo=estudiante['codUniversitario'],
-                contrasena=contrasena  # Pasamos la contraseña generada
-            )
-
-            if envio_exitoso:
-                self.logger.info(f"Correo de bienvenida enviado a {estudiante['correoP']}")
-                return {
-                    "success": True,
-                    "message": "Correo de bienvenida enviado exitosamente",
-                    "contrasena": contrasena  # Confirmación de la contraseña generada
-                }
-            else:
-                self.logger.error(f"Error al enviar correo de bienvenida a {estudiante['correoP']}")
-                return {
-                    "success": False,
-                    "message": "Error al enviar el correo de bienvenida"
-                }
+            return {
+                "success": True,
+                "message": f"Proceso completado. Exitosos: {correos_exitosos}, Fallidos: {correos_fallidos}",
+                "total_estudiantes": len(estudiantes)
+            }
 
         except Exception as e:
-            self.logger.error(f"Error en enviar_correo_bienvenida: {str(e)}")
+            self.logger.error(f"Error en enviar_correo_masivo: {str(e)}")
             return {
                 "success": False,
                 "message": f"Error en el proceso: {str(e)}"
             }
-    
-    def guardar_credenciales(self, id_persona, password_cifrada):
-        """Guarda la contraseña cifrada del estudiante en la base de datos"""
-        conexion = obtener_conexion()
-        if not conexion:
-            return False
-        try:
-            with conexion.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE usuario
-                    SET password = %s
-                    WHERE idUsuario = %s
-                """, (password_cifrada, id_persona))
-                conexion.commit()
-                return True
-        except Exception as e:
-            self.logger.error(f"Error al guardar credenciales: {str(e)}")
-            conexion.rollback()
-            return False
-        finally:
-            conexion.close()

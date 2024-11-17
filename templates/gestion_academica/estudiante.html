@@ -170,6 +170,20 @@
     </div>
 </div>
 
+<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h5 class="mb-3">Guardando estudiante</h5>
+                <p class="text-muted mb-0">Por favor, espere mientras se envían las credenciales.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -501,67 +515,80 @@
             });
         });
         
-        //
-        $('#formEstudiante').submit(async function (e) {
+        $('#formEstudiante').submit(function (e) {
             e.preventDefault();
-            if ($('#idEstudianteMod').val() === '') {
-                const username = $('#usuarioMod').val().trim();
-                const estadoUsuario = 'A';
-                const idTipoUsuario = 3;
-                if (!username) {
-                    mostrarAlerta("warning", "Error", "Debe generar el nombre de usuario antes de guardar.");
-                    return;
-                }
-                try {
-                    const usuarioResponse = await $.ajax({
-                        url: '/agregar_usuario',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            username: username,
-                            estado: estadoUsuario,
-                            idTipoUsuario: idTipoUsuario
-                        })
-                    });
-                    if (usuarioResponse.error) {
-                        mostrarAlerta("error", "Error al crear usuario", usuarioResponse.error);
-                        return;
-                    }
-                    const idUsuario = usuarioResponse.idUsuario;
-                    const data = {
-                        numDoc: $('#numDocMod').val(),
-                        nombre: $('#nombreEstudianteMod').val(),
-                        apellidos: $('#apellidosEstudianteMod').val(),
-                        codUniversitario: $('#codUniversitarioMod').val(),
-                        tel1: $('#tel1Mod').val(),
-                        tel2: $('#tel2Mod').val(),
-                        correoP: $('#correoPMod').val(),
-                        correoUSAT: $('#correoUSATMod').val(),
-                        estado: $('#estadoEstudianteMod').val(),
-                        idGenero: $('#generoMod').val(),
-                        idTipoDoc: $('#tipoDocMod').val(),
-                        idUsuario: idUsuario,
-                        idEscuela: $('#escuelaMod').val()
-                    };
-                    const estudianteResponse = await $.ajax({
-                        url: '/agregar_estudiante',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(data)
-                    });
 
-                    if (estudianteResponse.error) {
-                        mostrarAlerta("error", "Error al crear estudiante", estudianteResponse.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", estudianteResponse.mensaje);
-                        $('#modalEstudiante').modal('hide');
-                        table.ajax.reload();
+            if ($('#idEstudianteMod').val() === '') {
+                // Datos para agregar el usuario
+                const username = $('#usuarioMod').val();
+
+                // Mostrar el modal de carga
+                $('#loadingModal').modal('show');
+
+                // Crear el usuario antes de agregar el estudiante
+                $.ajax({
+                    url: '/agregar_usuario',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        username: username,
+                        estado: 'A',
+                        idTipoUsuario: 3
+                    }),
+                    success: function (usuarioResponse) {
+                        if (usuarioResponse.error) {
+                            mostrarAlerta("error", "Error", usuarioResponse.error);
+                            $('#loadingModal').modal('hide'); // Cerrar modal de carga
+                            return;
+                        }
+
+                        // Datos para agregar el estudiante
+                        const data = {
+                            numDoc: $('#numDocMod').val(),
+                            nombre: $('#nombreEstudianteMod').val(),
+                            apellidos: $('#apellidosEstudianteMod').val(),
+                            codUniversitario: $('#codUniversitarioMod').val(),
+                            tel1: $('#tel1Mod').val(),
+                            tel2: $('#tel2Mod').val(),
+                            correoP: $('#correoPMod').val(),
+                            correoUSAT: $('#correoUSATMod').val(),
+                            estado: $('#estadoEstudianteMod').val(),
+                            idGenero: $('#generoMod').val(),
+                            idTipoDoc: $('#tipoDocMod').val(),
+                            idUsuario: usuarioResponse.idUsuario,
+                            idEscuela: $('#escuelaMod').val()
+                        };
+
+                        // Hacer la solicitud para agregar el estudiante
+                        $.ajax({
+                            url: '/agregar_estudiante',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(data),
+                            success: function (response) {
+                                $('#loadingModal').modal('hide'); // Cerrar modal de carga
+
+                                if (response.error) {
+                                    mostrarAlerta("error", "Error", response.error);
+                                } else {
+                                    mostrarAlerta("success", "Éxito", response.mensaje);
+                                    table.ajax.reload();
+                                    $('#modalEstudiante').modal('hide');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                $('#loadingModal').modal('hide'); // Cerrar modal de carga
+                                mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
                     }
-                } catch (error) {
-                    mostrarAlerta("error", "Error", "Hubo un problema al guardar los datos.");
-                    console.error(error);
-                }
+                });
             } else {
+                // Funcionalidad para modificar estudiante
                 const data = {
                     idPersona: $('#idEstudianteMod').val(),
                     numDoc: $('#numDocMod').val(),
@@ -579,12 +606,16 @@
                     idEscuela: $('#escuelaMod').val()
                 };
 
+                $('#loadingModal').modal('show'); // Mostrar modal de carga
+
                 $.ajax({
                     url: '/modificar_estudiante',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (response) {
+                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
+
                         if (response.error) {
                             mostrarAlerta("error", "Error", response.error);
                         } else {
@@ -594,11 +625,13 @@
                         }
                     },
                     error: function (xhr, status, error) {
+                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
                         mostrarAlerta("error", "Error", "Hubo un error al modificar el estudiante.");
                     }
                 });
             }
         });
+
 
         // Evento para Eliminar Estudiante
         $('#tabla-estudiante tbody').on('click', '.btnEliminar', function () {

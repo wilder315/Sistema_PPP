@@ -1,5 +1,6 @@
 from bd import obtener_conexion
 from service.email_service import EmailService
+import controladores.controlador_usuario as controlador_usuario
 
 def obtener_estudiantes():
     conexion = obtener_conexion()
@@ -89,22 +90,35 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            # Insertar el estudiante
             cursor.execute("""
                 INSERT INTO persona (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
-            
-            
+
+            # Obtener el usuario y la contraseña descifrada
+            usuario_data = controlador_usuario.obtener_usuario_por_id(idUsuario)
+            if not usuario_data:
+                return {"error": "No se pudo obtener el usuario"}
+
+            usuario = usuario_data['username']
+            password_descifrada = controlador_usuario.descifrar_contraseña(usuario_data['password'])
+
             # Enviar correo de bienvenida
             email_service = EmailService()
             envio_exitoso = email_service.enviar_correo_bienvenida(
                 nombre=nombre,
                 apellidos=apellidos,
                 correo_destino=correoP,
-                codigo=codUniversitario
-            )  
-            return {"mensaje": "Estudiante agregado correctamente"}
+                codigo=usuario,
+                contrasena=password_descifrada
+            )
+
+            if envio_exitoso:
+                return {"mensaje": "Estudiante agregado correctamente y correo enviado"}
+            else:
+                return {"mensaje": "Estudiante agregado, pero hubo un error al enviar el correo"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
