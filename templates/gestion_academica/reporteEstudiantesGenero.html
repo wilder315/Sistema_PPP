@@ -9,6 +9,37 @@
 </nav>
 
 <div class="container-fluid my-4">
+    <!-- Filtro de Género -->
+    <div class="card w-100 mb-4">
+        <div class="card-header bg-red-usat text-white">
+            Filtros
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="filtroGenero" class="form-label">Filtrar por Género:</label>
+                    <select class="form-select" id="filtroGenero" onchange="filtrarGrafico()">
+                        <option value="todos">Todos</option>
+                        <option value="varones">Varones</option>
+                        <option value="mujeres">Mujeres</option>
+                        <option value="total">Total</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="card w-100 mb-4">
+        <div class="card-header bg-red-usat text-white">
+            Visualización Gráfica
+        </div>
+        <div class="card-body">
+            <canvas id="graficoBarras" style="width: 100%; height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabla existente -->
     <div class="card w-100">
         <div class="card-header bg-red-usat text-white">
             Distribución de Estudiantes por Género y Escuela
@@ -37,7 +68,11 @@
 </div>
 
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <script>
+    let chartBarras;
+    let datosGlobales;
+
     $(document).ready(function () {
         if ($.fn.DataTable.isDataTable('#tabla-estudiantes-genero')) {
             $('#tabla-estudiantes-genero').DataTable().clear().destroy();
@@ -52,7 +87,11 @@
             ajax: {
                 url: "/datos_estudiantes_genero",
                 type: "GET",
-                dataSrc: ""
+                dataSrc: function(data) {
+                    datosGlobales = data;
+                    actualizarGrafico(data);
+                    return data;
+                }
             },
             columns: [
                 { data: "Facultad", className: 'text-start' },
@@ -80,6 +119,124 @@
             }
         });
     });
+
+    function filtrarGrafico() {
+        const filtro = document.getElementById('filtroGenero').value;
+        actualizarGrafico(datosGlobales, filtro);
+    }
+
+    function actualizarGrafico(datos, filtro = 'todos') {
+        const ctx = document.getElementById('graficoBarras').getContext('2d');
+        
+        if (chartBarras) {
+            chartBarras.destroy();
+        }
+
+        const escuelas = datos.map(item => item.Escuela);
+        const varones = datos.map(item => Math.round(item.Varones));
+        const mujeres = datos.map(item => Math.round(item.Mujeres));
+        const totales = datos.map(item => Math.round(item.Total));
+
+        let datasets = [];
+
+        switch(filtro) {
+            case 'varones':
+                datasets = [{
+                    label: 'Varones',
+                    data: varones,
+                    backgroundColor: 'rgba(53, 162, 235, 0.8)',
+                    borderColor: 'rgba(53, 162, 235, 1)',
+                    borderWidth: 2
+                }];
+                break;
+            case 'mujeres':
+                datasets = [{
+                    label: 'Mujeres',
+                    data: mujeres,
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }];
+                break;
+            case 'total':
+                datasets = [{
+                    label: 'Total',
+                    data: totales,
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2
+                }];
+                break;
+            default:
+                datasets = [
+                    {
+                        label: 'Varones',
+                        data: varones,
+                        backgroundColor: 'rgba(53, 162, 235, 0.8)',
+                        borderColor: 'rgba(53, 162, 235, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Mujeres',
+                        data: mujeres,
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Total',
+                        data: totales,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2
+                    }
+                ];
+        }
+
+        chartBarras = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: escuelas,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribución por Género en cada Escuela'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + Math.round(context.raw);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return Math.round(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
 {% endblock %}
 {% endblock %}
