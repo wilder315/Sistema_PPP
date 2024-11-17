@@ -69,3 +69,23 @@ def eliminar_estudiante():
     idEstudiante = request.json.get('idEstudiante')
     resultado = controlador_estudiante.eliminar_estudiante(idEstudiante)
     return jsonify(resultado)
+
+
+@router_estudiante.route("/reporte_estudiantes_genero")
+def reporte_estudiantes_genero():
+    return render_template('gestion_academica/reporteEstudiantesGenero.html')
+
+@router_estudiante.route("/datos_estudiantes_genero", methods=["GET"])
+def datos_estudiantes_genero():
+    datos = controlador_estudiante.obtener_estudiantes_por_genero_escuela()
+    return jsonify(datos)
+
+
+@router_estudiante.route("/reporte_estudiantes_semestre")
+def reporte_estudiantes_semestre():
+    return render_template('gestion_academica/reporteEstudiantesSemestre.html')
+
+@router_estudiante.route("/datos_estudiantes_semestre", methods=["GET"])
+def datos_estudiantes_semestre():
+    datos = controlador_estudiante.obtener_estudiantes_por_semestre()
+    return jsonify(datos)

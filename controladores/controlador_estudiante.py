@@ -255,3 +255,78 @@ def obtener_ppp_finalizadas():
         conexion.close()
         
     return estado_ppp
+
+
+
+def obtener_estudiantes_por_genero_escuela():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    e.nombre as Escuela,
+                    f.nombre as Facultad,
+                    SUM(CASE WHEN g.nombre = 'Masculino' THEN 1 ELSE 0 END) as Varones,
+                    SUM(CASE WHEN g.nombre = 'Femenino' THEN 1 ELSE 0 END) as Mujeres,
+                    COUNT(*) as Total,
+                    ROUND((SUM(CASE WHEN g.nombre = 'Masculino' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as PorcentajeVarones,
+                    ROUND((SUM(CASE WHEN g.nombre = 'Femenino' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as PorcentajeMujeres
+                FROM persona p
+                INNER JOIN escuela e ON p.idEscuela = e.idEscuela
+                INNER JOIN facultad f ON e.idFacultad = f.idFacultad
+                INNER JOIN genero g ON p.idGenero = g.idGenero
+                INNER JOIN usuario u ON p.idUsuario = u.idUsuario
+                WHERE u.idTipoUsuario = 3 AND p.estado = 'A'
+                GROUP BY e.nombre, f.nombre
+                ORDER BY f.nombre, e.nombre
+            """)
+            columnas = [desc[0] for desc in cursor.description]
+            resultados = []
+            for row in cursor.fetchall():
+                resultados.append(dict(zip(columnas, row)))
+            return resultados
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()        
+        
+
+def obtener_estudiantes_por_semestre():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    sa.nombre as Semestre,
+                    e.nombre as Escuela,
+                    f.nombre as Facultad,
+                    COUNT(DISTINCT p.idPersona) as TotalEstudiantes,
+                    COUNT(DISTINCT CASE WHEN g.nombre = 'Masculino' THEN p.idPersona END) as Varones,
+                    COUNT(DISTINCT CASE WHEN g.nombre = 'Femenino' THEN p.idPersona END) as Mujeres,
+                    ROUND((COUNT(DISTINCT CASE WHEN g.nombre = 'Masculino' THEN p.idPersona END) * 100.0 / 
+                        COUNT(DISTINCT p.idPersona)), 2) as PorcentajeVarones,
+                    ROUND((COUNT(DISTINCT CASE WHEN g.nombre = 'Femenino' THEN p.idPersona END) * 100.0 / 
+                        COUNT(DISTINCT p.idPersona)), 2) as PorcentajeMujeres
+                FROM practicas_preprofesionales pp
+                INNER JOIN persona p ON pp.idPersona = p.idPersona
+                INNER JOIN escuela e ON p.idEscuela = e.idEscuela
+                INNER JOIN facultad f ON e.idFacultad = f.idFacultad
+                INNER JOIN genero g ON p.idGenero = g.idGenero
+                INNER JOIN semestre_academico sa ON pp.idSemestre = sa.idSemestre
+                WHERE p.estado = 'A'
+                GROUP BY sa.nombre, e.nombre, f.nombre
+                ORDER BY sa.nombre DESC, f.nombre, e.nombre
+            """)
+            columnas = [desc[0] for desc in cursor.description]
+            resultados = []
+            for row in cursor.fetchall():
+                resultados.append(dict(zip(columnas, row)))
+            return resultados
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()    

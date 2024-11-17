@@ -1,0 +1,87 @@
+{% extends "/gestion_academica/home.html" %}
+{% block titulo %} Reporte de Estudiantes por Semestre {% endblock %}
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Reporte de Estudiantes por Semestre</li>
+    </ol>
+</nav>
+
+<div class="container-fluid my-4">
+    <div class="card w-100">
+        <div class="card-header bg-red-usat text-white">
+            Distribución de Estudiantes Matriculados por Semestre
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-estudiantes-semestre" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Semestre</th>
+                            <th style="width: 20%;">Facultad</th>
+                            <th style="width: 20%;">Escuela</th>
+                            <th style="text-align:center">Total Estudiantes</th>
+                            <th style="text-align:center">Varones</th>
+                            <th style="text-align:center">Mujeres</th>
+                            <th style="text-align:center">% Varones</th>
+                            <th style="text-align:center">% Mujeres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        if ($.fn.DataTable.isDataTable('#tabla-estudiantes-semestre')) {
+            $('#tabla-estudiantes-semestre').DataTable().clear().destroy();
+        }
+        $('#tabla-estudiantes-semestre').DataTable({
+            paging: true,
+            info: true,
+            responsive: true,
+            autoWidth: false,
+            searching: true,
+            order: [[0, 'desc'], [1, 'asc'], [2, 'asc']],
+            ajax: {
+                url: "/datos_estudiantes_semestre",
+                type: "GET",
+                dataSrc: ""
+            },
+            columns: [
+                { data: "Semestre", className: 'text-start' },
+                { data: "Facultad", className: 'text-start' },
+                { data: "Escuela", className: 'text-start' },
+                { data: "TotalEstudiantes", className: 'text-center' },
+                { data: "Varones", className: 'text-center' },
+                { data: "Mujeres", className: 'text-center' },
+                { 
+                    data: "PorcentajeVarones", 
+                    className: 'text-center',
+                    render: function(data) {
+                        return data + '%';
+                    }
+                },
+                { 
+                    data: "PorcentajeMujeres", 
+                    className: 'text-center',
+                    render: function(data) {
+                        return data + '%';
+                    }
+                }
+            ],
+            language: {
+                url: "{{ url_for('static', filename='js/es-ES.json') }}"
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
