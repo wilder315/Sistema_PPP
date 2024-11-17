@@ -17,11 +17,6 @@ def obtener_jefe_por_id(idJefe):
     jefe = controlador_jefe.obtener_jefe_por_id(idJefe)   
     return jsonify(jefe)
 
-@router_jefe.route("/obtener_jefe_por_id_modificar/<int:idJefe>", methods=["GET"])
-def obtener_jefe_por_id_modificar(idJefe):
-    jefe = controlador_jefe.obtener_jefe_por_id_modificar(idJefe)
-    return jsonify(jefe)
-
 @router_jefe.route("/agregar_jefe", methods=["POST"])
 def agregar_jefe():
     data = request.json
@@ -34,7 +29,7 @@ def agregar_jefe():
     estado = data.get('estado')
     idGenero = data.get('idGenero')
     idTipoDoc = data.get('idTipoDoc')
-    idUsuario = 2  # Por ahora asumimos que el jefe tiene un usuario con id 2, en una implementación real, se debería obtener el id del usuario logueado.
+    idUsuario = data.get('idUsuario')
 
     resultado = controlador_jefe.agregar_jefe(numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idUsuario)
     return jsonify(resultado)
@@ -42,7 +37,6 @@ def agregar_jefe():
 @router_jefe.route("/modificar_jefe", methods=["POST"])
 def modificar_jefe():
     data = request.json
-    #idJefe = data.get('idJefe')
     numDoc = data.get('numDoc')
     nombre = data.get('nombre')
     apellidos = data.get('apellidos')

@@ -159,15 +159,45 @@ def modificar_usuario(idUsuario, username, estado, idTipoUsuario):
 
 def eliminar_usuario(idUsuario):
     if not idUsuario:
-        return {"error": "El ID del usuario es requerido."}
+        return {"error": "El ID del usuario es requerido."} 
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.nombre, p.apellidos, u.idTipoUsuario
+                FROM 
+                    persona p
+                INNER JOIN 
+                    usuario u ON p.idUsuario = u.idUsuario
+                WHERE 
+                    u.idUsuario = %s
+            """, (idUsuario,))
+            
+            resultado = cursor.fetchone()
+            if resultado:
+                nombre = resultado[0]
+                apellidos = resultado[1]
+                idTipoUsuario = resultado[2]
+                tipo_usuario = ""
+                if idTipoUsuario == 1:
+                    tipo_usuario = "Director de Escuela"
+                elif idTipoUsuario == 2:
+                    tipo_usuario = "Docente de Apoyo de PPP"
+                elif idTipoUsuario == 3:
+                    tipo_usuario = "Practicante"
+                elif idTipoUsuario == 4:
+                    tipo_usuario = "Jefe Directo"          
+                return {
+                    "error": f"Este usuario le pertenece a <strong>{nombre} {apellidos}</strong>, "
+                    f"quien es un <strong>{tipo_usuario}</strong>.<br>"
+                    "No se puede eliminar un usuario en uso."
+                }
             cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario,))
             conexion.commit()
-            return {"mensaje": "Usuario eliminada correctamente"}
+            return {"mensaje": "Usuario eliminado correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

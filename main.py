@@ -28,7 +28,7 @@ app = Flask(__name__)
 app.debug = False
 app.secret_key = 'super-secret'
 app.config['SESSION_PERMANENT'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=25)
 
 @app.before_request
 def verificar_autenticacion():

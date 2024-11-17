@@ -117,6 +117,8 @@ def modificar_estudiante(idEstudiante, numDoc, nombre, apellidos, codUniversitar
         conexion.close()
 
 def eliminar_estudiante(idEstudiante):
+    if not idEstudiante: 
+        return {"error": "El id del jefe es requerido"}
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}

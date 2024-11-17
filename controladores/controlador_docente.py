@@ -18,7 +18,7 @@ def obtener_docentes():
                 LEFT JOIN tipo_documento td ON p.idTipoDoc = td.idTipoDoc
                 LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
                 LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
-                WHERE u.idTipoUsuario = 2
+                WHERE u.idTipoUsuario IN (1, 2)
                 ORDER BY p.apellidos ASC, p.nombre ASC 
             """)
             column_names = [desc[0] for desc in cursor.description]

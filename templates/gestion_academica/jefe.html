@@ -9,10 +9,10 @@
     </ol>
 </nav>
 
-<!-- Cards para mostrar los resultados de la búsqueda -->
 <div class="container-fluid my-4">
     <div class="card w-100" id="card_jefes">
-        <div class="card-header bg-red-usat text-white">
+        <div class="card-header bg-red-usat text-white" id="headingOne" data-bs-toggle="collapse"
+            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
             Jefes
         </div>
         <div class="card-body">
@@ -29,15 +29,17 @@
                             <th style="text-align:center">Opciones</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        <!-- Los datos de los estudiantes se cargarán dinámicamente aquí -->
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal para agregar un nuevo jefé -->
-<div class="modal fade" id="modalJefe" tabindex="-1" aria-hidden="true">
+<!-- MODAL JEFE -->
+ <div class="modal fade" id="modalJefe" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -54,11 +56,8 @@
                             <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required>
                         </div> 
                         <div class="col-md-6 mb-3">
-                            <label for="tipoDocMod" class="form-label">Tipo de Documento:</label>
-                            <select class="form-control" id="tipoDocMod" name="idTipoDocMod" required>
-                                <option value="" disabled selected>Seleccionar tipo de documento</option>
-                                <!-- Los valores del tipo de documento se cargarán dinámicamente -->
-                            </select>
+                            <label for="cargoMod" class="form-label">Cargo:</label>
+                            <input type="text" class="form-control" id="cargoMod" name="cargoMod" required>
                         </div>
                     </div>
 
@@ -78,7 +77,7 @@
                             <input type="email" class="form-control" id="correoPMod" name="correoPMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="tel1Mod" class="form-label">Teléfono 1:</label>
+                            <label for="tel1Mod" class="form-label">Teléfono:</label>
                             <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required>
                         </div>
                         
@@ -105,10 +104,12 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="cargoMod" class="form-label">Cargo:</label>
-                            <input type="text" class="form-control" id="cargoMod" name="cargoMod" required>
+                            <label for="tipoDocMod" class="form-label">Tipo de Documento:</label>
+                            <select class="form-control" id="tipoDocMod" name="idTipoDocMod" required>
+                                <option value="" disabled selected>Seleccionar tipo de documento</option>
+                                <!-- Los valores del tipo de documento se cargarán dinámicamente -->
+                            </select>
                         </div>
-
                         <div class="col-md-6 mb-3">
                             <label for="usuarioMod" class="form-label">Usuario:</label>
                             <div class="input-group">
@@ -118,9 +119,7 @@
                                 </button>
                             </div>
                         </div>
-                        
                     </div>
-
 
                     <div class="text-end mt-10">
                         <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
@@ -155,7 +154,6 @@
 </div>
 
 {% block scripts %}
-<!-- Librerías externas -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/dataTables.buttons.min.js"></script>
@@ -167,15 +165,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 
-<!-- Script principal -->
 <Script> 
     $(document).ready(function() {
-        // Destruir si existe una tabla --Funciona....
+        $('#usuarioMod').prop('disabled', true);
         if ($.fn.DataTable.isDataTable('#tabla-jefe')) {
             $('#tabla-jefe').DataTable().clear().destroy();
         }
     
-        // Llenado de la tabla --Funciona.....
         var table = $('#tabla-jefe').DataTable({
             paging: true,
             pageLength: 10,
@@ -231,7 +227,7 @@
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${row.idPersona}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idPersona}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-trash-alt"></i></i></button>
                             <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
@@ -242,7 +238,7 @@
             }
         });
     
-        // Función para mostrar alerta --- Funciona .....
+        // Funcion para mostrar alerta
         function mostrarAlerta(tipo, titulo, mensaje) {
             Swal.fire({
                 icon: tipo,
@@ -253,10 +249,10 @@
             });
         }
     
-        // Función para cargar Tipo de documento -- Funciona....
+        // Función para cargar los tipoDocumentos dinámicamente
         function cargarTipoDocumentos(selectedTipoDocId) {
             $.ajax({
-                url: '/datos_tipoDocumentos',
+                url: '/datos_tipoDocumentosEstudiante',
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -274,10 +270,10 @@
             });
         }
     
-        // Función para cargar Genero -- Funciona.....
+        // Función para cargar los géneros dinámicamente
         function cargarGeneros(selectedGeneroId = null) {
             $.ajax({
-                url: '/datos_generos',  // Asegúrate de que esta URL sea correcta
+                url: '/datos_generos',
                 type: 'GET',
                 contentType: 'application/json',
                 success: function(response) {
@@ -295,52 +291,37 @@
             });
         }
 
-        //Función para cargar los usuarios dinamicamente -- Funciona....
-        function cargarUsuarios(selectedUsuarioId) {
-            $.ajax({
-                url: '/datos_usuarios_jefe',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var usuarioSelect = $('#usuarioMod');
-                    usuarioSelect.empty();
-                    usuarioSelect.append('<option value="" disabled selected>Seleccionar usuario</option>');
-                    response.forEach(function (usuario) {
-                        var selected = usuario.idUsuario == selectedUsuarioId ? 'selected' : '';
-                        usuarioSelect.append(`<option value="${usuario.idUsuario}" ${selected}>${usuario.username}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los usuarios.");
-                }
-            });
-        }
-
-        //Funcion para deshabilitar los controladores -- Funciona...
-        function deshabilitarControladores() {
-            $('#numDocMod').prop('disabled', true); 
+        //Funcion para deshabilitar los controles
+        function deshabilitarControles() {
+            $('#idJefeMod').prop('disabled', true);
+            $('#numDocMod').prop('disabled', true);
+            $('#cargoMod').prop('disabled', true); 
             $('#apellidosJefeMod').prop('disabled', true);
             $('#nombreJefeMod').prop('disabled', true);
             $('#correoPMod').prop('disabled', true);
-            $('#tel1Mod').prop('disabled', true);
-            $('#cargoMod').prop('disabled', true); 
+            $('#tel1Mod').prop('disabled', true);   
+            $('#estadoJefeMod').prop('disabled', true);
             $('#generoMod').prop('disabled', true);
             $('#tipoDocMod').prop('disabled', true);
+            $('#btnGenerarUsuario').prop('disabled', true);
         }
 
-        //Funcion para habilitar los controladores -- Funciona....
-        function habilitarControladores() {
+        //Funcion para habilitar los controles
+        function habilitarControles() {
+            $('#idJefeMod').prop('disabled', false);
             $('#numDocMod').prop('disabled', false);
+            $('#cargoMod').prop('disabled', false);
             $('#apellidosJefeMod').prop('disabled', false);
             $('#nombreJefeMod').prop('disabled', false);
             $('#correoPMod').prop('disabled', false);
-            $('#tel1Mod').prop('disabled', false);
-            $('#cargoMod').prop('disabled', false);
+            $('#tel1Mod').prop('disabled', false);  
+            $('#estadoJefeMod').prop('disabled', false);      
             $('#generoMod').prop('disabled', false);
             $('#tipoDocMod').prop('disabled', false);
+            $('#btnGenerarUsuario').prop('disabled', false); 
         }
 
-        //Evento para ver jefe
+        //Evento para Ver Jefe
         $('#tabla-jefe tbody').on('click', '.btnVer', function () {
             var id = $(this).data('id');
             $.ajax({
@@ -351,11 +332,9 @@
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-
                         $('#modal-title').text("Ver Jefe");
                         $('#formJefe')[0].reset();
                         $('#idJefeMod').val(response.idPersona);
-
                         $('#numDocMod').val(response.numDoc);
                         $('#nombreJefeMod').val(response.nombre);
                         $('#apellidosJefeMod').val(response.apellidos);
@@ -363,11 +342,10 @@
                         $('#correoPMod').val(response.correoP);
                         $('#cargoMod').val(response.cargo);
                         $('#estadoJefeMod').val(response.estado);
-
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        deshabilitarControladores();
-
+                        deshabilitarControles();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
@@ -380,7 +358,7 @@
             });
         });
 
-        //Evento para agregar jefe  -- Funciona....
+        //Evento para Agregar Jefe
         $(document).on('click', '.btnAgregar', function (e) {
             e.preventDefault();
             $('#modal-title').text("Agregar Jefe");
@@ -388,9 +366,8 @@
             $('#idJefeMod').val('');
             $('#estadoJefeMod').val('');
             $('#generoMod').val('');
-            $('#tel1Mod').val('');
             $('#tipoDocMod').val('');
-            $('#cardoMod').val('');
+            $('#usuarioMod').val('');
             cargarGeneros();
             cargarTipoDocumentos();
             habilitarControles();
@@ -400,7 +377,7 @@
             $('#modalJefe').modal('show');
         });
 
-        //Evento para generar usuario --Funciona...
+        //Evento para Generar Usuario
         $(document).on('click', '#btnGenerarUsuario', function () {
             const nombre = $('#nombreJefeMod').val();
             const apellidos = $('#apellidosJefeMod').val();
@@ -418,7 +395,7 @@
         $('#tabla-jefe tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_jefe_por_id_modificar/' + id,
+                url: '/obtener_jefe_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -435,9 +412,11 @@
                         $('#correoPMod').val(response.correoP);
                         $('#cargoMod').val(response.cargo);
                         $('#estadoJefeMod').val(response.estado);
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        habilitarControladores();
+                        habilitarControles();
+                        $('#btnGenerarUsuario').prop('disabled', true);
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
@@ -450,69 +429,76 @@
             });
         });
 
-
-        // Evento para guardar o modificar Jefe -- EXITO....
         $('#formJefe').submit(async function (e) {
             e.preventDefault();
-            if ($('#idJefeMod').val() === '') {  // Si no hay idJefeMod, es un nuevo jefe
-                const username = $('#usuarioMod').val().trim();
-                const estadoUsuario = 'A';
-                const idTipoUsuario = 3;
+            if ($('#idJefeMod').val() === '') {
+                const username = $('#usuarioMod').val();
                 if (!username) {
                     mostrarAlerta("warning", "Error", "Debe generar el nombre de usuario antes de guardar.");
                     return;
                 }
-                try {
-                    // Crear nuevo usuario
-                    const usuarioResponse = await $.ajax({
-                        url: '/agregar_usuario',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            username: username,
-                            estado: estadoUsuario,
-                            idTipoUsuario: idTipoUsuario
-                        })
-                    });
-
-                    if (usuarioResponse.error) {
-                        mostrarAlerta("error", "Error al crear usuario", usuarioResponse.error);
-                        return;
+                Swal.fire({
+                    title: 'Registrando',
+                    html: 'Le estamos enviando las credenciales, por favor espere.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
                     }
-                    const idUsuario = usuarioResponse.idUsuario;
-                    // Crear nuevo jefe
-                    const data = {
-                        numDoc: $('#numDocMod').val(),
-                        nombre: $('#nombreJefeMod').val(),
-                        apellidos: $('#apellidosJefeMod').val(),
-                        tel1: $('#tel1Mod').val(),
-                        correoP: $('#correoPMod').val(),
-                        cargo: $('#cargoMod').val(),
-                        estado: $('#estadoJefeMod').val(),
-                        idGenero: $('#generoMod').val(),
-                        idTipoDoc: $('#tipoDocMod').val(),
-                        idUsuario: idUsuario
-                    };
-
-                    const jefeResponse = await $.ajax({
-                        url: '/agregar_jefe',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(data) 
-                    });
-                    //console.log('valor de idTipoDoc', $('#tipoDocMod').val()); 
-                    if (jefeResponse.error) {
-                        mostrarAlerta("error", "Error al crear jefe", jefeResponse.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", jefeResponse.mensaje);
-                        $('#modalJefe').modal('hide');
-                        table.ajax.reload();  // Recargar la tabla de jefes
+                });
+                $.ajax({
+                    url: '/agregar_usuario',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        username: username,
+                        estado: 'A',
+                        idTipoUsuario: 4
+                    }),
+                    success: function (usuarioResponse) {
+                        if (usuarioResponse.error) {
+                            Swal.close();
+                            mostrarAlerta("error", "Error", usuarioResponse.error);
+                            return;
+                        }
+                        const data = {
+                            numDoc: $('#numDocMod').val(),
+                            nombre: $('#nombreJefeMod').val(),
+                            apellidos: $('#apellidosJefeMod').val(),
+                            tel1: $('#tel1Mod').val(),
+                            correoP: $('#correoPMod').val(),
+                            cargo: $('#cargoMod').val(),
+                            estado: $('#estadoJefeMod').val(),
+                            idGenero: $('#generoMod').val(),
+                            idTipoDoc: $('#tipoDocMod').val(),
+                            idUsuario: usuarioResponse.idUsuario,
+                        };
+                        $.ajax({
+                            url: '/agregar_jefe',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(data),
+                            success: function (response) {
+                                Swal.close();
+                                if (response.error) {
+                                    mostrarAlerta("error", "Error", response.error);
+                                } else {
+                                    mostrarAlerta("success", "Éxito", response.mensaje);
+                                    table.ajax.reload();
+                                    $('#modalJefe').modal('hide');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                Swal.close();
+                                mostrarAlerta("error", "Error", "Hubo un error al agregar el jefe.");
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.close();
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
                     }
-                } catch (error) {
-                    mostrarAlerta("error", "Error", "Hubo un problema al guardar los datos.");
-                    console.error(error);
-                }
-            } else {  // Si ya existe un idJefeMod, es una actualización
+                });
+            } else { 
                 const data = {
                     idPersona: $('#idJefeMod').val(),
                     numDoc: $('#numDocMod').val(),
@@ -535,7 +521,7 @@
                             mostrarAlerta("error", "Error", response.error);
                         } else {
                             mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();  // Recargar la tabla de jefes
+                            table.ajax.reload();
                             $('#modalJefe').modal('hide');
                         }
                     },
@@ -551,7 +537,7 @@
             var id = $(this).data('id');
             var nombreCompleto = $(this).data('apellidos') + " " + $(this).data('nombre');
             $('#modal-title-confirmar').text('Eliminar Jefe');
-            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el Jefe ');
+            $('#texto-confirmar').text('¿Estás seguro de que deseas eliminar el jefe ');
             $('#nombreJefeConfirmar').text(nombreCompleto);
             $('#idJefeConfirmar').val(id);
             $('#confirmarJefe').data('accion', 'eliminar');
@@ -570,8 +556,7 @@
             $('#modalConfirmar').modal('show');
         });
 
-
-        //Confirmar eliminación de jefe 
+        // Evento para Confirmar
         $('#confirmarJefe').click(function () {
             var id = $('#idJefeConfirmar').val();
             var accion = $(this).data('accion');
@@ -580,12 +565,12 @@
             var mensajeError = '';
             if (accion === 'eliminar') {
                 url = '/eliminar_jefe';
-                mensajeExito = 'El jefe fue eliminado correctamente';
+                mensajeExito = 'El jefe y su usuario fueron eliminados correctamente';
                 mensajeError = 'Hubo un error al eliminar al jefe.';
 
             } else if (accion === 'darDeBaja') {
                 url = '/dar_de_baja_jefe';
-                mensajeExito = 'Al jefe fue dado de baja correctamente';
+                mensajeExito = 'El jefe fy su usuario fueron dados de baja correctamente';
                 mensajeError = 'Hubo un error al dar de baja al jefe.';
             }
             $.ajax({
@@ -607,10 +592,7 @@
                 }
             });
         });
-
     });
-
-
 </Script>
 
 
