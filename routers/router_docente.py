@@ -17,11 +17,6 @@ def obtener_docente_por_id(idDocente):
     docente = controlador_docente.obtener_docente_por_id(idDocente)
     return jsonify(docente)
 
-@router_docente.route("/obtener_docente_por_id_modificar/<int:idDocente>", methods=["GET"])
-def obtener_docente_por_id_modificar(idDocente):
-    docente = controlador_docente.obtener_docente_por_id_modificar(idDocente)
-    return jsonify(docente)
-
 @router_docente.route("/agregar_docente", methods=["POST"])
 def agregar_docente():
     data = request.json

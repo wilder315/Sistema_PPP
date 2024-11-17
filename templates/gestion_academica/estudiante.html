@@ -170,20 +170,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-4">
-                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-                <h5 class="mb-3">Guardando estudiante</h5>
-                <p class="text-muted mb-0">Por favor, espere mientras se envían las credenciales.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -197,6 +183,7 @@
 
 <script>
     $(document).ready(function () {
+        $('#usuarioMod').prop('disabled', true);
         if ($.fn.DataTable.isDataTable('#tabla-estudiante')) {
             $('#tabla-estudiante').DataTable().clear().destroy();
         }
@@ -278,6 +265,7 @@
                 timer: 5000
             });
         }
+
         // Función para mostrar el estado de carga
         function mostrarCargando(titulo = 'Procesando', mensaje = 'Por favor, espere...') {
             Swal.fire({
@@ -299,11 +287,9 @@
 
         // Función para cerrar el estado de carga y mostrar alerta de resultado
         function cerrarCargandoYMostrarAlerta(tipo, titulo, mensaje) {
-            Swal.close(); // Cerrar el modal de carga
+            Swal.close();
             mostrarAlerta(tipo, titulo, mensaje);
         }
-
-
 
         // Función para cargar los géneros dinámicamente
         function cargarGeneros(selectedGeneroId) {
@@ -368,27 +354,6 @@
             });
         }
 
-        // Función para cargar los usuarios dinámicamente
-        function cargarUsuarios(selectedUsuarioId) {
-            $.ajax({
-                url: '/datos_usuarios_estudiantes',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var usuarioSelect = $('#usuarioMod');
-                    usuarioSelect.empty();
-                    usuarioSelect.append('<option value="" disabled selected>Seleccionar usuario</option>');
-                    response.forEach(function (usuario) {
-                        var selected = usuario.idUsuario == selectedUsuarioId ? 'selected' : '';
-                        usuarioSelect.append(`<option value="${usuario.idUsuario}" ${selected}>${usuario.username}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los usuarios.");
-                }
-            });
-        }
-
         // Función para deshabilitar los controles
         function deshabilitarControles(){
             $('#idEstudianteMod').prop('disabled', true);
@@ -403,7 +368,7 @@
             $('#estadoEstudianteMod').prop('disabled', true);
             $('#generoMod').prop('disabled', true);
             $('#tipoDocMod').prop('disabled', true);
-            $('#usuarioMod').prop('disabled', true);
+            $('#btnGenerarUsuario').prop('disabled', true); 
             $('#escuelaMod').prop('disabled', true);
         }
 
@@ -421,7 +386,7 @@
             $('#estadoEstudianteMod').prop('disabled', false);
             $('#generoMod').prop('disabled', false);
             $('#tipoDocMod').prop('disabled', false);
-            $('#usuarioMod').prop('disabled', false);
+            $('#btnGenerarUsuario').prop('disabled', false); 
             $('#escuelaMod').prop('disabled', false);
         }
 
@@ -448,9 +413,9 @@
                         $('#correoPMod').val(response.correoP);
                         $('#correoUSATMod').val(response.correoUSAT);
                         $('#estadoEstudianteMod').val(response.estado);
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
                         cargarEscuelas(response.idEscuela);
                         deshabilitarControles();
                         $('#btnCancelar').hide();
@@ -500,12 +465,11 @@
             }
         });
   
-
         // Evento para Modificar Estudiante
         $('#tabla-estudiante tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_estudiante_por_id_modificar/' + id,
+                url: '/obtener_estudiante_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -524,11 +488,12 @@
                         $('#correoPMod').val(response.correoP);
                         $('#correoUSATMod').val(response.correoUSAT);
                         $('#estadoEstudianteMod').val(response.estado);
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
                         cargarEscuelas(response.idEscuela);
                         habilitarControles();
+                        $('#btnGenerarUsuario').prop('disabled', true);
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
@@ -543,15 +508,17 @@
         
         $('#formEstudiante').submit(function (e) {
             e.preventDefault();
-
-            // Mostrar alerta de carga con SweetAlert2
             mostrarCargando('Procensado', 'Por favor, espere mientras se realiza la operación.');
-
             if ($('#idEstudianteMod').val() === '') {
-                // Datos para agregar el usuario
                 const username = $('#usuarioMod').val();
-
-                // Crear el usuario antes de agregar el estudiante
+                Swal.fire({
+                    title: 'Procesando',
+                    html: 'Por favor, espere mientras se realiza la operación.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 $.ajax({
                     url: '/agregar_usuario',
                     type: 'POST',
@@ -563,11 +530,10 @@
                     }),
                     success: function (usuarioResponse) {
                         if (usuarioResponse.error) {
-                            cerrarCargandoYMostrarAlerta('error', 'Error', usuarioResponse.error);
+                            Swal.close();
+                            mostrarAlerta("error", "Error", usuarioResponse.error);
                             return;
                         }
-
-                        // Datos para agregar el estudiante
                         const data = {
                             numDoc: $('#numDocMod').val(),
                             nombre: $('#nombreEstudianteMod').val(),
@@ -583,33 +549,33 @@
                             idUsuario: usuarioResponse.idUsuario,
                             idEscuela: $('#escuelaMod').val()
                         };
-
-                        // Hacer la solicitud para agregar el estudiante
                         $.ajax({
                             url: '/agregar_estudiante',
                             type: 'POST',
                             contentType: 'application/json',
                             data: JSON.stringify(data),
                             success: function (response) {
+                                Swal.close();
                                 if (response.error) {
-                                    cerrarCargandoYMostrarAlerta('error', 'Error', response.error);
+                                    mostrarAlerta("error", "Error", response.error);
                                 } else {
-                                    cerrarCargandoYMostrarAlerta('success', 'Éxito', 'Estudiante agregado correctamente y credenciales enviadas.');
+                                    mostrarAlerta("success", "Éxito", response.mensaje);
                                     table.ajax.reload();
                                     $('#modalEstudiante').modal('hide');
                                 }
                             },
                             error: function (xhr, status, error) {
-                                cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al agregar el estudiante.');
+                                Swal.close();
+                                mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
                             }
                         });
                     },
                     error: function (xhr, status, error) {
-                        cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al agregar el usuario.');
+                        Swal.close();
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
                     }
                 });
             } else {
-                // Funcionalidad para modificar estudiante
                 const data = {
                     idPersona: $('#idEstudianteMod').val(),
                     numDoc: $('#numDocMod').val(),
@@ -626,10 +592,7 @@
                     idUsuario: $('#usuarioMod').val(),
                     idEscuela: $('#escuelaMod').val()
                 };
-
-                // Mostrar alerta de carga con SweetAlert2
                 mostrarCargando('Procesando', 'Por favor, espere mientras se realiza la operación.');
-
                 $.ajax({
                     url: '/modificar_estudiante',
                     type: 'POST',
@@ -650,8 +613,6 @@
                 });
             }
         });
-
-
 
         // Evento para Eliminar Estudiante
         $('#tabla-estudiante tbody').on('click', '.btnEliminar', function () {

@@ -1,6 +1,6 @@
 from bd import obtener_conexion
-
-# OPERACIONES CRUD
+from service.email_service import EmailService
+import controladores.controlador_usuario as controlador_usuario
 
 def obtener_docentes():
     conexion = obtener_conexion()
@@ -40,32 +40,8 @@ def obtener_docente_por_id(idDocente):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT p.idPersona, p.numDoc, p.nombre, p.apellidos, p.tel1, p.tel2, p.correoP, 
-                p.correoUSAT, p.cargo, p.estado, p.idGenero, p.idTipoDoc, p.idEscuela, p.idUsuario
-                FROM persona p
-                WHERE p.idPersona = %s
-            """, (idDocente,))
-            row = cursor.fetchone()
-            if row:
-                columnas = [desc[0] for desc in cursor.description]
-                docente_dict = dict(zip(columnas, row))
-                return docente_dict
-            else:
-                return {"error": "Docente no encontrado"}
-    except Exception as e:
-        return {"error": str(e)}
-    finally:
-        conexion.close()
-
-def obtener_docente_por_id_modificar(idDocente):
-    conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT p.idPersona, p.numDoc, p.nombre, p.apellidos, p.tel1, p.tel2, p.correoP, 
-                p.correoUSAT, p.cargo, p.estado, p.idGenero, p.idTipoDoc, p.idEscuela, p.idUsuario
-                FROM persona p
+                p.correoUSAT, p.cargo, p.estado, p.idGenero, p.idTipoDoc, p.idEscuela, u.username
+                FROM persona p LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
                 WHERE p.idPersona = %s
             """, (idDocente,))
             row = cursor.fetchone()
@@ -93,7 +69,23 @@ def agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
-            return {"mensaje": "Docente agregado correctamente"}
+            usuario_data = controlador_usuario.obtener_usuario_por_id(idUsuario)
+            if not usuario_data:
+                return {"error": "No se pudo obtener el usuario"}
+            usuario = usuario_data['username']
+            password_descifrada = controlador_usuario.descifrar_contraseña(usuario_data['password'])
+            email_service = EmailService()
+            envio_exitoso = email_service.enviar_correo_bienvenida(
+                nombre=nombre,
+                apellidos=apellidos,
+                correo_destino=correoP,
+                codigo=usuario,
+                contrasena=password_descifrada
+            )
+            if envio_exitoso:
+                return {"mensaje": "Docente agregado correctamente y correo enviado"}
+            else:
+                return {"mensaje": "Docente agregado, pero hubo un error al enviar el correo"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
@@ -129,9 +121,14 @@ def eliminar_docente(idDocente):
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idDocente,))
+            idUsuario = cursor.fetchone()
+            if not idUsuario:
+                return {"error": "No se encontró el usuario asociado al estudiante."}
             cursor.execute("DELETE FROM persona WHERE idPersona = %s", (idDocente,))
+            cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario[0],))           
             conexion.commit()
-            return {"mensaje": "Docente eliminado correctamente"}
+            return {"mensaje": "Docente y usuario eliminados correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
@@ -145,10 +142,15 @@ def dar_de_baja_docente(idDocente):
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
-        with conexion.cursor() as cursor:
+       with conexion.cursor() as cursor:
+            cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idDocente,))
+            idUsuario = cursor.fetchone()
+            if not idUsuario:
+                return {"error": "No se encontró el usuario asociado al estudiante."}
             cursor.execute("UPDATE persona SET estado = 'I' WHERE idPersona = %s", (idDocente,))
+            cursor.execute("UPDATE usuario SET estado = 'I' WHERE idUsuario = %s", (idUsuario[0],))    
             conexion.commit()
-            return {"mensaje": "Docente dado de baja correctamente"}
+            return {"mensaje": "Docente dado de baja y usuario inhabilitado correctamente"}  
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

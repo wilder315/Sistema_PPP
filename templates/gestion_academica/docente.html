@@ -122,11 +122,14 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="usuarioMod" class="form-label">Usuario:</label>
-                            <select class="form-control" id="usuarioMod" name="idUsuarioMod" required>
-                                <option value="" disabled selected>Seleccionar usuario</option>
-                                <!-- Los valores de usuario se cargarán dinámicamente -->
-                            </select>
-                        </div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="usuarioMod" name="usuarioMod" readonly>
+                                <button type="button" style=" border: 1px solid #ddd;" class="btn btn-outline-secondary" id="btnGenerarUsuario">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
+                        </div>                        
+                    </div>
                     </div>
 
                     <div class="mb-3">
@@ -268,6 +271,31 @@
             });
         }
 
+        // Función para mostrar el estado de carga
+        function mostrarCargando(titulo = 'Procesando', mensaje = 'Por favor, espere...') {
+            Swal.fire({
+                title: titulo,
+                html: `
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted mb-0">${mensaje}</p>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        // Función para cerrar el estado de carga y mostrar alerta de resultado
+        function cerrarCargandoYMostrarAlerta(tipo, titulo, mensaje) {
+            Swal.close();
+            mostrarAlerta(tipo, titulo, mensaje);
+        }
+
         // Función para cargar los géneros dinámicamente
         function cargarGeneros(selectedGeneroId) {
             $.ajax({
@@ -331,27 +359,6 @@
             });
         }
 
-        // Función para cargar los usuarios dinámicamente
-        function cargarUsuarios(selectedUsuarioId) {
-            $.ajax({
-                url: '/datos_usuarios_docentes',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var usuarioSelect = $('#usuarioMod');
-                    usuarioSelect.empty();
-                    usuarioSelect.append('<option value="" disabled selected>Seleccionar usuario</option>');
-                    response.forEach(function (usuario) {
-                        var selected = usuario.idUsuario == selectedUsuarioId ? 'selected' : '';
-                        usuarioSelect.append(`<option value="${usuario.idUsuario}" ${selected}>${usuario.username}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los usuarios.");
-                }
-            });
-        }
-
         // Función para deshabilitar los controles
         function deshabilitarControles(){
             $('#idDocenteMod').prop('disabled', true);
@@ -366,7 +373,7 @@
             $('#estadoDocenteMod').prop('disabled', true);
             $('#generoMod').prop('disabled', true);
             $('#tipoDocMod').prop('disabled', true);
-            $('#usuarioMod').prop('disabled', true);
+            $('#btnGenerarUsuario').prop('disabled', true); 
             $('#escuelaMod').prop('disabled', true);
         }
 
@@ -384,7 +391,7 @@
             $('#estadoDocenteMod').prop('disabled', false);
             $('#generoMod').prop('disabled', false);
             $('#tipoDocMod').prop('disabled', false);
-            $('#usuarioMod').prop('disabled', false);
+            $('#btnGenerarUsuario').prop('disabled', false); 
             $('#escuelaMod').prop('disabled', false);
         }
 
@@ -411,9 +418,9 @@
                         $('#correoPMod').val(response.correoP);
                         $('#correoUSATMod').val(response.correoUSAT);
                         $('#estadoDocenteMod').val(response.estado);
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
                         cargarEscuelas(response.idEscuela);
                         deshabilitarControles();
                         $('#btnCancelar').hide();
@@ -450,11 +457,25 @@
             $('#modalDocente').modal('show');
         });
 
+        // Evento para Generar Usuario
+        $(document).on('click', '#btnGenerarUsuario', function () {
+            const nombre = $('#nombreDocenteMod').val();
+            const apellidos = $('#apellidosDocenteMod').val();
+            if (nombre && apellidos) {
+                const inicialNombre = nombre.charAt(0).toLowerCase();
+                const primerApellido = apellidos.split(' ')[0].toLowerCase();
+                const usuarioGenerado = `${inicialNombre}${primerApellido}`;                
+                $('#usuarioMod').val(usuarioGenerado);
+            } else {
+                mostrarAlerta('warning', 'Atención', 'Debe ingresar el nombre y los apellidos antes de generar el usuario.');
+            }
+        });
+
         // Evento para Modificar Docente
         $('#tabla-docente tbody').on('click', '.btnModificar', function () {
             var id = $(this).data('id');
             $.ajax({
-                url: '/obtener_docente_por_id_modificar/' + id,
+                url: '/obtener_docente_por_id/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -473,11 +494,12 @@
                         $('#correoPMod').val(response.correoP);
                         $('#correoUSATMod').val(response.correoUSAT);
                         $('#estadoDocenteMod').val(response.estado);
+                        $('#usuarioMod').val(response.username);
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
-                        cargarUsuarios(response.idUsuario);
                         cargarEscuelas(response.idEscuela);
                         habilitarControles();
+                        $('#btnGenerarUsuario').prop('disabled', true);
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();
@@ -492,38 +514,71 @@
 
         $('#formDocente').submit(function (e) {
             e.preventDefault();
+            mostrarCargando('Procensado', 'Por favor, espere mientras se realiza la operación.');
             if ($('#idDocenteMod').val() === '') {
-                var data = {
-                    numDoc: $('#numDocMod').val(),
-                    nombre: $('#nombreDocenteMod').val(),
-                    apellidos: $('#apellidosDocenteMod').val(),
-                    cargo: $('#cargoMod').val(),
-                    tel1: $('#tel1Mod').val(),
-                    tel2: $('#tel2Mod').val(),
-                    correoP: $('#correoPMod').val(),
-                    correoUSAT: $('#correoUSATMod').val(),
-                    estado: $('#estadoDocenteMod').val(),
-                    idGenero: $('#generoMod').val(),
-                    idTipoDoc: $('#tipoDocMod').val(),
-                    idUsuario: $('#usuarioMod').val(),
-                    idEscuela: $('#escuelaMod').val()
-                };
+                const username = $('#usuarioMod').val();
+                Swal.fire({
+                    title: 'Procesando',
+                    html: 'Por favor, espere mientras se realiza la operación.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 $.ajax({
-                    url: '/agregar_docente',
+                    url: '/agregar_usuario',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function (response) {
-                        if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
-                        } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
-                            table.ajax.reload();
-                            $('#modalDocente').modal('hide');
+                    data: JSON.stringify({
+                        username: username,
+                        estado: 'A',
+                        idTipoUsuario: 3
+                    }),
+                    success: function (usuarioResponse) {
+                        if (usuarioResponse.error) {
+                            Swal.close();
+                            mostrarAlerta("error", "Error", usuarioResponse.error);
+                            return;
                         }
+                        const data = {
+                            numDoc: $('#numDocMod').val(),
+                            nombre: $('#nombreDocenteMod').val(),
+                            apellidos: $('#apellidosDocenteMod').val(),
+                            cargo: $('#cargoMod').val(),
+                            tel1: $('#tel1Mod').val(),
+                            tel2: $('#tel2Mod').val(),
+                            correoP: $('#correoPMod').val(),
+                            correoUSAT: $('#correoUSATMod').val(),
+                            estado: $('#estadoDocenteMod').val(),
+                            idGenero: $('#generoMod').val(),
+                            idTipoDoc: $('#tipoDocMod').val(),
+                            idUsuario: usuarioResponse.idUsuario,
+                            idEscuela: $('#escuelaMod').val()
+                        };
+                        $.ajax({
+                            url: '/agregar_docente',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(data),
+                            success: function (response) {
+                                Swal.close();
+                                if (response.error) {
+                                    mostrarAlerta("error", "Error", response.error);
+                                } else {
+                                    mostrarAlerta("success", "Éxito", response.mensaje);
+                                    table.ajax.reload();
+                                    $('#modalDocente').modal('hide');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                Swal.close();
+                                mostrarAlerta("error", "Error", "Hubo un error al agregar el docente.");
+                            }
+                        });
                     },
                     error: function (xhr, status, error) {
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el docente.");
+                        Swal.close();
+                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
                     }
                 });
             } else {
@@ -543,6 +598,7 @@
                     idUsuario: $('#usuarioMod').val(),
                     idEscuela: $('#escuelaMod').val()
                 };
+                mostrarCargando('Procesando', 'Por favor, espere mientras se realiza la operación.');
                 $.ajax({
                     url: '/modificar_docente',
                     type: 'POST',
@@ -597,11 +653,11 @@
             var mensajeError = '';
             if (accion === 'eliminar') {
                 url = '/eliminar_docente';
-                mensajeExito = 'El docente fue eliminado correctamente';
+                mensajeExito = 'El docente y su usuario fueron eliminados correctamente';
                 mensajeError = 'Hubo un error al eliminar el docente.';
             } else if (accion === 'darDeBaja') {
                 url = '/dar_de_baja_docente';
-                mensajeExito = 'El docente fue dado de baja correctamente';
+                mensajeExito = 'El docente y su usuario fueron dados de baja correctamente';
                 mensajeError = 'Hubo un error al dar de baja el docente.';
             }
             $.ajax({

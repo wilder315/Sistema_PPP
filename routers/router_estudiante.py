@@ -17,11 +17,6 @@ def obtener_estudiante_por_id(idEstudiante):
     estudiante = controlador_estudiante.obtener_estudiante_por_id(idEstudiante)
     return jsonify(estudiante)
 
-@router_estudiante.route("/obtener_estudiante_por_id_modificar/<int:idEstudiante>", methods=["GET"])
-def obtener_estudiante_por_id_modificar(idEstudiante):
-    estudiante = controlador_estudiante.obtener_estudiante_por_id_modificar(idEstudiante)
-    return jsonify(estudiante)
-
 @router_estudiante.route("/agregar_estudiante", methods=["POST"])
 def agregar_estudiante():
     data = request.json
