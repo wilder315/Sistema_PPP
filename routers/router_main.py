@@ -79,6 +79,11 @@ def logout():
     flash('Sesión cerrada exitosamente.', 'success')
     return redirect(url_for('router_main.login'))
 
+@router_main.route('/perfil')
+@login_required
+def perfil():
+    return render_template('/dashboard/perfil.html')
+
 # Principal
 
 @router_main.route("/index")
@@ -104,11 +109,6 @@ def practicas_pre_profesionales():
 @login_required
 def home():
     return render_template('home.html')
-
-@router_main.route('/perfil')
-@login_required
-def perfil():
-    return render_template('perfil.html')
 
 # Módulo de Gestión Académica
 

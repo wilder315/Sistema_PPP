@@ -261,4 +261,85 @@ color: #6c757d;
 opacity: 1;
 filter: brightness(0.5);
 }
-  
+
+.container-perfil {
+    min-height: 100vh;
+}
+
+.foto-perfil {
+    width: 50%;
+    width: 50%;
+    border-radius: 50%;
+    border: 2px solid #E33439;
+    object-fit: cover;
+}
+
+.foto-perfil-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 50%;
+}
+
+.foto-perfil-hover:hover {
+    opacity: 1;
+}
+
+.card-header {
+    height: 50px;
+    line-height: 30px;
+    padding: 10px 15px;
+}
+
+.header-text {
+    flex-shrink: 0; /* Evita que el texto se reduzca */
+    margin-right: 10px;
+}
+
+#falsodiv {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    height: 100%;
+}
+
+#btnEditarCredenciales {
+    color: #ffffff; /* Color blanco por defecto */
+    background: none;
+    border: none;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alineado a la derecha */
+    padding-right: 15px; /* Espacio a la derecha */
+    transition: color 0.3s;
+}
+
+#btnEditarCredenciales:hover {
+    color: #000000; /* Cambia a negro al pasar el cursor */
+}
+
+#btnEditarDatos {
+    color: #ffffff; /* Color blanco por defecto */
+    background: none;
+    border: none;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alineado a la derecha */
+    padding-right: 15px; /* Espacio a la derecha */
+    transition: color 0.3s;
+}
+
+#btnEditarCredenciales:hover {
+    color: #000000; /* Cambia a negro al pasar el cursor */
+}

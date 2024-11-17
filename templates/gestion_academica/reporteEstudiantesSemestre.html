@@ -9,49 +9,30 @@
 </nav>
 
 <div class="container-fluid my-4">
-    <!-- Filtros -->
-    <div class="card w-100 mb-4">
-        <div class="card-header bg-red-usat text-white">
-            Filtros
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="filtroGenero" class="form-label">Filtrar por Género:</label>
-                    <select class="form-select" id="filtroGenero" onchange="filtrarGrafico()">
-                        <option value="todos">Todos</option>
-                        <option value="varones">Varones</option>
-                        <option value="mujeres">Mujeres</option>
-                        <option value="total">Total</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="filtroSemestre" class="form-label">Filtrar por Semestre:</label>
-                    <select class="form-select" id="filtroSemestre" onchange="filtrarGrafico()">
-                        <option value="todos">Todos los semestres</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráfico -->
-    <div class="card w-100 mb-4">
-        <div class="card-header bg-red-usat text-white">
-            Visualización Gráfica
-        </div>
-        <div class="card-body">
-            <canvas id="graficoBarras" style="width: 100%; height: 400px;"></canvas>
-        </div>
-    </div>
-
-    <!-- Tabla existente -->
     <div class="card w-100">
         <div class="card-header bg-red-usat text-white">
             Distribución de Estudiantes Matriculados por Semestre
         </div>
         <div class="card-body">
             <div class="table-responsive">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="filtroGenero" class="form-label">Filtrar por Género:</label>
+                        <select class="form-select" id="filtroGenero" onchange="filtrarGrafico()">
+                            <option value="todos">Todos</option>
+                            <option value="varones">Varones</option>
+                            <option value="mujeres">Mujeres</option>
+                            <option value="total">Total</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="filtroSemestre" class="form-label">Filtrar por Semestre:</label>
+                        <select class="form-select" id="filtroSemestre" onchange="filtrarGrafico()">
+                            <option value="todos">Todos los semestres</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="divider" style="border-top: 2px solid #d32f2f; margin: 20px 0"></div>
                 <table id="tabla-estudiantes-semestre" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
@@ -72,6 +53,14 @@
             </div>
         </div>
     </div>
+    <div class="card w-100 mb-4">
+        <div class="card-header bg-red-usat text-white">
+            Visualización Gráfica
+        </div>
+        <div class="card-body">
+            <canvas id="graficoBarras" style="width: 100%; height: 400px;"></canvas>
+        </div>
+    </div>
 </div>
 
 {% block scripts %}
@@ -86,11 +75,14 @@
         }
         $('#tabla-estudiantes-semestre').DataTable({
             paging: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 15, 20],
             info: true,
             responsive: true,
-            autoWidth: false,
-            searching: true,
+            autoWidth: true,
+            searching: false,
             order: [[0, 'desc'], [1, 'asc'], [2, 'asc']],
+            dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
             ajax: {
                 url: "/datos_estudiantes_semestre",
                 type: "GET",
