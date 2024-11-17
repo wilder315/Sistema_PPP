@@ -278,6 +278,32 @@
                 timer: 5000
             });
         }
+        // Función para mostrar el estado de carga
+        function mostrarCargando(titulo = 'Procesando', mensaje = 'Por favor, espere...') {
+            Swal.fire({
+                title: titulo,
+                html: `
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted mb-0">${mensaje}</p>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
+        // Función para cerrar el estado de carga y mostrar alerta de resultado
+        function cerrarCargandoYMostrarAlerta(tipo, titulo, mensaje) {
+            Swal.close(); // Cerrar el modal de carga
+            mostrarAlerta(tipo, titulo, mensaje);
+        }
+
+
 
         // Función para cargar los géneros dinámicamente
         function cargarGeneros(selectedGeneroId) {
@@ -518,12 +544,12 @@
         $('#formEstudiante').submit(function (e) {
             e.preventDefault();
 
+            // Mostrar alerta de carga con SweetAlert2
+            mostrarCargando('Procensado', 'Por favor, espere mientras se realiza la operación.');
+
             if ($('#idEstudianteMod').val() === '') {
                 // Datos para agregar el usuario
                 const username = $('#usuarioMod').val();
-
-                // Mostrar el modal de carga
-                $('#loadingModal').modal('show');
 
                 // Crear el usuario antes de agregar el estudiante
                 $.ajax({
@@ -537,8 +563,7 @@
                     }),
                     success: function (usuarioResponse) {
                         if (usuarioResponse.error) {
-                            mostrarAlerta("error", "Error", usuarioResponse.error);
-                            $('#loadingModal').modal('hide'); // Cerrar modal de carga
+                            cerrarCargandoYMostrarAlerta('error', 'Error', usuarioResponse.error);
                             return;
                         }
 
@@ -566,25 +591,21 @@
                             contentType: 'application/json',
                             data: JSON.stringify(data),
                             success: function (response) {
-                                $('#loadingModal').modal('hide'); // Cerrar modal de carga
-
                                 if (response.error) {
-                                    mostrarAlerta("error", "Error", response.error);
+                                    cerrarCargandoYMostrarAlerta('error', 'Error', response.error);
                                 } else {
-                                    mostrarAlerta("success", "Éxito", response.mensaje);
+                                    cerrarCargandoYMostrarAlerta('success', 'Éxito', 'Estudiante agregado correctamente y credenciales enviadas.');
                                     table.ajax.reload();
                                     $('#modalEstudiante').modal('hide');
                                 }
                             },
                             error: function (xhr, status, error) {
-                                $('#loadingModal').modal('hide'); // Cerrar modal de carga
-                                mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
+                                cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al agregar el estudiante.');
                             }
                         });
                     },
                     error: function (xhr, status, error) {
-                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
-                        mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
+                        cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al agregar el usuario.');
                     }
                 });
             } else {
@@ -606,7 +627,8 @@
                     idEscuela: $('#escuelaMod').val()
                 };
 
-                $('#loadingModal').modal('show'); // Mostrar modal de carga
+                // Mostrar alerta de carga con SweetAlert2
+                mostrarCargando('Procesando', 'Por favor, espere mientras se realiza la operación.');
 
                 $.ajax({
                     url: '/modificar_estudiante',
@@ -614,23 +636,21 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (response) {
-                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
-
                         if (response.error) {
-                            mostrarAlerta("error", "Error", response.error);
+                            cerrarCargandoYMostrarAlerta('error', 'Error', response.error);
                         } else {
-                            mostrarAlerta("success", "Éxito", response.mensaje);
+                            cerrarCargandoYMostrarAlerta('success', 'Éxito', response.mensaje);
                             table.ajax.reload();
                             $('#modalEstudiante').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
-                        $('#loadingModal').modal('hide'); // Cerrar modal de carga
-                        mostrarAlerta("error", "Error", "Hubo un error al modificar el estudiante.");
+                        cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al modificar el estudiante.');
                     }
                 });
             }
         });
+
 
 
         // Evento para Eliminar Estudiante
@@ -666,11 +686,11 @@
             var mensajeError = '';
             if (accion === 'eliminar') {
                 url = '/eliminar_estudiante';
-                mensajeExito = 'El estudiante fue eliminado correctamente';
+                mensajeExito = 'El estudiante y su usuario fueron eliminados correctamente';
                 mensajeError = 'Hubo un error al eliminar el estudiante.';
             } else if (accion === 'darDeBaja') {
                 url = '/dar_de_baja_estudiante';
-                mensajeExito = 'El estudiante fue dado de baja correctamente';
+                mensajeExito = 'El estudiante y su usuario fueron dados de baja correctamente';
                 mensajeError = 'Hubo un error al dar de baja el estudiante.';
             }
             $.ajax({

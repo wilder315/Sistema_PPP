@@ -1,45 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correo Masivo</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
-            font-family: Arial, sans-serif;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .header {
-            background-color: #003366;
+            background-color: #E33439;
             color: white;
             padding: 20px;
             text-align: center;
+            border-bottom: 4px solid #d32f2f;
+            position: relative;
         }
+
+        .header img {
+            max-width: 100px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
         .content {
             padding: 20px;
-            background-color: #f9f9f9;
         }
+
+        .content h2 {
+            color: #E33439;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .content li {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .content li strong {
+            color: #333;
+        }
+
         .footer {
             text-align: center;
             padding: 20px;
             font-size: 12px;
             color: #666;
+            background-color: white;
+            border-top: 4px solid #d32f2f;
         }
-        .logo {
-            max-width: 150px;
-            margin-bottom: 20px;
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .divider {
+            border-top: 2px solid #d32f2f;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Sistema de PPP - USAT</h1>
+            <h1 class="title">SISTEMA DE PPP - USAT</h1>
         </div>
+
+        <div class="divider"></div>
+
         <div class="content">
+            <h2>Hola practicantes</h2>
             {{ contenido | safe }}
         </div>
+
+        <div class="divider"></div>
+
         <div class="footer">
-            <p>Universidad Católica Santo Toribio de Mogrovejo - USAT</p>
+            <p>Universidad Católica Santo Toribio de Mogrovejo</p>
             <p>Sistema de Prácticas Pre-Profesionales</p>
+            <p>Av. San Josemaría Escrivá de Balaguer N° 855 Chiclayo - Perú | Teléfono: 606200</p>
+            <p>© Copyright 2018: USAT - Todos los derechos reservados</p>
         </div>
     </div>
 </body>

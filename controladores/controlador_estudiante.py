@@ -152,33 +152,64 @@ def eliminar_estudiante(idEstudiante):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
+    
     try:
         with conexion.cursor() as cursor:
+            # Obtener el idUsuario asociado al estudiante
+            cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idEstudiante,))
+            idUsuario = cursor.fetchone()
+
+            if not idUsuario:
+                return {"error": "No se encontró el usuario asociado al estudiante."}
+
+            # Eliminar el estudiante
             cursor.execute("DELETE FROM persona WHERE idPersona = %s", (idEstudiante,))
+            # Eliminar el usuario asociado
+            cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario[0],))
+            
             conexion.commit()
-            return {"mensaje": "Estudiante eliminado correctamente"}
+            return {"mensaje": "Estudiante y usuario eliminados correctamente"}
+    
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
+    
     finally:
         conexion.close()
+
 
 def dar_de_baja_estudiante(idEstudiante):
     if not idEstudiante:
         return {"error": "El ID del estudiante es requerido."}
+    
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
+    
     try:
         with conexion.cursor() as cursor:
+            # Obtener el idUsuario asociado al estudiante
+            cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idEstudiante,))
+            idUsuario = cursor.fetchone()
+
+            if not idUsuario:
+                return {"error": "No se encontró el usuario asociado al estudiante."}
+
+            # Actualizar el estado del estudiante a 'I' (Inactivo)
             cursor.execute("UPDATE persona SET estado = 'I' WHERE idPersona = %s", (idEstudiante,))
+            # Actualizar el estado del usuario a 'I' (Inactivo)
+            cursor.execute("UPDATE usuario SET estado = 'I' WHERE idUsuario = %s", (idUsuario[0],))
+            
             conexion.commit()
-            return {"mensaje": "Estudiante dado de baja correctamente"}
+            return {"mensaje": "Estudiante dado de baja y usuario inhabilitado correctamente"}
+    
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
+    
     finally:
         conexion.close()
+
     
 #------------------------ CARLOS DELGADO
 def obtener_estudiantes_por_fecha(): 
