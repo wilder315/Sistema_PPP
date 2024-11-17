@@ -3,6 +3,11 @@ import controladores.controlador_jefe as controlador_jefe
 
 router_jefe = Blueprint('router_jefe', __name__)
 
+def cargar_foto():
+    with open("static/img/fotoPerfil.txt", "r", encoding="utf-8") as file:
+        foto = file.read()
+    return foto
+
 @router_jefe.route("/jefe")
 def jefe(): 
     return render_template("jefe.html")  
@@ -25,13 +30,14 @@ def agregar_jefe():
     apellidos = data.get('apellidos')
     tel1 = data.get('tel1')
     correoP = data.get('correoP')
+    foto = cargar_foto()
     cargo = data.get('cargo')
     estado = data.get('estado')
     idGenero = data.get('idGenero')
     idTipoDoc = data.get('idTipoDoc')
     idUsuario = data.get('idUsuario')
 
-    resultado = controlador_jefe.agregar_jefe(numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idUsuario)
+    resultado = controlador_jefe.agregar_jefe(numDoc, nombre, apellidos, tel1, correoP, foto, cargo, estado, idGenero, idTipoDoc, idUsuario)
     return jsonify(resultado)
 
 @router_jefe.route("/modificar_jefe", methods=["POST"])

@@ -3,6 +3,11 @@ import controladores.controlador_docente as controlador_docente
 
 router_docente = Blueprint('router_docente', __name__)
 
+def cargar_foto():
+    with open("static/img/fotoPerfil.txt", "r", encoding="utf-8") as file:
+        foto = file.read()
+    return foto
+
 @router_docente.route("/docente")
 def docente():
     return render_template('gestion_academica/docente.html')
@@ -27,6 +32,7 @@ def agregar_docente():
     tel2 = data.get('tel2')
     correoP = data.get('correoP')
     correoUSAT = data.get('correoUSAT')
+    foto = cargar_foto()
     cargo = data.get('cargo')
     estado = data.get('estado')
     idGenero = data.get('idGenero')
@@ -34,7 +40,7 @@ def agregar_docente():
     idUsuario = data.get('idUsuario')
     idEscuela = data.get('idEscuela')
 
-    resultado = controlador_docente.agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
+    resultado = controlador_docente.agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, foto, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
     return jsonify(resultado)
 
 @router_docente.route("/modificar_docente", methods=["POST"])

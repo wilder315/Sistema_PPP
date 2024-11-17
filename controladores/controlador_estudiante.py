@@ -57,7 +57,7 @@ def obtener_estudiante_por_id(idEstudiante):
     finally:
         conexion.close()
 
-def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela):
+def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, foto, estado, idGenero, idTipoDoc, idUsuario, idEscuela):
     if not tel2:
         tel2 = None
     conexion = obtener_conexion()
@@ -66,9 +66,9 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO persona (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
+                INSERT INTO persona (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, foto, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, foto, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
             usuario_data = controlador_usuario.obtener_usuario_por_id(idUsuario)
             if not usuario_data:

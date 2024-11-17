@@ -51,16 +51,16 @@ def obtener_jefe_por_id(idJefe):
     finally:
         conexion.close()
 
-def agregar_jefe(numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idUsuario): 
+def agregar_jefe(numDoc, nombre, apellidos, tel1, correoP, foto, cargo, estado, idGenero, idTipoDoc, idUsuario): 
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO persona (numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idUsuario)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            """, (numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idUsuario))
+                INSERT INTO persona (numDoc, nombre, apellidos, tel1, correoP, foto, cargo, estado, idGenero, idTipoDoc, idUsuario)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """, (numDoc, nombre, apellidos, tel1, correoP, foto, cargo, estado, idGenero, idTipoDoc, idUsuario))
             conexion.commit()
             usuario_data = controlador_usuario.obtener_usuario_por_id(idUsuario)
             if not usuario_data:
