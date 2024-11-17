@@ -82,3 +82,33 @@ def practicas_activas():
 def practicas_con_estado():
     resultado = controlador_practicas.obtener_practicas_con_estado()
     return jsonify(resultado)
+
+################################ Reportes Carlos Delgado ############################### 
+@router_practicas.route("/reporte_practicas1", methods=["POST"])
+def reporte_practicas1():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No se enviaron datos"}), 400
+        
+        #mostrar los datos que llegaron del backend para verificar 
+        #print(data)
+
+        # Obtener los parámetros con valores por defecto si no se envían
+        idSemestre = data.get('idSemestre', 0)
+        idEscuela = data.get('idEscuela', 0)
+        idEstado = data.get('idEstado', 0)
+        numDoc = data.get('numDoc', 0)
+
+        # Llamar al controlador
+        resultado = controlador_practicas.reporte_practicas_estudiantes(
+            idSemestre, idEscuela, idEstado, numDoc
+        )
+
+        if not resultado:
+            return jsonify({"message": "No se encontraron prácticas para los criterios dados"}), 404
+        
+        return jsonify({"data": resultado})  # Devolver los valores bajo la clave 'data'
+
+    except Exception as e:
+        return jsonify({"error": f"Error en el servidor: {str(e)}"}), 500

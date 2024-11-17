@@ -1,0 +1,198 @@
+{% extends "/gestion_academica/index.html"%}
+{% block titulo %}Reporte Prácticas de Estudiantes{% endblock %}
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Reporte Prácticas de Estudiantes</li>
+    </ol>
+</nav>
+
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3"><strong>Reporte de Prácticas Por Estudiante</strong></h1>
+</div>
+
+<!-- FILTRO SUPERIOR CON COMBOX-->
+<div class="container-fluid my-4">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="semestre" class="form-label">Semestre</label>
+            <select id="semestre" class="form-select">
+                <option value="">Seleccionar Semestre</option>
+                <!-- Aquí se cargarán los semestres desde el servidor -->
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="escuela" class="form-label">Escuela</label>
+            <select id="escuela" class="form-select">
+                <option value="">Seleccionar Escuela</option>
+                <!-- Aquí se cargarán las escuelas desde el servidor -->
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select id="estado" class="form-select">
+                <option value="">Seleccionar Estado</option>
+                <!-- Aquí se cargarán los estados desde el servidor -->
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="empresa" class="form-label">Empresa</label>
+            <select id="empresa" class="form-select">
+                <option value="">Seleccionar Empresa</option>
+                <!-- Aquí se cargarán las empresas desde el servidor -->
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Cards para mostrar los resultados de la búsqueda -->
+<div class="container-fluid my-4">
+    <div class="card w-100" id="card_jefes">
+        <div class="card-header bg-red-usat text-white">
+            Prácticas de Estudiantes
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-reporte1" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center">Código</th>
+                            <th style="text-align:center">Apellidos</th>
+                            <th style="text-align:center">Nombre</th>
+                            <th style="text-align:center">Teléfono</th>
+                            <th style="width: 15%; text-align:center">Correo Usat</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<!-- Librerías externas -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+
+<!-- Script principal -->
+<script>
+    $(document).ready(function() {
+        if ($.fn.DataTable.isDataTable('#tabla-reporte1')) {
+            $('#tabla-reporte1').DataTable().clear().destroy();
+        }
+    
+        var table = $('#tabla-reporte1').DataTable({
+            paging: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 15, 20],
+            info: true,
+            responsive: true,
+            autoWidth: true,
+            searching: false, //Desactivar la busqueda
+            order: [],
+            dom: 'rt<"bottom-controls"ip>', //elimina controles de busqueda y botones
+            ajax: {
+                url: "/reporte_practicas1",
+                type: "POST",
+                contentType: "application/json",
+                data: function (d) {
+                    return JSON.stringify({
+                        //agrega los filtros
+                        idSemestre: $('#semestre').val() || 0,
+                        idEscuela: $('#escuela').val() || 0,
+                        idEstado: $('#estado').val() || 0,
+                        numDoc: $('#empresa').val() || 0
+                    });
+                },
+                dataSrc: "data.data",
+                error: function(xhr, status, error){
+                    console.error('Error en la carga de datos:', error); 
+                }
+            },
+            processing: true,
+            serverSide: false,
+            columns: [
+                { data: "codUniversitario", className: 'text-center' },
+                { data: "apellidos" },
+                { data: "nombre" },
+                { data: "tel1", className: 'text-center' },
+                { data: "correoUSAT" },
+            ],
+            language: {
+                url: "{{ url_for('static', filename='js/es-ES.json') }}" // Traducción de DataTables
+            }
+        });
+
+        // Funciones para cargar los comboBox (semestre, escuela, estado, empresa)
+        function cargarSelectData(url, selectId, keyValue, keyText) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function(response) {
+                    var select = $(selectId);
+                    select.empty();
+                    select.append('<option value="">Todos</option>'); // Opción por defecto
+                    response.forEach(function(item) {
+                        select.append(`<option value="${item[keyValue]}">${item[keyText]}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los datos.");
+                }
+            });
+        }
+        // Cargar semestre
+        cargarSelectData('/datos_semestres', '#semestre', 'idSemestre', 'nombre');
+
+        // Cargar escuela
+        cargarSelectData('/datos_escuelas', '#escuela', 'idEscuela', 'nombre');
+
+        // Cargar estado
+        cargarSelectData('/datos_estados', '#estado', 'idEstado', 'nombre');
+
+        // Cargar empresa
+        cargarSelectData('/datos_empresas', '#empresa', 'idEmpresa', 'nombre');
+
+
+
+        // Función para obtener los valores de los filtros
+        function obtenerFiltros() {
+            var semestre = $('#semestre').val() || '';   // Si está vacío o no definido, asignar 0
+            var escuela = $('#escuela').val() || '';     // Lo mismo aquí
+            var estado = $('#estado').val() || '';       // Lo mismo aquí
+            var empresa = $('#empresa').val() || '';     // Lo mismo aquí
+
+            console.log('Filtros seleccionados:', { semestre, escuela, estado, empresa });
+
+            return { semestre, escuela, estado, empresa };
+        }
+
+        // Recargar la tabla al cambiar los filtros
+        $('#semestre, #escuela, #estado, #empresa').on('change', function() {
+            var filtros = obtenerFiltros(); 
+            table.ajax.reload(); // Recargar los datos de la tabla
+        });
+
+        
+    });
+</script>
+
+
+{% endblock %}
+{% endblock %}

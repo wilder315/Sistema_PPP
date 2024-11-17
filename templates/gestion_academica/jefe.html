@@ -253,28 +253,7 @@
             });
         }
     
-        // Función para cargar géneros dinámicamente -- Funciona....
-        function cargarGeneros(selectedGeneroId = null) {
-            $.ajax({
-                url: '/datos_generos',  // Asegúrate de que esta URL sea correcta
-                type: 'GET',
-                contentType: 'application/json',
-                success: function(response) {
-                    var generoSelect = $('#generoMod');
-                    generoSelect.empty();
-                    generoSelect.append('<option value="" disabled selected>Seleccionar género</option>');
-                    response.forEach(function (genero) {
-                        var selected = parseInt(genero.idGenero) === parseInt(selectedGeneroId) ? 'selected' : '';  
-                        generoSelect.append(`<option value="${genero.idGenero}" ${selected}>${genero.nombre}</option>`);
-                    });
-                },
-                error: function(xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros"); 
-                }
-            });
-        }
-    
-        // Función para cargar tipos de documentos dinámicamente -- Funciona.....
+        // Función para cargar Tipo de documento -- Funciona....
         function cargarTipoDocumentos(selectedTipoDocId) {
             $.ajax({
                 url: '/datos_tipoDocumentos',
@@ -291,6 +270,27 @@
                 },
                 error: function (xhr, status, error) {
                     mostrarAlerta("error", "Error", "Hubo un error al cargar los tipos de documentos.");
+                }
+            });
+        }
+    
+        // Función para cargar Genero -- Funciona.....
+        function cargarGeneros(selectedGeneroId = null) {
+            $.ajax({
+                url: '/datos_generos',  // Asegúrate de que esta URL sea correcta
+                type: 'GET',
+                contentType: 'application/json',
+                success: function(response) {
+                    var generoSelect = $('#generoMod');
+                    generoSelect.empty();
+                    generoSelect.append('<option value="" disabled selected>Seleccionar género</option>');
+                    response.forEach(function (genero) {
+                        var selected = parseInt(genero.idGenero) === parseInt(selectedGeneroId) ? 'selected' : '';  
+                        generoSelect.append(`<option value="${genero.idGenero}" ${selected}>${genero.nombre}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los géneros"); 
                 }
             });
         }
@@ -354,9 +354,8 @@
 
                         $('#modal-title').text("Ver Jefe");
                         $('#formJefe')[0].reset();
-
-                        //cargar los datos del jefe en los campos...
                         $('#idJefeMod').val(response.idPersona);
+
                         $('#numDocMod').val(response.numDoc);
                         $('#nombreJefeMod').val(response.nombre);
                         $('#apellidosJefeMod').val(response.apellidos);
@@ -364,10 +363,11 @@
                         $('#correoPMod').val(response.correoP);
                         $('#cargoMod').val(response.cargo);
                         $('#estadoJefeMod').val(response.estado);
-                        //cargar valores dinamicos en selects...
+
                         cargarGeneros(response.idGenero);
                         cargarTipoDocumentos(response.idTipoDoc);
                         deshabilitarControladores();
+
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
                         $('#btnCerrar').show();
@@ -546,13 +546,6 @@
             }
         });
 
-        // Llamar a la función de carga de tipos de documentos y géneros cuando se muestra el modal -- Funciona...
-        $('#modalJefe').on('show.bs.modal', function() {
-            cargarGeneros();  // Cargar géneros
-            cargarTipoDocumentos();  // Cargar tipos de documento
-        });
-
-
         // Evento para Eliminar Jefe
         $('#tabla-jefe tbody').on('click', '.btnEliminar', function () {
             var id = $(this).data('id');
@@ -589,7 +582,7 @@
                 url = '/eliminar_jefe';
                 mensajeExito = 'El jefe fue eliminado correctamente';
                 mensajeError = 'Hubo un error al eliminar al jefe.';
-                
+
             } else if (accion === 'darDeBaja') {
                 url = '/dar_de_baja_jefe';
                 mensajeExito = 'Al jefe fue dado de baja correctamente';

@@ -235,3 +235,47 @@ def obtener_ultimo_id():
         conexion.close()
     
     return practicas
+
+############################# REPORTES ESTUDIANTES PRÁCTICAS #############################
+def reporte_practicas_estudiantes(idSemestre, idEscuela, idEstado, numDoc): 
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+
+    practicas_estudiante = []
+    try:
+        with conexion.cursor() as cursor:
+            query = """
+                SELECT 
+                    pe.codUniversitario, 
+                    pe.apellidos, 
+                    pe.nombre, 
+                    pe.tel1, 
+                    pe.correoUSAT
+                FROM persona AS pe
+                INNER JOIN practicas_preprofesionales pp ON pe.idPersona = pp.idPersona
+                INNER JOIN estado est ON pp.idEstado = est.idEstado
+                INNER JOIN semestre_academico sem ON pp.idSemestre = sem.idSemestre
+                INNER JOIN escuela esc ON esc.idEscuela = pe.idEscuela
+                INNER JOIN institucion ins ON ins.numDoc = pp.numDocInstitucion
+                WHERE 
+                    (sem.idSemestre = %s OR %s = 0) AND
+                    (esc.idEscuela = %s OR %s = 0) AND
+                    (est.idEstado = %s OR %s = 0) AND
+                    (ins.numDoc = %s OR %s = 0)
+                GROUP BY pe.idPersona
+            """
+            cursor.execute(query, (idSemestre, idSemestre, idEscuela, idEscuela, idEstado, idEstado, numDoc, numDoc))
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+
+            for row in rows:
+                practica_dict = dict(zip(column_names, row))
+                practicas_estudiante.append(practica_dict)
+                
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+    return {"data": practicas_estudiante}

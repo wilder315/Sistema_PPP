@@ -8,6 +8,11 @@ def datos_instituciones():
     instituciones = controlador_institucion.obtener_instituciones()
     return jsonify(instituciones)
 
+@router_institucion.route("/datos_empresas", methods=["GET"])
+def datos_empresas():
+    empresas = controlador_institucion.obtener_empresas()
+    return jsonify(empresas)
+
 @router_institucion.route("/jefe_institucion", methods=["GET"])
 def jefe_institucion():
     ruc = request.args.get('ruc')

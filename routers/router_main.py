@@ -277,4 +277,9 @@ def datos_dashboard_tendencias():
             return jsonify({"error": datos["error"]}), 500
         return jsonify(datos)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500    
+        return jsonify({"error": str(e)}), 500  
+    
+@router_main.route("/reporte_estudiantes_practicas")
+@login_required
+def reporte_estudiantes_practicas():
+    return render_template('gestion_academica/reportePracticas.html') 
