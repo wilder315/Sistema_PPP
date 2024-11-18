@@ -279,3 +279,72 @@ def reporte_practicas_estudiantes(idSemestre, idEscuela, idEstado, numDoc):
         conexion.close()
 
     return {"data": practicas_estudiante}
+
+def obtener_reporte_horas_practicas2(codUniversitario=None):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    
+    reporte_horas = []
+    try:
+        with conexion.cursor() as cursor:
+            # Agregar el filtro en la consulta SQL usando el parámetro codUniversitario
+            consulta = """
+            SELECT 
+                p.nombre AS Nombre_Alumno,
+                p.apellidos AS Apellidos_Alumno,
+                p.codUniversitario AS Codigo_Universitario,
+                e.nombre AS Escuela,
+                sa.nombre AS Semestre_Academico,
+                i.razonSocial AS Institucion,
+                tp.nombre AS Tipo_Practica,
+                ppp.modalidad AS Modalidad,
+                ppp.area AS Area,
+                ppp.fechaInicio AS Fecha_Inicio,
+                ppp.fechaFin AS Fecha_Fin,
+                ppp.numeroHorasPPP AS Horas_Requeridas,
+                ppp.numeroHorasRealizadas AS Horas_Completadas,
+                ppp.numeroHorasPendientes AS Horas_Pendientes,
+                ROUND((ppp.numeroHorasRealizadas / ppp.numeroHorasPPP) * 100, 2) AS Porcentaje_Avance,
+                es.nombre AS Estado_Practica
+            FROM 
+                persona p
+                INNER JOIN practicas_preprofesionales ppp ON p.idPersona = ppp.idPersona
+                INNER JOIN escuela e ON p.idEscuela = e.idEscuela
+                INNER JOIN semestre_academico sa ON ppp.idSemestre = sa.idSemestre
+                INNER JOIN institucion i ON ppp.numDocInstitucion = i.numDoc
+                INNER JOIN tipo_practicas tp ON ppp.idTipoPractica = tp.idTipoPractica
+                INNER JOIN estado es ON ppp.idEstado = es.idEstado
+            WHERE 
+                p.estado = 'A'
+            """
+            # Si se proporciona codUniversitario, añadir la condición de filtro
+            if codUniversitario:
+                consulta += " AND p.codUniversitario = %s"
+            
+            consulta += " ORDER BY p.apellidos, p.nombre, sa.nombre;"
+            
+            # Ejecutar la consulta con o sin parámetro según corresponda
+            if codUniversitario:
+                cursor.execute(consulta, (codUniversitario,))
+            else:
+                cursor.execute(consulta)
+            
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            print("Filas obtenidas:", len(rows)) 
+
+            for row in rows:
+                reporte_dict = dict(zip(column_names, row))
+                # Agregar información adicional sobre el estado de las horas
+                reporte_dict['Estado_Horas'] = 'Completado' if reporte_dict['Horas_Pendientes'] == 0 else 'En Proceso'
+                # Formatear modalidad
+                reporte_dict['Modalidad'] = 'Presencial' if reporte_dict['Modalidad'] == 'P' else 'Virtual' if reporte_dict['Modalidad'] == 'V' else 'Híbrido'
+                reporte_horas.append(reporte_dict)
+
+    except Exception as e:
+        return {"error": f"Error al generar el reporte: {str(e)}"}
+    finally:
+        conexion.close()
+    
+    return reporte_horas

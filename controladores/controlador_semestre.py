@@ -145,7 +145,7 @@ def obtener_datos_dashboard2(idEscuela, idSemestre):
                     INNER JOIN usuario usu ON usu.idUsuario = pe.idUsuario
                     LEFT JOIN practicas_preprofesionales pp ON pp.idPersona = pe.idPersona
                     LEFT JOIN linea_desarrollo li ON pp.idLinea = li.idLinea
-                    WHERE usu.idTipoUsuario = 2 
+                    WHERE usu.idTipoUsuario IN (1, 2) 
                     AND (%s = 0 OR li.idEscuela = %s)
                     AND (%s = 0 OR pp.idSemestre = %s)) AS docentes,
 

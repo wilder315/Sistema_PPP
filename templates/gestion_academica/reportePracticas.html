@@ -60,10 +60,58 @@
                             <th style="text-align:center">Nombre</th>
                             <th style="text-align:center">Teléfono</th>
                             <th style="width: 15%; text-align:center">Correo Usat</th>
+                            <th style="text-align:center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                        <!-- Los datos se cargan dinámicamente -->
+                    </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Mostrar detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-red-usat text-white">
+                <h5 class="modal-title" id="detallesModalLabel" style="color:white">Detalles del Estudiante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3 text-muted">Información del Estudiante</h6>
+                                <p><strong>Código:</strong> <span id="modal-codigo"></span></p>
+                                <p><strong>Apellidos:</strong> <span id="modal-apellidos"></span></p>
+                                <p><strong>Nombre:</strong> <span id="modal-nombre"></span></p>
+                                <p><strong>Escuela:</strong> <span id="modal-escuela"></span></p>
+                                <p><strong>Semestre de Inicio:</strong> <span id="modal-semestre"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3 text-muted">Información de Prácticas</h6>
+                                <p><strong>Institución:</strong> <span id="modal-institucion"></span></p>
+                                <p><strong>Modalidad:</strong> <span id="modal-modalidad"></span></p>
+                                <p><strong>Horas Requeridas:</strong> <span id="modal-horas-requeridas"></span></p>
+                                <p><strong>Horas Completadas:</strong> <span id="modal-horas-completadas"></span></p>
+                                <p><strong>Horas Pendientes:</strong> <span id="modal-horas-pendientes"></span></p>
+                                <p><strong>Porcentaje de Avance:</strong> <span id="modal-porcentaje"></span></p>
+                                <p><strong>Estado:</strong> <span id="modal-estado"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -71,7 +119,6 @@
 
 {% block scripts %}
 <!-- Librerías externas -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
@@ -82,7 +129,6 @@
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
 
 <!-- Script principal -->
 <script>
@@ -98,16 +144,16 @@
             info: true,
             responsive: true,
             autoWidth: true,
-            searching: false, //Desactivar la busqueda
+            searching: false, // Desactivar la búsqueda
             order: [],
-            dom: 'rt<"bottom-controls"ip>', //elimina controles de busqueda y botones
+            dom: 'rt<"bottom-controls"ip>', // Elimina controles de búsqueda y botones
             ajax: {
                 url: "/reporte_practicas1",
                 type: "POST",
                 contentType: "application/json",
                 data: function (d) {
                     return JSON.stringify({
-                        //agrega los filtros
+                        // Agrega los filtros
                         idSemestre: $('#semestre').val() || 0,
                         idEscuela: $('#escuela').val() || 0,
                         idEstado: $('#estado').val() || 0,
@@ -127,10 +173,65 @@
                 { data: "nombre" },
                 { data: "tel1", className: 'text-center' },
                 { data: "correoUSAT" },
+                {
+                    data: null,
+                    className: 'text-start',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return '<button class="btn btn-primary btn-sm ver-detalles">' +
+                                '<i class="fas fa-eye me-1"></i>Ver</button>';
+                    }
+                }
             ],
             language: {
                 url: "{{ url_for('static', filename='js/es-ES.json') }}" // Traducción de DataTables
             }
+        });
+
+        // Evento ver Detalle
+        $('#tabla-reporte1').on('click', '.ver-detalles', function() { 
+            var data = $('#tabla-reporte1').DataTable().row($(this).parents('tr')).data();
+            
+            // Realiza una solicitud AJAX a /reporte_horas_practica usando el codUniversitario del estudiante
+            $.ajax({
+                url: "/reporte_horas_practica2",
+                type: "GET",
+                data: { codUniversitario: data.codUniversitario }, // Pasando `codUniversitario` como parámetro
+                success: function(response) {
+                    if (response.length > 0) {
+                        var detalles = response[0]; // Accedemos al primer elemento del array
+        
+                        // Actualizar los datos en el modal con la respuesta
+                        $('#modal-nombre').text(detalles.Nombre_Alumno);
+                        $('#modal-apellidos').text(detalles.Apellidos_Alumno);
+                        $('#modal-codigo').text(detalles.Codigo_Universitario);
+                        $('#modal-escuela').text(detalles.Escuela);
+                        $('#modal-semestre').text(detalles.Semestre_Academico);
+                        $('#modal-institucion').text(detalles.Institucion);
+                        $('#modal-modalidad').text(detalles.Modalidad);
+                        $('#modal-horas-requeridas').text(detalles.Horas_Requeridas);
+                        $('#modal-horas-completadas').text(detalles.Horas_Completadas);
+                        $('#modal-horas-pendientes').text(detalles.Horas_Pendientes);
+                        $('#modal-porcentaje').text(detalles.Porcentaje_Avance + '%');
+                        
+                        // Establecer el estado con el badge correspondiente
+                        var estadoBadge = detalles.Estado_Horas === 'Completado' 
+                            ? '<span class="badge bg-success">Completado</span>'
+                            : '<span class="badge bg-warning">En Proceso</span>';
+                        $('#modal-estado').html(estadoBadge);
+                        
+                        // Mostrar el modal
+                        $('#detallesModal').modal('show');
+                    } else {
+                        console.error('No se encontró información para mostrar en el modal.');
+                        mostrarAlerta("error", "Error", "No se encontró información del estudiante.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error al cargar los detalles:', error);
+                    mostrarAlerta("error", "Error", "Hubo un error al cargar los detalles del estudiante.");
+                }
+            });
         });
 
         // Funciones para cargar los comboBox (semestre, escuela, estado, empresa)
@@ -164,30 +265,12 @@
         // Cargar empresa
         cargarSelectData('/datos_empresas', '#empresa', 'idEmpresa', 'nombre');
 
-
-
-        // Función para obtener los valores de los filtros
-        function obtenerFiltros() {
-            var semestre = $('#semestre').val() || '';   // Si está vacío o no definido, asignar 0
-            var escuela = $('#escuela').val() || '';     // Lo mismo aquí
-            var estado = $('#estado').val() || '';       // Lo mismo aquí
-            var empresa = $('#empresa').val() || '';     // Lo mismo aquí
-
-            console.log('Filtros seleccionados:', { semestre, escuela, estado, empresa });
-
-            return { semestre, escuela, estado, empresa };
-        }
-
         // Recargar la tabla al cambiar los filtros
         $('#semestre, #escuela, #estado, #empresa').on('change', function() {
-            var filtros = obtenerFiltros(); 
             table.ajax.reload(); // Recargar los datos de la tabla
         });
-
-        
     });
 </script>
-
 
 {% endblock %}
 {% endblock %}

@@ -112,3 +112,14 @@ def reporte_practicas1():
 
     except Exception as e:
         return jsonify({"error": f"Error en el servidor: {str(e)}"}), 500
+    
+@router_practicas.route("/reporte_horas_practica2", methods=["GET"])
+def reporte_horas_practica2():
+    # Obtener el parámetro `idPersona` de la solicitud
+    cod_universitario = request.args.get('codUniversitario')  # Obtiene el parámetro como string
+    
+    # Llamar a la función con el codUniversitario si fue proporcionado
+    reporte_horas = controlador_practicas.obtener_reporte_horas_practicas2(cod_universitario)
+    
+    # Retornar el resultado en formato JSON
+    return jsonify(reporte_horas)
