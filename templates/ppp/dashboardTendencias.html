@@ -71,7 +71,7 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-red-usat text-white">
-                    Número de estudiantes por Modalidades
+                    Número de prácticas por Modalidades
                 </div>
                 <div class="card-body">
                     <canvas id="grafico-modalidades"></canvas>
@@ -86,15 +86,17 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-red-usat text-white">
-                    Instituciones por Escuela
+                    Número de Ptacticantes por Instituciones y Escuela
                 </div>
                 <div class="card-body">
+                    <h6 style="text-align: center; font-style: bold;">Seleccionar escuela:</h6>
+                    <br>
                     <!-- Selector de escuela -->
                     <div class="row mb-4">
                         <div class="col-md-8 mx-auto">
                             <div class="input-group">
                                 <select class="form-select" id="escuela_selector">
-                                    <option value="">Seleccione una escuela</option>
+                                    <option value="">Escuela</option>
                                 </select>
                                 <button class="btn btn-primary" id="btn_filtrar_instituciones">
                                     <i class="fas fa-filter"></i> Filtrar
@@ -108,8 +110,8 @@
                         <table class="table table-striped" id="tabla-instituciones">
                             <thead>
                                 <tr>
-                                    <th>Institución</th>
-                                    <th>Total Practicantes</th>
+                                    <th style="text-align: start;">Institución</th>
+                                    <th style="text-align: start;">Total Practicantes</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -122,7 +124,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-red-usat text-white">
-                    Tasas de Finalización Mensual
+                    Porcentaje(%) de Finalización Mensual de Prácticas
                 </div>
                 <div class="card-body">
                     <canvas id="grafico-tasas"></canvas>
@@ -377,7 +379,7 @@
                             max: 100,
                             title: {
                                 display: true,
-                                text: 'Tasa de Finalización (%)',
+                                text: ' (%) de Finalización',
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -439,7 +441,7 @@
                             tabla.append(`
                                 <tr>
                                     <td>${item.Institucion}</td>
-                                    <td class="text-center">${item.Total_Practicantes}</td>
+                                    <td class="text-start">${item.Total_Practicantes}</td>
                                 </tr>
                             `);
                         });

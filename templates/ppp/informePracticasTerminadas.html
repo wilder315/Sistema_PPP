@@ -4,7 +4,8 @@
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de
+                Prácticas Pre Profesionales</a></li>
         <li class="breadcrumb-item active" aria-current="page">Prácticas Terminadas por Semestre</li>
     </ol>
 </nav>
@@ -49,11 +50,11 @@
                 <table id="tabla-practicas-terminadas" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="text-align:center">Apellidos</th>
-                            <th style="text-align:center">Nombres</th>
-                            <th style="text-align:center">Escuela</th>
-                            <th style="text-align:center">Estado</th>
-                            <th style="text-align:center">Acciones</th>
+                            <th style="text-align:start">Apellidos</th>
+                            <th style="text-align:start">Nombres</th>
+                            <th style="text-align:start">Escuela</th>
+                            <th style="text-align:start">Estado</th>
+                            <th style="text-align:start">Acciones</th>
                         </tr>
                     </thead>
                 </table>
@@ -68,7 +69,8 @@
         <div class="modal-content">
             <div class="modal-header bg-red-usat text-white">
                 <h5 class="modal-title" id="detallesModalLabel">Detalles de la Práctica</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -97,13 +99,13 @@
         $.ajax({
             url: '/semestres',
             type: 'GET',
-            success: function(data) {
+            success: function (data) {
                 const semestreSelector = $('#semestre_selector');
-                data.forEach(function(semestre) {
+                data.forEach(function (semestre) {
                     semestreSelector.append(new Option(semestre.nombre, semestre.id));
                 });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error al cargar semestres:', error);
                 Swal.fire({
                     icon: 'error',
@@ -145,35 +147,35 @@
                     data: {
                         semestre: semestre
                     },
-                    dataSrc: function(json) {
+                    dataSrc: function (json) {
                         $('#total_completados').text(json.length);
                         return json;
                     }
                 },
                 columns: [
-                    { data: "Apellidos_Alumno", className: 'text-center' },
-                    { data: "Nombre_Alumno", className: 'text-center' },
-                    { data: "Escuela", className: 'text-center' },
-                    { 
+                    { data: "Apellidos_Alumno", className: 'text-start' },
+                    { data: "Nombre_Alumno", className: 'text-start' },
+                    { data: "Escuela", className: 'text-start' },
+                    {
                         data: "Estado_Practica",
-                        className: 'text-center',
-                        render: function(data) {
+                        className: 'text-start',
+                        render: function (data) {
                             return '<span class="badge bg-success">Completado</span>';
                         }
                     },
-                    { 
+                    {
                         data: null,
-                        className: 'text-center',
-                        render: function(data, type, row) {
+                        className: 'text-start',
+                        render: function (data, type, row) {
                             return '<button class="btn btn-sm btn-info ver-detalles" data-bs-toggle="tooltip" title="Ver detalles">' +
-                                   '<i class="fas fa-eye"></i></button>';
+                                '<i class="fas fa-eye"></i></button>';
                         }
                     }
                 ],
                 language: {
                     url: "{{ url_for('static', filename='js/es-ES.json') }}",
-                    searchPlaceholder: "Buscar...",
-                    search: ""
+                    searchPlaceholder: "Apellidos, Nombres o Escuela"
+                    
                 },
                 dom: '<"top"lf>rt<"bottom"ip><"clear">',
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
@@ -182,15 +184,15 @@
         }
 
         // Evento click del botón filtrar
-        $('#btn_filtrar').click(function() {
+        $('#btn_filtrar').click(function () {
             actualizarTabla();
         });
 
         // Manejador para el botón de detalles
-        $('#tabla-practicas-terminadas').on('click', '.ver-detalles', function() {
+        $('#tabla-practicas-terminadas').on('click', '.ver-detalles', function () {
             var table = $('#tabla-practicas-terminadas').DataTable();
             var data = table.row($(this).parents('tr')).data();
-            
+
             // Llenar el modal con los datos
             $('#modal_codigo').text(data.Codigo_Universitario);
             $('#modal_semestre').text(data.Semestre_Academico);
@@ -198,7 +200,7 @@
             $('#modal_fecha_inicio').text(new Date(data.Fecha_Inicio).toLocaleDateString('es-ES'));
             $('#modal_fecha_fin').text(new Date(data.Fecha_Fin).toLocaleDateString('es-ES'));
             $('#modal_horas').text(data.Horas_Completadas);
-            
+
             // Mostrar el modal
             var detallesModal = new bootstrap.Modal(document.getElementById('detallesModal'));
             detallesModal.show();
@@ -208,4 +210,10 @@
         $('[data-bs-toggle="tooltip"]').tooltip();
     });
 </script>
+
+<style>
+    .dataTables_filter input::placeholder {
+        font-size: 12px; 
+    }
+</style>
 {% endblock %}
