@@ -46,6 +46,12 @@
         </div>
         <div class="card-body scrollable">
             <form id="form-informe">
+                <div class="mb-3">
+                    <label for="idPractica" class="form-label">Seleccionar Práctica:</label>
+                    <select class="form-control" id="idPractica" name="idPractica" required>
+                        <option value="" selected disabled>Seleccione una práctica</option>
+                    </select>
+                </div>
                 <!-- Encabezado -->
                 <div class="row">
                     <div class="col-md-6">
@@ -255,6 +261,27 @@
         $('#tabla-plan-trabajo tbody').append(nuevaFila);
     });
 
+    // Función para cargar las prácticas dinámicamente
+    function cargarPracticas(selectedPracticaId) {
+    $.ajax({
+        url: '/obtener_practicas_informe_inicial',
+        type: 'GET',
+        contentType: 'application/json',
+        success: function (response) {
+            var practicaSelect = $('#idPractica');
+            practicaSelect.empty();
+            practicaSelect.append('<option value="" disabled selected>Seleccione una práctica</option>');
+            response.forEach(function (practica) {
+                var selected = parseInt(practica.idPractica) === parseInt(selectedPracticaId) ? 'selected' : '';  
+                practicaSelect.append(`<option value="${practica.idPractica}" ${selected}>ID: ${practica.idPractica} - Estudiante: ${practica.estudiante}</option>`);
+            });
+        },
+        error: function (xhr, status, error) {
+            mostrarAlerta("error", "Error", "Hubo un error al cargar las prácticas.");
+        }
+    });
+}
+
     // Eliminar filas seleccionadas del plan de trabajo
     $('#eliminarPlanTrabajo').on('click', function() {
         $('.seleccionar-plan:checked').closest('tr').remove();
@@ -263,6 +290,7 @@
     // Enviar el formulario con AJAX y mostrar alerta de éxito
     $(document).ready(function() {
         cargarInstituciones();
+        cargarPracticas();
     });
 
     // Enviar el formulario con AJAX y mostrar alerta de éxito

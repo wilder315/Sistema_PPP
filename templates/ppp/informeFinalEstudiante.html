@@ -296,5 +296,63 @@
         var fila = btn.closest('tr');
         fila.remove();
     }
+
+     // Función para agregar conclusiones dinámicamente
+     $('#agregarConclusion').on('click', function() {
+        const nuevaConclusion = `
+            <div class="mb-3">
+                <textarea class="form-control" name="conclusiones[]" rows="2" placeholder="Conclusión"></textarea>
+            </div>
+        `;
+        $('#conclusiones-container').append(nuevaConclusion);
+    });
+
+    // Función para agregar recomendaciones dinámicamente
+    $('#agregarRecomendacion').on('click', function() {
+        const nuevaRecomendacion = `
+            <div class="mb-3">
+                <textarea class="form-control" name="recomendaciones[]" rows="2" placeholder="Recomendación"></textarea>
+            </div>
+        `;
+        $('#recomendaciones-container').append(nuevaRecomendacion);
+    });
+
+    // Enviar el formulario con AJAX
+    $('#form-informe-final').on('submit', function(event) {
+        event.preventDefault();
+        const formData = $(this).serialize();
+
+        $.ajax({
+            url: "{{ url_for('router_informe.agregar_informe_final_estudiante') }}",
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message,
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.error || 'No se pudo guardar el informe.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al enviar el formulario.',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+    });
 </script>
 {% endblock %}
