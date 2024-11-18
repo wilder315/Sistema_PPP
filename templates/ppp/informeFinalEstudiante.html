@@ -323,7 +323,7 @@
         const formData = $(this).serialize();
 
         $.ajax({
-            url: "{{ url_for('router_informe.agregar_informe_final_estudiante') }}",
+            url: "{{ url_for('router_informe.agregar_informe_final') }}",
             type: 'POST',
             data: formData,
             dataType: 'json',
