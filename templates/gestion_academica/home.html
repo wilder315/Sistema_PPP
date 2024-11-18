@@ -139,6 +139,11 @@
                     <li class="sidebar-header">
                         Módulo de Gestión Académica
                     </li>                   
+                        <a class="sidebar-link" href="{{ url_for('router_main.gestion_academica') }}">
+                            Módulo de Gestión Académica
+                        </a> 
+                    </li>    
+                        
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.docente') }}">
                             <i class="fas fa-chalkboard-teacher fa-lg"></i>
@@ -161,6 +166,8 @@
                         <a class="sidebar-link" href="{{ url_for('router_main.jefe') }}">
                             <i class="fas fa-user-graduate fa-lg"></i>
                             <span class="align-middle">Jefes</span>
+                            <i class="fas fa-business-time fa-lg"></i>
+                            <span class="align-middle">Jefe Directo</span>
                         </a>
                     </li>                    
                     <li class="sidebar-item">

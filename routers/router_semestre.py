@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, render_template
 import controladores.controlador_semestre as controlador_semestre
 
+
 router_semestre = Blueprint('router_semestre', __name__)
 
 @router_semestre.route("/semestre")
@@ -47,3 +48,39 @@ def eliminar_semestre():
     idsemestre = request.json.get('idSemestre')
     resultado = controlador_semestre.eliminar_semestre(idsemestre)
     return jsonify(resultado)
+
+################################################## carlos delgado #################################################
+@router_semestre.route('/dashboard2', methods=['POST'])
+def dashboard2():
+    data = request.json
+    idEscuela = data.get('idEscuela', 0)
+    idSemestre = data.get('idSemestre', 0)
+
+    datos = controlador_semestre.obtener_datos_dashboard2(idEscuela, idSemestre)
+
+    return jsonify(datos)
+
+@router_semestre.route('/ultimos_estudiantes', methods=['POST'])
+def ultimos_estudiantes():
+    data = request.json
+    idEscuela = data.get('idEscuela', 0)
+    idSemestre = data.get('idSemestre', 0)
+
+    # Obtener los últimos estudiantes registrados
+    estudiantes = controlador_semestre.obtener_ultimos_estudiantes(idEscuela, idSemestre)
+    
+    return jsonify({'data': estudiantes})
+
+@router_semestre.route('/estudiantes_por_institucion', methods=['POST'])
+def estudiantes_por_institucion():
+    data = request.json
+    idEscuela = data.get('idEscuela', 0)
+    idSemestre = data.get('idSemestre', 0)
+
+    # Obtener los datos de estudiantes por institución
+    instituciones = controlador_semestre.obtener_estudiantes_por_institucion(idEscuela, idSemestre)
+    
+    return jsonify({'data': instituciones})
+
+
+
