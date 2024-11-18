@@ -20,18 +20,12 @@
                 <table id="tabla-horas-practica" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="text-align:center">Nombre</th>
-                            <th style="text-align:center">Apellidos</th>
                             <th style="text-align:center">Código</th>
-                            <th style="text-align:center">Escuela</th>
-                            <th style="text-align:center">Semestre</th>
-                            <th style="text-align:center">Institución</th>
-                            <th style="text-align:center">Modalidad</th>
-                            <th style="text-align:center">Horas Requeridas</th>
-                            <th style="text-align:center">Horas Completadas</th>
-                            <th style="text-align:center">Horas Pendientes</th>
+                            <th style="text-align:center">Apellidos</th>
+                            <th style="text-align:center">Nombre</th>
                             <th style="text-align:center">% Avance</th>
                             <th style="text-align:center">Estado</th>
+                            <th style="text-align:center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,18 +37,74 @@
     </div>
 </div>
 
+<!-- Modal para mostrar detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-red-usat text-white">
+                <h5 class="modal-title" id="detallesModalLabel" style="color:white">Detalles del Estudiante</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3 text-muted">Información del Estudiante</h6>
+                                <p><strong>Código:</strong> <span id="modal-codigo"></span></p>
+                                <p><strong>Apellidos:</strong> <span id="modal-apellidos"></span></p>
+                                <p><strong>Nombre:</strong> <span id="modal-nombre"></span></p>
+                                <p><strong>Escuela:</strong> <span id="modal-escuela"></span></p>
+                                <p><strong>Semestre de Inicio:</strong> <span id="modal-semestre"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-3 text-muted">Información de Prácticas</h6>
+                                <p><strong>Institución:</strong> <span id="modal-institucion"></span></p>
+                                <p><strong>Modalidad:</strong> <span id="modal-modalidad"></span></p>
+                                <p><strong>Horas Requeridas:</strong> <span id="modal-horas-requeridas"></span></p>
+                                <p><strong>Horas Completadas:</strong> <span id="modal-horas-completadas"></span></p>
+                                <p><strong>Horas Pendientes:</strong> <span id="modal-horas-pendientes"></span></p>
+                                <p><strong>Porcentaje de Avance:</strong> <span id="modal-porcentaje"></span></p>
+                                <p><strong>Estado:</strong> <span id="modal-estado"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
 {% block scripts %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+
+<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
 <script>
     $(document).ready(function () {
+        // Inicialización de DataTables
         if ($.fn.DataTable.isDataTable('#tabla-horas-practica')) {
             $('#tabla-horas-practica').DataTable().clear().destroy();
         }
+
         $('#tabla-horas-practica').DataTable({
             paging: true,
             info: false,
             responsive: true,
-            autoWidth: true,
+            autoWidth: false,
             searching: true,
             order: [],
             ajax: {
@@ -63,26 +113,19 @@
                 dataSrc: ""
             },
             columns: [
-                { data: "Nombre_Alumno", className: 'text-center' },
-                { data: "Apellidos_Alumno", className: 'text-center' },
-                { data: "Codigo_Universitario", className: 'text-center' },
-                { data: "Escuela", className: 'text-center' },
-                { data: "Semestre_Academico", className: 'text-center' },
-                { data: "Institucion", className: 'text-center' },
-                { data: "Modalidad", className: 'text-center' },
-                { data: "Horas_Requeridas", className: 'text-center' },
-                { data: "Horas_Completadas", className: 'text-center' },
-                { data: "Horas_Pendientes", className: 'text-center' },
+                { data: "Codigo_Universitario", className: 'text-start' },
+                { data: "Apellidos_Alumno", className: 'text-start' },
+                { data: "Nombre_Alumno", className: 'text-start' },
                 { 
                     data: "Porcentaje_Avance",
-                    className: 'text-center',
+                    className: 'text-start',
                     render: function(data, type, row) {
                         return data + '%';
                     }
                 },
                 { 
                     data: "Estado_Horas",
-                    className: 'text-center',
+                    className: 'text-start',
                     render: function(data, type, row) {
                         if (data === 'Completado') {
                             return '<span class="badge bg-success">Completado</span>';
@@ -90,13 +133,74 @@
                             return '<span class="badge bg-warning">En Proceso</span>';
                         }
                     }
+                },
+                {
+                    data: null,
+                    className: 'text-start',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return '<button class="btn btn-primary btn-sm ver-detalles">' +
+                                '<i class="fas fa-eye me-1"></i>Ver</button>';
+                    }
                 }
             ],
             language: {
                 url: "{{ url_for('static', filename='js/es-ES.json') }}"
             }
         });
+
+        // Manejador para el botón "Ver Detalles"
+        $('#tabla-horas-practica').on('click', '.ver-detalles', function() {
+            var data = $('#tabla-horas-practica').DataTable().row($(this).parents('tr')).data();
+            
+            // Actualizar datos en el modal
+            $('#modal-nombre').text(data.Nombre_Alumno);
+            $('#modal-apellidos').text(data.Apellidos_Alumno);
+            $('#modal-codigo').text(data.Codigo_Universitario);
+            $('#modal-escuela').text(data.Escuela);
+            $('#modal-semestre').text(data.Semestre_Academico);
+            $('#modal-institucion').text(data.Institucion);
+            $('#modal-modalidad').text(data.Modalidad);
+            $('#modal-horas-requeridas').text(data.Horas_Requeridas);
+            $('#modal-horas-completadas').text(data.Horas_Completadas);
+            $('#modal-horas-pendientes').text(data.Horas_Pendientes);
+            $('#modal-porcentaje').text(data.Porcentaje_Avance + '%');
+            
+            // Establecer el estado con el badge correspondiente
+            var estadoBadge = data.Estado_Horas === 'Completado' 
+                ? '<span class="badge bg-success">Completado</span>'
+                : '<span class="badge bg-warning">En Proceso</span>';
+            $('#modal-estado').html(estadoBadge);
+            
+            // Mostrar el modal
+            $('#detallesModal').modal('show');
+        });
     });
 </script>
-{% endblock %}
+
+<style>
+    .modal-header.bg-red-usat {
+        background-color: #9D2449 !important;
+    }
+    
+    .btn-close-white {
+        filter: brightness(0) invert(1);
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+    }
+
+    .modal-body .card {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .ver-detalles {
+        transition: all 0.3s ease;
+    }
+
+    .ver-detalles:hover {
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

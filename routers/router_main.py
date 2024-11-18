@@ -244,29 +244,33 @@ def datos_horas_practica_escuela():
 def practicas_terminadas():
     return render_template('ppp/informePracticasTerminadas.html')
 
+
+
+@router_main.route("/semestres")
+def obtener_semestres():
+    try:
+        datos = controlador_informeAlumno.obtener_semestres()
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @router_main.route("/datos_practicas_terminadas")
-@login_required
 def datos_practicas_terminadas():
     try:
-        # Obtener mes y año de los parámetros de la URL
-        mes = request.args.get('mes', type=int)
-        anio = request.args.get('anio', type=int)
+        id_semestre = request.args.get('semestre', type=int)
+        if not id_semestre:
+            return jsonify({"error": "Semestre no especificado"}), 400
         
-        # Si no se proporcionan mes y año, usar los valores actuales
-        if not mes or not anio:
-            from datetime import datetime
-            fecha_actual = datetime.now()
-            mes = fecha_actual.month
-            anio = fecha_actual.year
-        
-        # Llamar al controlador con los parámetros
-        datos = controlador_informeAlumno.obtener_practicas_terminadas_mes(mes, anio)
+        datos = controlador_informeAlumno.obtener_practicas_terminadas_semestre(id_semestre)
         
         if isinstance(datos, dict) and "error" in datos:
             return jsonify({"error": datos["error"]}), 500
         return jsonify(datos)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
 @router_main.route("/dashboard-tendencias")
 @login_required
@@ -288,3 +292,28 @@ def datos_dashboard_tendencias():
 @login_required
 def reporte_estudiantes_practicas():
     return render_template('gestion_academica/reportePracticas.html') 
+
+
+@router_main.route("/escuelas")
+def obtener_lista_escuelas():
+    try:
+        datos = controlador_informeAlumno.obtener_escuelas()
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@router_main.route("/instituciones_por_escuela")
+def obtener_instituciones_escuela():
+    try:
+        id_escuela = request.args.get('escuela', type=int)
+        if not id_escuela:
+            return jsonify({"error": "Escuela no especificada"}), 400
+        
+        datos = controlador_informeAlumno.obtener_instituciones_por_escuela(id_escuela)
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

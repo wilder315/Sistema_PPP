@@ -4,7 +4,8 @@
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de
+                Prácticas Pre Profesionales</a></li>
         <li class="breadcrumb-item active" aria-current="page">Dashboard de Tendencias</li>
     </ol>
 </nav>
@@ -70,7 +71,7 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header bg-red-usat text-white">
-                    Distribución de Modalidades
+                    Número de estudiantes por Modalidades
                 </div>
                 <div class="card-body">
                     <canvas id="grafico-modalidades"></canvas>
@@ -85,17 +86,30 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-red-usat text-white">
-                    Top Instituciones por Escuela
+                    Instituciones por Escuela
                 </div>
                 <div class="card-body">
+                    <!-- Selector de escuela -->
+                    <div class="row mb-4">
+                        <div class="col-md-8 mx-auto">
+                            <div class="input-group">
+                                <select class="form-select" id="escuela_selector">
+                                    <option value="">Seleccione una escuela</option>
+                                </select>
+                                <button class="btn btn-primary" id="btn_filtrar_instituciones">
+                                    <i class="fas fa-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de instituciones -->
                     <div class="table-responsive">
                         <table class="table table-striped" id="tabla-instituciones">
                             <thead>
                                 <tr>
-                                    <th>Escuela</th>
                                     <th>Institución</th>
                                     <th>Total Practicantes</th>
-                                    <th>Promedio Horas</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -121,8 +135,28 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         let graficos = {};
+
+        // Cargar escuelas al inicio
+        $.ajax({
+            url: '/escuelas',
+            type: 'GET',
+            success: function (data) {
+                const escuelaSelector = $('#escuela_selector');
+                data.forEach(function (escuela) {
+                    escuelaSelector.append(new Option(escuela.nombre, escuela.id));
+                });
+            },
+            error: function (error) {
+                console.error('Error al cargar escuelas:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar las escuelas'
+                });
+            }
+        });
 
         function inicializarGraficos(datos) {
             // Destruir gráficos existentes si existen
@@ -139,7 +173,7 @@
             datos.tendencias_generales.forEach(item => {
                 totalPracticas += parseInt(item.Total_Practicas) || 0;
                 totalFinalizadas += parseInt(item.Practicas_Finalizadas) || 0;
-                
+
                 const horas = parseFloat(item.Promedio_Horas);
                 if (!isNaN(horas) && horas > 0) {
                     sumaHoras += horas;
@@ -179,7 +213,47 @@
                     responsive: true,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            },
+                            title: {
+                                display: true,
+                                text: 'Cantidad de Prácticas',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Escuelas Profesionales',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribución de Prácticas por Escuela',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
                         }
                     }
                 }
@@ -198,60 +272,96 @@
             graficos.modalidades = new Chart(ctxModalidades, {
                 type: 'pie',
                 data: {
-                    labels: Object.keys(modalidadesData).map(mod => 
-                        mod === 'P' ? 'Presencial' : 
-                        mod === 'V' ? 'Virtual' : 'Híbrido'
+                    labels: Object.keys(modalidadesData).map(mod =>
+                        mod === 'P' ? 'Presencial' : 'Virtual'
                     ),
                     datasets: [{
                         data: Object.values(modalidadesData),
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.5)',
-                            'rgba(54, 162, 235, 0.5)',
-                            'rgba(255, 206, 86, 0.5)'
-                        ]
+                            'rgba(255, 99, 132, 0.8)',    // Rosa para Presencial
+                            'rgba(54, 162, 235, 0.8)'     // Azul para Virtual
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
                     }]
                 },
                 options: {
-                    responsive: true
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                generateLabels: function (chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const dataset = data.datasets[0];
+                                            const value = dataset.data[i];
+                                            return {
+                                                text: `${label}: ${value}`,
+                                                fillStyle: dataset.backgroundColor[i],
+                                                strokeStyle: dataset.borderColor[i],
+                                                lineWidth: 1,
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'N° estudiantes por Modalidad',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value * 100) / total).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
                 }
-            });
-
-            // Tabla de instituciones
-            const tabla = $('#tabla-instituciones tbody');
-            tabla.empty();
-            datos.instituciones_populares.forEach(item => {
-                tabla.append(`
-                    <tr>
-                        <td>${item.Escuela}</td>
-                        <td>${item.Institucion}</td>
-                        <td>${item.Total_Practicantes}</td>
-                        <td>${parseFloat(item.Promedio_Horas).toFixed(2)}</td>
-                    </tr>
-                `);
             });
 
             // Gráfico de tasas de finalización
             const ctxTasas = document.getElementById('grafico-tasas').getContext('2d');
-const escuelas = [...new Set(datos.tasas_finalizacion.map(item => item.Escuela))];
-const datasets = escuelas.map((escuela, index) => {
-    const escuelaData = datos.tasas_finalizacion.filter(item => item.Escuela === escuela);
-    // Crear array de 12 meses con valores por defecto de 0
-    const tasasPorMes = new Array(12).fill(0);
-    
-    // Llenar solo los meses que tienen datos
-    escuelaData.forEach(item => {
-        const mesIndex = item.Mes - 1; // Convertir mes a índice 0-11
-        tasasPorMes[mesIndex] = parseFloat(item.Tasa_Finalizacion) || 0;
-    });
-    
-    return {
-        label: escuela,
-        data: tasasPorMes,
-        borderColor: `hsl(${index * 360 / escuelas.length}, 70%, 50%)`,
-        fill: false,
-        tension: 0.1 // Hace la línea más suave
-    };
-});
+            const escuelas = [...new Set(datos.tasas_finalizacion.map(item => item.Escuela))];
+            const datasets = escuelas.map((escuela, index) => {
+                const escuelaData = datos.tasas_finalizacion.filter(item => item.Escuela === escuela);
+                const tasasPorMes = new Array(12).fill(0);
+
+                escuelaData.forEach(item => {
+                    const mesIndex = item.Mes - 1;
+                    tasasPorMes[mesIndex] = parseFloat(item.Tasa_Finalizacion) || 0;
+                });
+
+                return {
+                    label: escuela,
+                    data: tasasPorMes,
+                    borderColor: `hsl(${index * 360 / escuelas.length}, 70%, 50%)`,
+                    fill: false,
+                    tension: 0.1
+                };
+            });
 
             graficos.tasas = new Chart(ctxTasas, {
                 type: 'line',
@@ -264,9 +374,84 @@ const datasets = escuelas.map((escuela, index) => {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Tasa de Finalización (%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Meses',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                }
+                            }
                         }
                     }
+                }
+            });
+        }
+
+        // Función para actualizar la tabla de instituciones
+        function actualizarTablaInstituciones() {
+            const escuela = $('#escuela_selector').val();
+            if (!escuela) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: 'Por favor seleccione una escuela'
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/instituciones_por_escuela',
+                type: 'GET',
+                data: { escuela: escuela },
+                success: function (data) {
+                    const tabla = $('#tabla-instituciones tbody');
+                    tabla.empty();
+                    if (data.length === 0) {
+                        tabla.append(`
+                            <tr>
+                                <td colspan="2" class="text-center">No hay datos disponibles</td>
+                            </tr>
+                        `);
+                    } else {
+                        data.forEach(item => {
+                            tabla.append(`
+                                <tr>
+                                    <td>${item.Institucion}</td>
+                                    <td class="text-center">${item.Total_Practicantes}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.error('Error al cargar instituciones:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron cargar las instituciones'
+                    });
                 }
             });
         }
@@ -276,22 +461,30 @@ const datasets = escuelas.map((escuela, index) => {
             $.ajax({
                 url: '/datos_dashboard_tendencias',
                 method: 'GET',
-                success: function(response) {
+                success: function (response) {
                     inicializarGraficos(response);
                 },
-                error: function(error) {
+                error: function (error) {
                     console.error('Error al cargar los datos:', error);
-                    alert('Error al cargar los datos del dashboard');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al cargar los datos del dashboard'
+                    });
                 }
             });
         }
 
-        // Evento click para el botón de refresh
-        $('#btn-refresh').click(function() {
+        // Eventos
+        $('#btn-refresh').click(function () {
             actualizarDashboard();
         });
 
-        // Carga inicial
+        $('#btn_filtrar_instituciones').click(function () {
+            actualizarTablaInstituciones();
+        });
+
+        // Carga inicial del dashboard
         actualizarDashboard();
     });
 </script>
