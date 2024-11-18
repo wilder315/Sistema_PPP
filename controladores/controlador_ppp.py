@@ -42,44 +42,138 @@ def obtener_practicas():
     
     return practicas
 
-def obtener_practica_por_id(idPractica):
+def obtener_practica_por_id(id_practica):
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    
-    practica = None
+        return None
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM practicas_preprofesionales WHERE idPractica = %s", (idPractica,))
-            row = cursor.fetchone()
-            if row:
-                columnas = [desc[0] for desc in cursor.description]
-                practica_dict = dict(zip(columnas, row))
-                return practica_dict
-            else:
-                return {"error": "Práctica no encontrada"}
+            cursor.execute("""
+                SELECT 
+                    p.fechaInicio, p.fechaFin, p.horario, p.modalidad, p.area,
+                    p.numeroHorasPPP, p.numeroHorasPendientes, p.numeroHorasRealizadas,
+                    p.idSemestre, p.idLinea, p.numDocInstitucion, p.idTipoPractica,
+                    e.apellidos, e.nombre, p.idPersona
+                FROM practicas_preprofesionales p
+                JOIN persona e ON p.idPersona = e.idPersona
+                WHERE p.idPractica = %s
+            """, (id_practica,))
+            practica = cursor.fetchone()
+            if practica:
+                return {
+                    "fechaInicio": practica[0],
+                    "fechaFin": practica[1],
+                    "horario": practica[2],
+                    "modalidad": practica[3],
+                    "area": practica[4],
+                    "numeroHorasPPP": practica[5],
+                    "numeroHorasPendientes": practica[6],
+                    "numeroHorasRealizadas": practica[7],
+                    "idSemestre": practica[8],
+                    "idLinea": practica[9],
+                    "numDocInstitucion": practica[10],
+                    "idTipoPractica": practica[11],
+                    "apellidosEstudiante": practica[12],
+                    "nombreEstudiante": practica[13],
+                    "idPersona": practica[14]
+                }
     except Exception as e:
+        print(f"Error al obtener práctica: {str(e)}")
+        return None
+    finally:
+        conexion.close()
+
+def obtener_practica_por_estudiante(id_estudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return None
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.fechaInicio, p.fechaFin, p.horario, p.modalidad, p.area,
+                    p.numeroHorasPPP, p.numeroHorasPendientes, p.numeroHorasRealizadas,
+                    p.idSemestre, p.idLinea, p.numDocInstitucion, p.idTipoPractica,
+                    e.apellidos, e.nombre, p.idPersona, p.idPractica, p.idEstado, p.estadoVigencia, p.semestreFinal
+                FROM practicas_preprofesionales p
+                JOIN persona e ON p.idPersona = e.idPersona
+                WHERE p.idPersona = %s
+                  AND p.estadoVigencia = 'P'
+                ORDER BY p.fechaInicio DESC
+                LIMIT 1
+            """, (id_estudiante,))
+            
+            practica = cursor.fetchone()
+            if practica:
+                return {
+                    "fechaInicio": practica[0],
+                    "fechaFin": practica[1],
+                    "horario": practica[2],
+                    "modalidad": practica[3],
+                    "area": practica[4],
+                    "numeroHorasPPP": practica[5],
+                    "numeroHorasPendientes": practica[6],
+                    "numeroHorasRealizadas": practica[7],
+                    "idSemestre": practica[8],
+                    "idLinea": practica[9],
+                    "numDocInstitucion": practica[10],
+                    "idTipoPractica": practica[11],
+                    "apellidosEstudiante": practica[12],
+                    "nombreEstudiante": practica[13],
+                    "idPersona": practica[14],
+                    "idPractica": practica[15],
+                    "idEstado": practica[16],
+                    "estadoVigencia": practica[17],
+                    "semestreFinal": practica[18]
+                }
+            else:
+                return {"mensaje": "No se encontró una práctica activa para este estudiante."}
+    except Exception as e:
+        print(f"Error al obtener la práctica del estudiante: {str(e)}")
         return {"error": str(e)}
     finally:
         conexion.close()
 
-def agregar_practica(fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona):
+
+def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona):
     # Validaciones
     if not fechaInicio or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
         return {"error": "Todos los campos son requeridos."}
+
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
 
     try:
         with conexion.cursor() as cursor:
-            # Insertar la práctica preprofesional
-            cursor.execute("""
-                INSERT INTO practicas_preprofesionales (fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, estadoVigencia, idSemestre, idLinea, numDocInstitucion, idEstado, idTipoPractica, idPersona)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
-            """, (fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, 'P', idSemestre, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
-            conexion.commit()
-            return {"mensaje": "Práctica agregada correctamente"}
+            # Verificar si el idPractica ya existe
+            cursor.execute("SELECT idPractica FROM practicas_preprofesionales WHERE idPractica = %s", (idPractica,))
+            practica_existente = cursor.fetchone()
+
+            if practica_existente:
+                # Actualizar los campos permitidos
+                cursor.execute("""
+                    UPDATE practicas_preprofesionales
+                    SET horario = %s, modalidad = %s, area = %s,
+                        numeroHorasPPP = %s, numeroHorasPendientes = %s, numeroHorasRealizadas = %s,
+                        idLinea = %s, numDocInstitucion = %s, idTipoPractica = %s, estadoVigencia = %s, idEstado = %s
+                    WHERE idPractica = %s
+                """, (horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
+                      idLinea, numDocInstitucion, idTipoPractica, 'P', 1, idPractica))
+                conexion.commit()
+                return {"mensaje": "Práctica actualizada correctamente"}
+            else:
+                # Insertar nueva práctica
+                cursor.execute("""
+                    INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, horario, modalidad, area,
+                                                            numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
+                                                            estadoVigencia, idSemestre, idLinea, numDocInstitucion, idEstado,
+                                                            idTipoPractica, idPersona)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes,
+                      numeroHorasRealizadas, 'P', idSemestre, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
+                conexion.commit()
+                return {"mensaje": "Práctica agregada correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

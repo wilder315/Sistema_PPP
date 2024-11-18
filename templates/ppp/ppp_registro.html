@@ -336,6 +336,7 @@
                                         </div>
                                     </div>                      
                                 </div>
+                                 <!--
                                 <div class="row mb-3">                     
                                     <div class="col-md-6">
                                         <label for="fechainicialestudiante" class="form-label">Fecha Subido:</label>
@@ -346,6 +347,7 @@
                                         <input type="date" class="form-control" id="fechainicialinstitucion" name="fechainicialinstitucion">
                                     </div>
                                 </div>
+                                -->
                             </div>
                             <div class="tab-pane fade" id="ifinales" role="tabpanel" aria-labelledby="ifinales-tab">
                                 <div class="row mb-3">                     
@@ -362,6 +364,7 @@
                                         </div>
                                     </div>                      
                                 </div>
+                                <!--
                                 <div class="row mb-3">                     
                                     <div class="col-md-6">
                                         <label for="fechafinalestudiante" class="form-label">Fecha Subido:</label>
@@ -372,6 +375,7 @@
                                         <input type="date" class="form-control" id="fechafinalinstitucion" name="fechafinalinstitucion">
                                     </div>
                                 </div>
+                                -->
                             </div>
                             <div class="tab-pane fade" id="constancia" role="tabpanel" aria-labelledby="constancia-tab">
                                 <div class="row mb-3">                     
@@ -381,13 +385,16 @@
                                             <input type="checkbox" class="form-check-input" id="constancia" name="constancia">                      
                                         </div>
                                     </div>
+                                    <!--
                                     <div class="col-md-6">
                                         <label for="fechaconstancia" class="form-label">Fecha Subido:</label>
                                         <input type="date" class="form-control" id="fechaconstancia" name="fechaconstancia">
-                                    </div>                    
+                                    </div> 
+                                    -->                
                                 </div>
                             </div>
                             <div class="text-end">
+                                <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
                                 <button id="btnGuardar" type="submit" class="btn btn-primary" style="margin-top: 15px;">Guardar</button>
                             </div>
                         </div> 
@@ -421,6 +428,9 @@
         });
     }
 
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        window.location.reload();
+    });
     
     function disableTabs() {
         const tabs = document.querySelectorAll('.nav-link');
@@ -468,7 +478,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_semestres')
+        fetch('/datos_ultimos_semestres')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('semestrea');
@@ -483,7 +493,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_semestres')
+        fetch('/datos_ultimos_semestres')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('semestrefinal');
@@ -543,28 +553,43 @@
     });
 
     document.getElementById('razonsocial').addEventListener('change', function() {
-        const jefeInput = document.getElementById('jefe');
-        jefeInput.value = '';
-
-        if (this.value) {
-            fetch(`/jefe_institucion?ruc=${this.value}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error en la solicitud');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.length > 0) {
-                        jefeInput.value = `${data[0].apellidos} ${data[0].nombre}`;                       
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al obtener el jefe inmediato:', error);
-                    jefeInput.value = 'No se encontró jefe.';
-                });
+        const numDocInstitucion = this.value;
+        if (numDocInstitucion) {
+            obtenerDatosInstitucion(numDocInstitucion);
         }
     });
+
+    function obtenerDatosInstitucion(numDocInstitucion) {
+        const jefeInput = document.getElementById('jefe');
+        const giroInput = document.getElementById('giroinstitucion');
+
+        // Limpiar los campos antes de cargar los datos
+        jefeInput.value = '';
+        giroInput.value = '';
+
+        fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos de la institución');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.length > 0) {
+                    jefeInput.value = `${data[0].apellidos} ${data[0].nombre}`;
+                    giroInput.value = data[0].giro || 'Giro no disponible';
+                } else {
+                    jefeInput.value = 'No se encontró jefe.';
+                    giroInput.value = 'Giro no disponible';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos de la institución:', error);
+                jefeInput.value = 'No se encontró jefe.';
+                giroInput.value = 'Giro no disponible';
+            });
+    }
+
 
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_estados')
@@ -711,6 +736,105 @@
             alert("Hubo un error al realizar la solicitud.");
         });
     });
+
+    function cargarDatosPractica(data) {
+        // Asignar datos de la práctica a los controles
+        document.getElementById('fechaInicio').value = data.fechaInicio ? formatFechaParaInput(data.fechaInicio) : '';
+        document.getElementById('fechaFin').value = data.fechaFin ? formatFechaParaInput(data.fechaFin) : '';
+        document.getElementById('horario').value = data.horario || '';
+        document.querySelector(`input[name="modalidad"][value="${data.modalidad}"]`).checked = true;
+        document.getElementById('area').value = data.area || '';
+        document.getElementById('horasrequeridas').value = data.numeroHorasPPP || '';
+        document.getElementById('horaspendientes').value = data.numeroHorasPendientes || '';
+        document.getElementById('horaspractica').value = data.numeroHorasRealizadas || '';
+        document.getElementById('semestrea').value = data.idSemestre || '';
+        document.getElementById('lineadesarrollo').value = data.idLinea || '';
+        document.getElementById('razonsocial').value = data.numDocInstitucion || '';
+        document.getElementById('tipo_practica').value = data.idTipoPractica || '';
+        document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
+        idPersona = data.idPersona; // Almacenar el ID de la persona
+
+        // Obtener giro y jefe de la institución seleccionada
+        if (data.numDocInstitucion) {
+            obtenerDatosInstitucion(data.numDocInstitucion);
+        }
+    }
+
+
+
+    document.getElementById('btnBuscarID').addEventListener('click', function (event) {
+        event.preventDefault(); // Evitar recargar la página
+        const idPractica = document.getElementById('id').value;
+        
+        if (!idPractica) {
+            alert("Por favor, ingrese un ID válido para buscar.");
+            return;
+        }
+
+        // Llamada a la ruta con el parámetro idPractica en la URL
+        fetch(`/obtener_practica_por_id/${idPractica}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                    limpiarControles();
+                    disableTabs();
+                } else {
+                    cargarDatosPractica(data);
+                    enableTabs();
+                    document.getElementById('id').disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar la práctica:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica.");
+            });
+    });
+
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Función para manejar la búsqueda de práctica por estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault(); // Evitar recargar la página
+        const idEstudiante = idPersona; // Usaremos el idPersona obtenido al seleccionar el estudiante
+
+        if (!idEstudiante) {
+            alert("Por favor, seleccione un estudiante válido para buscar.");
+            return;
+        }
+
+        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                    limpiarControles();
+                    disableTabs();
+                } else if (data.mensaje) {
+                    mostrarAlerta("info", "Información", data.mensaje);
+                    limpiarControles();
+                    disableTabs();
+                } else {
+                    // Asignar el ID de la práctica al input id="id"
+                    document.getElementById('id').value = data.idPractica || '';
+                    document.getElementById('id').disabled = true;
+                    // Cargar los datos de la práctica
+                    cargarDatosPractica(data);
+                    enableTabs();
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar la práctica del estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+            });
+    });
+
 
 </script>
 

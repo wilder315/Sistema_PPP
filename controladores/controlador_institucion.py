@@ -68,7 +68,12 @@ def obtener_jefe(ruc):
     instituciones = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT p.apellidos, p.nombre FROM persona p INNER JOIN institucion i ON p.idPersona = i.idPersona where i.numdoc = %s", (ruc,))
+            cursor.execute("""
+                SELECT p.apellidos, p.nombre, i.giro 
+                FROM persona p 
+                INNER JOIN institucion i ON p.idPersona = i.idPersona 
+                WHERE i.numdoc = %s
+            """, (ruc,))
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
             for row in rows:
