@@ -136,7 +136,8 @@
                                     <i class="bi bi-search"></i>
                                 </button>
                             </div>
-                        </div>                                                                                         
+                        </div> 
+                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
                     </div>   
                 </fieldset>
 
@@ -257,13 +258,13 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="estadopractica" class="form-label">Estado de la Práctica:</label>
-                                        <select class="form-select" id="estadopractica" name="estadopractica" required>
+                                        <select class="form-select" id="estadopractica" name="estadopractica">
                                             <option value="" disabled selected>Seleccionar estado</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="estadovigencia" class="form-label">Estado de Vigencia:</label>
-                                        <select class="form-select" id="estadovigencia" name="estadovigencia" required>
+                                        <select class="form-select" id="estadovigencia" name="estadovigencia">
                                             <option value="" disabled selected>Seleccionar estado</option>
                                             <option value="P">En Proceso</option>
                                             <option value="F">Finalizada</option>
@@ -609,12 +610,15 @@
     const inputEstudiante = document.getElementById('estudiante');
     const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
     let idPersona = 0;
+
     inputEstudiante.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         fetch('/datos_estudiantes')
             .then(response => response.json())
             .then(data => {
                 dropdownEstudiantes.innerHTML = '';
+
+                // Filtrar los resultados
                 const resultados = data.filter(estudiante => 
                     `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
                 );
@@ -623,11 +627,12 @@
                     resultados.forEach(estudiante => {
                         const li = document.createElement('li');
                         li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
-                        li.dataset.id = estudiante.idPersona;                   
-                        li.value = estudiante.idPersona;
+                        li.dataset.id = estudiante.idPersona; // Usar dataset para almacenar el ID
                         li.addEventListener('click', () => {
                             inputEstudiante.value = li.textContent;
-                            idPersona = li.value;
+                            idPersona = li.dataset.id; // Recuperar el ID correctamente
+                            console.log(`ID Persona seleccionado: ${idPersona}`); // Verificar el ID recuperado
+                            $('#idPersonaMod').val(response.idPersona);
                             dropdownEstudiantes.classList.remove('show');
                             handleEstudianteChange();
                             calcularHorasPendientes();
@@ -641,33 +646,12 @@
             })
             .catch(error => console.error('Error:', error));
     });
+
     document.addEventListener('click', function(event) {
         if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
             dropdownEstudiantes.classList.remove('show');
         }
     });
-
-    function handleEstudianteChange() {
-        fetch(`/datos_horas_ppp?id=${idPersona}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la solicitud');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.length > 0) {
-                    document.getElementById('horasrequeridas').value = data[0].hRequeridas;
-                    calcularHorasPendientes();             
-                } else {
-                    console.log('No se encontraron datos para el estudiante.');
-                    document.getElementById('horasrequeridas').value = '';
-                }
-            })
-            .catch(error => {
-                console.error('Error al obtener las horas requeridas:', error);
-            });
-    }
 
     function calcularHorasPendientes(){
         document.getElementById('horaspractica').value = 0;
@@ -682,7 +666,6 @@
     document.getElementById('horaspractica').addEventListener('input', calcularHorasPendientes);
     document.getElementById('estudiante').addEventListener('input', calcularHorasPendientes)
   
-
     document.getElementById('btnGuardar').addEventListener('click', function() {
         const fechaInicio = document.getElementById('fechaInicio').value;
         const horario = document.getElementById('horario').value;
@@ -695,6 +678,8 @@
         const idLinea = document.getElementById('lineadesarrollo').value;
         const numDocInstitucion = document.getElementById('razonsocial').value;
         const idTipoPractica = document.getElementById('tipo_practica').value;
+        const idPersona = document.getElementById('idPersonaMod').value;
+        
         if (!fechaInicio || !modalidad || !horario || !area || !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas || !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona) {
             alert("Todos los campos son requeridos.");
             return;
