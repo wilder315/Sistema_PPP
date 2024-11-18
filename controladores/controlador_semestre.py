@@ -114,6 +114,7 @@ def dar_de_baja_semestre(idSemestre):
         return {"error": str(e)}
     finally:
         conexion.close()        conexion.close()
+        conexion.close()
         
 ######################################## código del dashboard 02 #########################
 
