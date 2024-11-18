@@ -40,11 +40,11 @@
         <div class="container text-center">
             <h1 class="index-title">Sistema de Gestión de Prácticas Pre Profesionales - USAT</h1>
             <div class="d-flex flex-wrap justify-content-center">
-                <a href="{{ url_for('router_main.gestion_academica') }}" class="module-button">
+                <a id="btnGestionAcademica" href="{{ url_for('router_main.gestion_academica') }}" class="module-button" style="display: none;">
                     Módulo de Gestión Académica
                     <img src="{{ url_for('static', filename='img/gaicono.png') }}" alt="Icono GA">
                 </a>
-                <a href="{{ url_for('router_main.practicas_pre_profesionales') }}" class="module-button">
+                <a id="btnPracticas" href="{{ url_for('router_main.practicas_pre_profesionales') }}" class="module-button" style="display: none;">
                     Módulo de Prácticas Pre Profesionales
                     <img src="{{ url_for('static', filename='img/pppicono.png') }}" alt="Icono PPP">
                 </a>
@@ -89,11 +89,12 @@
             let apellidoUsuario = localStorage.getItem('a') || sessionStorage.getItem('a');
             var fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
             let usuario = localStorage.getItem('username') || sessionStorage.getItem('username');
+            const idTipoUsuario = localStorage.getItem('id_tipo_usuario') || sessionStorage.getItem('id_tipo_usuario');
             if (nombreUsuario) {
                 document.getElementById('nombreUsuario').textContent = nombreUsuario;
             }
-            if (apellidoUsuario){
-                document.getElementById('apellidoUsuario').textContent = apellidoUsuario;                
+            if (apellidoUsuario) {
+                document.getElementById('apellidoUsuario').textContent = apellidoUsuario;
             }
             if (fotoBase64) {
                 document.getElementById('github-profile-pic').src = 'data:image/jpeg;base64,' + fotoBase64;
@@ -101,7 +102,14 @@
             if (usuario) {
                 document.getElementById('usernamenav').textContent = usuario;
             }
+            if (idTipoUsuario === '1' || idTipoUsuario === '2') {
+                document.getElementById('btnGestionAcademica').style.display = 'flex';
+                document.getElementById('btnPracticas').style.display = 'flex';
+            } else if (idTipoUsuario === '3' || idTipoUsuario === '4') {
+                document.getElementById('btnPracticas').style.display = 'flex';
+            }
         });
+
     </script>
 </body>
 

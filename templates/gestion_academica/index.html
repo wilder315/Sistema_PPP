@@ -15,14 +15,270 @@
 
     <!-- JQVMap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jqvmap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+
+
 </head> 
 {% block titulo %} Inicio {% endblock %}
 {% block contenido %}
 
+<style>  
+    /* Estilos generales para las tarjetas */
+    .small-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 120px;  /* Reducir la altura del card */
+        border-radius: 10px;
+        position: relative;
+        margin-bottom: 1rem; /* Espacio inferior entre las tarjetas */
+        padding: 10px;
+    }
 
-    <div class="container-fluid p-0">
-        <h1 class="h3 mb-3"><strong>Panel de análisis</strong></h1>
-    </div>
+    /* Estilo para la parte interna de la tarjeta */
+    .small-box .inner {
+        display: flex;
+        flex-direction: row;
+        justify-content: center; /* Centra el contenido horizontalmente */
+        align-items: center; /* Centra el contenido verticalmente */
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Estilo para el número dentro de la tarjeta */
+    .small-box h1 {
+        font-size: 3rem; /* Reducir tamaño del número */
+        color: white;
+        margin-bottom: 0;
+    }
+
+    /* Estilo para el texto h4 dentro de la tarjeta */
+    .small-box h4 {
+        color: white;
+        margin-top: 0.5rem; /* Espacio entre el número y el texto */
+        font-size: 1.5rem; /* Ajustar tamaño del texto */
+    }
+
+    /* Estilo del icono al lado derecho */
+    .small-box i {
+        font-size: 3rem; /* Reducir tamaño del icono */
+        color: white;
+        margin-right: 10px; /* Espacio entre el icono y el texto */
+    }
+
+    /* Estilo para la tarjeta cuando se usa el icono */
+    .text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-right: 10px;
+        margin-left: 5px;
+        width: 50%; /* Ajuste para reducir el tamaño de los textos */
+    }
+
+    /* Asegurar que los márgenes y el padding no sobrepasen la altura */
+    .small-box .small-box-footer {
+        background: rgba(0, 0, 0, 0.1);
+        color: #000;
+        display: block;
+        padding: 3px 0;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        z-index: 10;
+    }
+    /* Quitar subrayado solo para este enlace */
+    .no-underline {
+        text-decoration: none; /* Elimina el subrayado */
+    }
+
+    .no-underline:hover {
+        text-decoration: none; /* Elimina el subrayado al pasar el ratón */
+    }
+    #chart-container {
+        height: 300px; /* Altura fija para mantener igual que la tabla */
+    }
+
+    /* Asegurar que el canvas ocupe todo el espacio del contenedor */
+    #chart-instituciones {
+        height: 100% !important; /* Ocupar todo el contenedor */
+        width: 100% !important;  /* Ocupar todo el ancho del contenedor */
+    }
+    
+    /* Contenedor de la tabla con altura fija */
+    #tabla-estudiante-container {
+        height: 300px; /* Altura fija para el contenedor */
+        overflow: hidden; /* Evita el scroll vertical */
+    }
+
+    /* Tabla con altura fija y asegurando que ocupa todo el espacio disponible */
+    #tabla-estudiante {
+        height: 100%; /* Ocupa el 100% del contenedor */
+        width: 100%; /* Ancho completo */
+        table-layout: fixed; /* Fija el ancho de las columnas */
+    }
+
+    /* Estilo para las filas de la tabla */
+    #tabla-estudiante tbody tr {
+        height: 20px; /* Altura fija para cada fila */
+    }
+
+    /* Estilo para las celdas de la tabla */
+    #tabla-estudiante td, #tabla-estudiante th {
+        padding: 5px 5px; /* Reducir el padding */
+        font-size: 14px; /* Ajustar tamaño del texto */
+        text-align: center;
+        vertical-align: middle; /* Centra el texto verticalmente */
+    }
+
+    /* Asegurar que la fila de "Cargando datos..." tenga la misma altura que las demás filas */
+    #tabla-estudiante tbody tr td {
+        height: 65px; /* Establece una altura fija para la fila "Cargando datos..." */
+        vertical-align: middle; /* Centra el texto verticalmente */
+        text-align: center; /* Centra el texto horizontalmente */
+    }
+    
+    
+</style>
+
+    <div class="container">
+
+        <div class="row">
+            <!-- ComboBox de Facultad-->
+            <div class="col-md-6">
+                <div class="col-md-6">
+                    <label for="escuela">Escuela:</label>
+                    <select id="escuela" class="form-control">
+                        <option value="">Seleccionar Escuela:</option> 
+                    </select>
+                </div>
+            </div>
+            <!-- ComboBox de Semestre-->
+            <div class="col-md-6">
+                <div class="col-md-6">
+                    <label for="semestre">Semestre:</label>
+                    <select id="semestre" class="form-control"> 
+                        <option value="">Seleccionar Semestre</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- INDICADORES  CARDS SUPERIORES-->
+        <div class="row mt-3">
+
+            <!-- Card para Estudiantes -->
+            <div class="col-lg-3 col-md-6 mb-2">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <div class="text-container">
+                            <h1 id="estudiantes" class="mb-0">0</h1>
+                            <a href="{{url_for('router_main.estudiante') }}" class="text-white no-underline">
+                                <h4>Estudiantes</h4>
+                            </a>
+                        </div>
+                        <i class="fa fa-users fa-3x mb-2"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card para Docentes -->
+            <div class="col-lg-3 col-md-6 mb-2">
+                <div class="small-box bg-success">
+                    <div class="inner d-flex justify-content-between align-items-center">
+                        <div class="text-container text-white">
+                            <h1 id="docentes" class="mb-0" style="font-size: 3rem; color: white;">0</h1>
+                            <a href="{{url_for('router_main.docente') }}" class="text-white no-underline">
+                                <h4>Docentes</h4>
+                            </a>
+                        </div>
+                        <i class="fa fa-chalkboard-teacher fa-3x mb-2" style="color: white;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card para Instituciones -->
+            <div class="col-lg-3 col-md-6 mb-2">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <div class="text-container">
+                            <h1 id="instituciones" class="mb-0">0</h1>
+                            <a href="{{url_for('router_main.institucion') }}" class="text-white no-underline">
+                                <h4>Instituciones</h4>
+                            </a>
+                        </div>
+                        <i class="fa fa-building fa-3x mb-2"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card para Jefes -->
+            <div class="col-lg-3 col-md-6 mb-2">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <div class="text-container">
+                            <h1 id="jefes" class="mb-0">0</h1>
+                            <a href="{{url_for('router_main.jefe') }}" class="text-white no-underline">
+                                <h4>Jefes</h4>
+                            </a>
+                        </div>
+                        <i class="fa fa-user-tie fa-3x mb-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- GRAFICOS -->
+        <div class="row">
+
+            <!-- Grafico Tabla Estudiantes -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-red-usat text-white">
+                        <h3 class="card-title" style="color: white !important;">
+                            <i class="fas fa-chart-pie mr-1"></i>
+                            Últimos Estudiantes Registrados por Escuela y Semestre:
+                        </h3>
+                    </div>
+                    <div id="tabla-estudiante-container" class="card-body"> <!-- Contenedor con altura fija -->
+                        <table id="tabla-estudiante" class="table table-striped" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Estudiantes</th>
+                                    <th>Correo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3" style="text-align:center;">Cargando datos...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gráfico Barras vertical - Cantidad de estudiantes por Institución -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-red-usat text-white">
+                        <h3 class="card-title" style="color: white !important;">
+                            <i class="fas fa-chart-pie mr-1"></i>
+                            Cantidad de estudiantes por Institución
+                        </h3>
+                    </div>
+                    <div class="card-body" id="chart-container"> <!-- Contenedor con altura fija -->
+                        <canvas id="chart-instituciones"></canvas> <!-- El gráfico ocupará toda la altura del contenedor -->
+                    </div>
+                </div>
+            </div>
+
+
+        </div> 
+    </div> 
+
 
     <!-- Scripts al final del body -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -38,8 +294,162 @@
     <!-- Adaptador de fechas para Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
 
-    <!-- Mapa -->
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/jquery.vmap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
+
+    <!-- Script para cargar datos -->
+    <script> 
+        $(document).ready(function() {
+
+            //Funcion para cargar los datos de la tabla
+            function cargarUltimosEstudiantes(filtros) {
+                $.ajax({
+                    url: '/ultimos_estudiantes',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(filtros),
+                    success: function(response) {
+                        // Limpiar la tabla
+                        var tableBody = $('#tabla-estudiante tbody');
+                        tableBody.empty();
+    
+                        // Llenar la tabla con los datos de los estudiantes
+                        response.data.forEach(function(estudiante) {
+                            var row = '<tr>';
+                            row += '<td style="text-align:center">' + estudiante.codUniversitario + '</td>';
+                            row += '<td>' + estudiante.nombres + '</td>';
+                            row += '<td>' + estudiante.correoUSAT + '</td>';
+                            row += '</tr>';
+                            tableBody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar los estudiantes:', error);
+                    }
+                });
+            }
+
+            //Función -> para cargar datos de estudiantes por institución
+            function cargarEstudiantesPorInstitucion(filtros) {
+                $.ajax({
+                    url: '/estudiantes_por_institucion',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(filtros),
+                    success: function(response) {
+                        // Verifica que hay datos en la respuesta
+                        if (response.data && response.data.length > 0) {
+                            // Extraer etiquetas y datos para el gráfico
+                            const labels = response.data.map(item => item.razonSocial);
+                            const data = response.data.map(item => item.cantidad);
+    
+                            // Actualizar gráfico
+                            actualizarGrafico('chart-instituciones', 'Estudiantes por Institución', labels, data);
+                        } else {
+                            console.error('No se encontraron datos para mostrar en el gráfico');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar estudiantes por institución:', error);
+                    }
+                });
+            }
+
+            //Función -> Actualizar gráfico de barra de Instituciones
+            function actualizarGrafico(chartId, titulo, labels, data) {
+                console.log("Datos para el gráfico:", labels, data); // Verifica que se están obteniendo datos
+            
+                const chartContainer = document.getElementById(chartId);
+                if (chartContainer.chartInstance) {
+                    chartContainer.chartInstance.destroy(); // Elimina gráfico anterior
+                }
+            
+                const ctx = chartContainer.getContext('2d');
+                chartContainer.chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: titulo,
+                            data: data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Color de las barras
+                            borderColor: 'rgba(75, 192, 192, 1)', // Color del borde
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            
+
+            //cargar opciones de Facultad y Semestre
+            cargarSelectData('/datos_escuelas', '#escuela', 'idEscuela', 'nombre'); 
+            cargarSelectData('/datos_semestres', '#semestre', 'idSemestre', 'nombre'); 
+
+            //Cargar los datos iniciales del dashboard (sin filtros)
+            cargarDashboard({idEscuela: 0, idSemestre: 0}); 
+            cargarUltimosEstudiantes({idEscuela: 0, idSemestre: 0});
+            cargarEstudiantesPorInstitucion({idEscuela: 0, idSemestre: 0});
+
+            //Evento para recargar datos del dashboard al cambiar los comboBox
+            $('#escuela, #semestre').on('change', function (){
+                const filtros = {
+                    idEscuela: $('#escuela').val() || 0,
+                    idSemestre: $('#semestre').val() || 0
+                }; 
+                cargarDashboard(filtros);
+                cargarUltimosEstudiantes(filtros); 
+                cargarEstudiantesPorInstitucion(filtros);  
+            }); 
+
+            //Función -> cargar opciones de los comboBox
+            function cargarSelectData(url, selectId, keyValue, keyText){
+                $.ajax({
+                    url: url, 
+                    type: 'GET', 
+                    success: function(response){
+                        const select = $(selectId); 
+                        select.empty().append('<option value="">Seleccionar</option>')
+                        response.forEach(item => {
+                            select.append(`<option value="${item[keyValue]}">${item[keyText]}</option>`);
+                        })
+                    }
+                }); 
+            }
+
+            //Función -> Cargar datos del dashboard 
+            function cargarDashboard(filtros){
+                $.ajax({
+                    url: '/dashboard2', 
+                    type: 'POST', 
+                    contentType: 'application/json', 
+                    data: JSON.stringify(filtros), 
+                    success: function(response){
+                        //Actualizar Indicadores
+                        $('#estudiantes').text(response.estudiantes);
+                        $('#docentes').text(response.docentes);
+                        $('#instituciones').text(response.instituciones);
+                        $('#jefes').text(response.jefes);
+
+                        //Actualizar gráfico de estudiantes por instituciones
+                        //actualizarGrafico('chart-instituciones', 'Estudiantes por Instituciones', response.estudiantesPorInstitucion.labels, response.estudiantesPorInstitucion.data); 
+
+                        //Actualizar gráfico de cantidad de registrados por semestre 
+                        //actualizarGrafico('chart-registrados', 'Cantidad de Registrados por Semestre', response.registradosPorSemestre.labels, response.registradosPorSemestre.data);
+                    }
+                }); 
+            }
+
+            
+
+            
+        }); 
+    </script> 
 
 {% endblock %}
