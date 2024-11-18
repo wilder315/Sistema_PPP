@@ -56,7 +56,7 @@
                 <table id="tabla-resumen-escuelas" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="text-align:center">Escuela</th>
+                            <th style="text-align:start; width: 20%;">Escuela</th>
                             <th style="text-align:center">Total Estudiantes</th>
                             <th style="text-align:center">Horas Realizadas</th>
                             <th style="text-align:center">Horas Pendientes</th>
@@ -135,7 +135,7 @@
                 }
             },
             columns: [
-                { data: "Escuela", className: 'text-center' },
+                { data: "Escuela", className: 'text-start' },
                 { data: "Total_Estudiantes", className: 'text-center' },
                 { data: "Total_Horas_Realizadas", className: 'text-center' },
                 { data: "Total_Horas_Pendientes", className: 'text-center' },
@@ -187,7 +187,8 @@
                 });
             },
             language: {
-                url: "{{ url_for('static', filename='js/es-ES.json') }}"
+                url: "{{ url_for('static', filename='js/es-ES.json') }}",
+                searchPlaceholder: "Escribe escuela"
             }
         });
     });
