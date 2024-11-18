@@ -325,6 +325,7 @@
             $('#tipoMod').val('');
             cargarTipoUsuarios();
             habilitarControles();
+            $('#btnVerContraseña').hide();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
@@ -349,6 +350,7 @@
                         $('#estadoUsuarioMod').val(response.estado);
                         cargarTipoUsuarios(response.idTipoUsuario);
                         habilitarControles();
+                        $('#btnVerContraseña').show();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();

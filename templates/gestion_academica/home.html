@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css">
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-2.0.3/datatables.min.css" />
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 	<link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.5.0/css/rowReorder.bootstrap5.css">
 	<link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.css">
@@ -135,7 +134,7 @@
                         style="max-width: 160px; display: flex;">
                 </a>
 
-                <ul class="sidebar-nav">
+                <ul class="sidebar-nav">               
                     <li class="sidebar-header">
                         Módulo de Gestión Académica
                     </li>                   
@@ -156,13 +155,7 @@
                             <i class="fas fa-user-graduate fa-lg"></i>
                             <span class="align-middle">Estudiantes</span>
                         </a>
-                    </li> 
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.jefe') }}">
-                            <i class="fas fa-user-graduate fa-lg"></i>
-                            <span class="align-middle">Jefes</span>
-                        </a>
-                    </li>                    
+                    </li>                       
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.facultad') }}">                           
                             <i class="fas fa-landmark fa-lg"></i>
@@ -182,6 +175,24 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.jefe') }}">
+                            <i class="fas fa-briefcase fa-lg"></i>
+                            <span class="align-middle">Jefes</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.linea_desarrollo') }}">
+                            <i class="fas fa-chart-line fa-lg"></i>
+                            <span class="align-middle">Línea de Desarrollo</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_email.mostrar_formulario_masivo') }}">
+                            <i class="fas fa-envelope fa-lg"></i>
+                            <span class="align-middle">Mensaje Masivo</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.semestre') }}">
                             <i class="far fa-calendar-check fa-lg"></i>
                             <span class="align-middle">Semestres</span>
@@ -193,38 +204,25 @@
                             <span class="align-middle">Usuarios</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_email.mostrar_formulario_masivo') }}">
-                            <i class="fas fa-envelope fa-lg"></i>
-                            <span class="align-middle">Envío de Correos</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.linea_desarrollo') }}">
-                            <i class="fas fa-chart-line fa-lg"></i>
-                            <span class="align-middle">Línea de Desarrollo</span>
-                        </a>
-                    </li>
-
                     <li class="sidebar-header">
                         Reportes
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{url_for('router_main.reporte_estudiantes_practicas')}}">
                             <i class="fas fa-chart-line fa-lg"></i>
-                            <span class="align-middle">Reporte 1</span>
+                            <span class="align-middle">Prácticas Por Estudiante</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_genero') }}">
                             <i class="fas fa-chart-bar fa-lg"></i>
-                            <span class="align-middle">Reporte 2</span>
+                            <span class="align-middle">Estudiantes por Género</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_semestre') }}">
                             <i class="fas fa-chart-line fa-lg"></i>
-                            <span class="align-middle">Reporte 3</span>
+                            <span class="align-middle">Estudiantes por Semestre</span>
                         </a>
                     </li>
                 </ul>
