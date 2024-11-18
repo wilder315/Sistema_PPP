@@ -1,256 +1,364 @@
-{% extends "dashboard/index.html" %}
-
-{% block titulo %}
-  Perfil
-{% endblock %}
-
+{% extends "/ppp/index.html" %}
+{% block titulo %}Perfil{% endblock %}
 {% block contenido %}
+
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Inicio</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Perfil</li>
-  </ol>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Perfil</li>
+    </ol>
 </nav>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-6 d-flex align-items-stretch">
-      <div class="card mb-4 w-100 shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="card-title">Información personal</h5>
+<div class="container-fluid my-4">
+    <div class="card flex-grow-1 mb-3">
+        <div class="card-header bg-red-usat text-white position-relative d-flex align-items-center">
+            <span id="apellidosNombres"></span>
         </div>
-        <div class="card-body">
-          <form id="perfil-form">
-            {% for field in ['nombres', 'apellidos', 'dni', 'email', 'telefono'] %}
-            <div class="mb-3 skeleton">
-              <label for="{{ field }}" class="form-label">{{ field.capitalize() }}</label>
-              <div class="input-group">
-                <span class="input-group-text">
-                  <i class="bi {% if field == 'nombres' or field == 'apellidos' %}bi-person{% elif field == 'dni' %}bi-card-text{% elif field == 'email' %}bi-envelope{% else %}bi-telephone{% endif %}"></i>
-                </span>
-                <input id="{{ field }}" name="{{ field }}" type="{{ 'email' if field == 'email' else 'text' }}" class="form-control" placeholder="Ingresa tu {{ field }}" />
-              </div>
-            </div>
-            {% endfor %}
-            <button type="submit" class="btn btn-primary w-100 skeleton">Guardar cambios</button>
-          </form>
-        </div>
-      </div>
     </div>
-    <div class="col-md-6 d-flex align-items-stretch">
-      <div class="card mb-4 w-100 shadow-sm">
-        <div class="card-body d-flex justify-content-center position-relative">
-          <div class="profile-img-wrapper skeleton">
-            <div class="loading-spinner" id="loading-spinner"></div>
-            <img id="foto-perfil" alt="Foto de perfil" class="profile-img" style="display: none;" />
-            <div class="profile-img-overlay">
-              <button id="mostrar-imagen" class="btn btn-light mb-2">Mostrar imagen</button>
-              <button id="cambiar-imagen" class="btn btn-light mb-2">Cambiar imagen</button>
-              <button id="eliminar-imagen" class="btn btn-danger">Eliminar imagen</button>
-              <input type="file" id="file-input" class="d-none" accept="image/*">
+    <div class="row align-items-stretch">
+        <div class="col-md-6 d-flex flex-column">
+            <div class="card flex-grow-1 mb-3">
+                <div class="card-header bg-red-usat text-white position-relative d-flex align-items-center">
+                    Credenciales
+                    <div id="falsodiv"></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ndoc" class="form-label">N° Documento:</label>
+                            <input type="text" class="form-control" id="ndoc" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="usuario" class="form-label">Usuario:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="usuario" readonly>
+                                <button type="button"  style=" border: 1px solid #ddd;" class="btn btn-outline-secondary" id="btnCambiarContraseña" data-bs-toggle="modal" data-bs-target="#modalCredenciales">
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+            <div class="card flex-grow-1 d-flex flex-column justify-content-center align-items-center mb-3">
+                <img src="/static/img/default-profile.png" alt="Foto de Perfil" id="fotoPerfil" class="foto-perfil">
+                <div class="foto-perfil-hover">
+                    <span>Haz click para cambiar</span>
+                    <input type="file" id="inputFotoPerfil" accept="image/*" style="display: none;">
+                </div>
+            </div>
         </div>
-        <div class="card-body text-center">
-          <h5 id="username" class=" skeleton">Cargando...</h5>
-          <p class="card-text">Información de perfil</p>
+        <div class="col-md-6 d-flex flex-column">
+            <div class="card flex-grow-1 mb-3">
+                <div class="card-header bg-red-usat text-white d-flex justify-content-between align-items-center">
+                    <span class="header-text">Mis Datos</span>
+                    <button id="btnEditarDatos" data-bs-toggle="modal" data-bs-target="#modalDatos">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="codUniversitario" class="form-label">Código Universitario:</label>
+                            <input type="text" class="form-control" id="codUniversitario" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cargo" class="form-label">Cargo:</label>
+                            <input type="text" class="form-control" id="cargo" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="genero" class="form-label">Género:</label>
+                            <input type="text" class="form-control" id="genero" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="escuelap" class="form-label">Escuela:</label>
+                            <input type="text" class="form-control" id="escuelap" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card flex-grow-1">
+                <div class="card-header bg-red-usat text-white d-flex justify-content-between align-items-center">
+                    <span class="header-text">Contactos</span>
+                    <button id="btnEditarContactos" data-bs-toggle="modal" data-bs-target="#modalContactos">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="correoPersonal" class="form-label">Correo Personal:</label>
+                            <input type="email" class="form-control" id="correoPersonal" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="correoU" class="form-label">Correo USAT:</label>
+                            <input type="text" class="form-control" id="correoU" name="correoU" readonly>
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono1" class="form-label">Teléfono 1:</label>
+                            <input type="text" class="form-control" id="telefono1" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono2" class="form-label">Teléfono 2:</label>
+                            <input type="text" class="form-control" id="telefono2" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
-<!-- Modal para mostrar imagen en grande -->
-<div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="imagenModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="imagenModalLabel">Imagen de perfil</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <img id="imagen-grande" src="" class="img-fluid" alt="Imagen de perfil">
-      </div>
+<!-- MODAL CREDENCIALES -->
+<div class="modal fade" id="modalCredenciales" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title1">Cambiar Credenciales</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCredenciales">
+                    <input type="hidden" id="idUsuario" name="idUsuario">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="usernameMod" class="form-label">Usuario:</label>
+                            <input type="text" class="form-control" id="usernameMod" name="usernameMod" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="contraseñaMod" class="form-label">Contraseña Actual:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="contraseñaMod" name="contraseñaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('contraseñaMod')" onmouseup="ocultarPassword('contraseñaMod')" onmouseleave="ocultarPassword('contraseñaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>         
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="nuevaMod" class="form-label">Nueva Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="nuevaMod" name="nuevaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('nuevaMod')" onmouseup="ocultarPassword('nuevaMod')" onmouseleave="ocultarPassword('nuevaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>                 
+                        </div>
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="confirmadaMod" class="form-label">Confirmar Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirmadaMod" name="confirmadaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('confirmadaMod')" onmouseup="ocultarPassword('confirmadaMod')" onmouseleave="ocultarPassword('confirmadaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <label id="errorMensaje" class="form-text d-none"></label>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardarCredenciales">Guardar</button>
+                    </div>   
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLeSaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.7.2/font/bootstrap-icons.min.css"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- MODAL DATOS -->
+<div class="modal fade" id="modalDatos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title2"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDatos">
+                    <input type="hidden" id="idUsuarioMod" name="idUsuarioMod">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="correoMod" class="form-label">Correo Personal:</label>
+                            <input type="text" class="form-control" id="correoMod" name="correoMod" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tel1Mod" class="form-label">Teléfono 1:</label>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tel2Mod" class="form-label">Teléfono 2:</label>
+                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="generoMod" class="form-label">Género:</label>
+                            <input type="text" class="form-control" id="generoMod" name="generoMod" required>
+                        </div>
+                    </div> 
+                    <div class="text-end">
+                        <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                    </div>   
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  function handleResponse(response, successCallback) {
-    response.json().then(data => {
-      if (data.error) {
-        Swal.fire('Error', data.error, 'error');
-      } else {
-        successCallback(data);
-      }
+    document.addEventListener('DOMContentLoaded', function () {
+        const nombreUsuario = localStorage.getItem('n') || sessionStorage.getItem('n');
+        const apellidoUsuario = localStorage.getItem('a') || sessionStorage.getItem('a');
+        const fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
+        const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+        const idPersona = localStorage.getItem('id_persona') || sessionStorage.getItem('id_persona');
+        const idTipoUsuario = localStorage.getItem('id_tipo_usuario') || sessionStorage.getItem('id_tipo_usuario');
+        const idUsuario = localStorage.getItem('idUsuario') || sessionStorage.getItem('idUsuario');
+        if (nombreUsuario && apellidoUsuario) {
+            document.getElementById('apellidosNombres').textContent = `Bienvenido a tu perfil, ${nombreUsuario} ${apellidoUsuario}`;
+        }
+        if (username) {
+            document.getElementById('usuario').value = username;
+            document.getElementById('usernameMod').value = username;
+            document.getElementById('usernameMod').setAttribute('readonly', true);
+        }
+        if (fotoBase64) {
+            document.getElementById('fotoPerfil').src = 'data:image/jpeg;base64,' + fotoBase64;
+        }
+        if (idUsuario) {
+            document.getElementById('idUsuario').value = idUsuario;
+        }
+        cargarDatos(idPersona);
+        const nuevaMod = document.getElementById('nuevaMod');
+        const confirmadaMod = document.getElementById('confirmadaMod');
+        const errorMensaje = document.getElementById('errorMensaje');
+        nuevaMod.addEventListener('input', validarContraseñas);
+        confirmadaMod.addEventListener('input', validarContraseñas);
+        document.getElementById('btnGuardarCredenciales').addEventListener('click', guardarCredenciales);
+        console.log(document.getElementById('idUsuario').value);
     });
-  }
 
-  function updateProfileImage(data) {
-    const fotoPerfil = document.getElementById('foto-perfil');
-    if (data.foto) {
-      fotoPerfil.src = `/static/img/${data.foto}`;
-    } else {
-      fotoPerfil.src = '/static/img/USUARIO.jpg';
+    function cargarDatos(idPersona) {
+        $.ajax({
+            url: '/obtener_informacion_completa_persona/' + idPersona,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.error) {
+                    mostrarAlerta("error", "Error", response.error);
+                } else {
+                    $('#ndoc').val(response.numDoc);
+                    $('#correoPersonal').val(response.correoPersonal);
+                    $('#telefono1').val(response.tel1);
+                    $('#telefono2').val(response.tel2);
+                    $('#codUniversitario').val(response.codUniversitario);
+                    $('#cargo').val(response.cargo);
+                    $('#escuelap').val(response.escuela);
+                    $('#genero').val(response.genero);
+                    $('#correoU').val(response.correoUSAT);
+                }
+            },
+            error: function () {
+                mostrarAlerta("error", "Error", "Hubo un error al obtener la información.");
+            }
+        });
     }
-    fotoPerfil.onload = function() {
-      document.getElementById('loading-spinner').style.display = 'none';
-      fotoPerfil.style.display = 'block';
-    };
-    fotoPerfil.onerror = function() {
-      document.getElementById('loading-spinner').style.display = 'none';
-    };
-  }
 
-  fetch('/datos_usuario')
-    .then(response => handleResponse(response, data => {
-      document.getElementById('nombres').value = data.nombres;
-      document.getElementById('apellidos').value = data.apellidos;
-      document.getElementById('dni').value = data.n_documento;
-      document.getElementById('email').value = data.correo;
-      document.getElementById('telefono').value = data.telefono;
-      document.getElementById('username').innerText = data.username;
-      updateProfileImage(data);
-      document.querySelectorAll('.skeleton').forEach(el => el.classList.remove('skeleton'));
-    }));
-
-  document.getElementById('perfil-form').addEventListener('submit', function (event) {
-    event.preventDefault();
-    const formData = new FormData(this);
-    const jsonData = Object.fromEntries(formData.entries());
-    fetch('/actualizar_datos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(jsonData)
-    })
-    .then(response => handleResponse(response, data => {
-      Swal.fire('Éxito', data.mensaje, 'success');
-    }));
-  });
-
-  document.getElementById('mostrar-imagen').addEventListener('click', function () {
-    const fotoPerfil = document.getElementById('foto-perfil');
-    document.getElementById('imagen-grande').src = fotoPerfil.src;
-    new bootstrap.Modal(document.getElementById('imagenModal')).show();
-  });
-
-  document.getElementById('cambiar-imagen').addEventListener('click', function () {
-    document.getElementById('file-input').click();
-  });
-
-  document.getElementById('file-input').addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append('foto', file);
-      fetch('/actualizar_foto', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => handleResponse(response, data => {
-        Swal.fire('Éxito', data.mensaje, 'success');
-        updateProfileImage(data);
-      }));
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
     }
-  });
 
-  document.getElementById('eliminar-imagen').addEventListener('click', function () {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "No podrás revertir esto",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminarla'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch('/static/img/USUARIO.jpg')
-          .then(res => res.blob())
-          .then(blob => {
-            const formData = new FormData();
-            formData.append('foto', blob, 'USUARIO.jpg');
-            fetch('/actualizar_foto', {
-              method: 'POST',
-              body: formData
-            })
-            .then(response => handleResponse(response, data => {
-              Swal.fire('Eliminada', 'La imagen de perfil ha sido eliminada.', 'success');
-              updateProfileImage(data);
-            }));
-          });
-      }
-    })
-  });
-});
+    function mostrarPassword(id) {
+        document.getElementById(id).type = 'text';
+    }
+
+    function ocultarPassword(id) {
+        document.getElementById(id).type = 'password';
+    }
+
+    document.querySelectorAll('.eye-btn').forEach(button => {
+        const inputId = button.previousElementSibling.getAttribute('id');
+        button.addEventListener('mousedown', () => mostrarPassword(inputId));
+        button.addEventListener('mouseup', () => ocultarPassword(inputId));
+        button.addEventListener('mouseleave', () => ocultarPassword(inputId));
+    });
+
+    function validarContraseñas() {
+        const nuevaMod = document.getElementById('nuevaMod').value;
+        const confirmadaMod = document.getElementById('confirmadaMod').value;
+        const errorMensaje = document.getElementById('errorMensaje');
+        if (nuevaMod === confirmadaMod && nuevaMod !== '') {
+            errorMensaje.classList.remove('d-none');
+            errorMensaje.textContent = "Las contraseñas coinciden";
+            errorMensaje.style.color = 'green';
+        } else if (nuevaMod !== confirmadaMod) {
+            errorMensaje.classList.remove('d-none');
+            errorMensaje.textContent = "Las contraseñas no coinciden";
+            errorMensaje.style.color = 'red';
+        } else {
+            errorMensaje.classList.add('d-none');
+        }
+    }
+
+    function guardarCredenciales(e) {
+        e.preventDefault();
+        const idUsuario = document.getElementById('idUsuario').value;
+        
+        const contraseñaActual = document.getElementById('contraseñaMod').value;
+        const nuevaContraseña = document.getElementById('nuevaMod').value;
+        if (!contraseñaActual || !nuevaContraseña) {
+            mostrarAlerta("warning", "Campos incompletos", "Por favor, complete todos los campos.");
+            return;
+        }
+        fetch('/validar_contraseña_actual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idUsuario: idUsuario, contraseñaActual: contraseñaActual })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarAlerta("error", "Error", data.error);
+            } else if (!data.valida) {
+                mostrarAlerta("error", "Error", "La contraseña actual es incorrecta.");
+            } else {
+                fetch('/actualizar_contraseña', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idUsuario: idUsuario, nuevaPassword: nuevaContraseña })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        mostrarAlerta("error", "Error", data.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", "La contraseña ha sido actualizada correctamente.");
+                        $('#modalCredenciales').modal('hide');
+                    }
+                })
+                .catch(() => {
+                    mostrarAlerta("error", "Error", "Hubo un problema al actualizar la contraseña.");
+                });
+            }
+        })
+        .catch(() => {
+            mostrarAlerta("error", "Error", "Hubo un problema al validar la contraseña actual.");
+        });
+    }
 </script>
-
-<style>
-.card-title {
-    color: white;
-}
-.profile-img-wrapper {
-  position: relative;
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-.profile-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.profile-img-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.profile-img-wrapper:hover .profile-img-overlay {
-  opacity: 1;
-}
-.profile-img-overlay button {
-  margin: 5px;
-}
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  color: transparent;
-}
-.skeleton::before {
-  content: '\00a0'; /* non-breaking space */
-}
-.loading-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 2s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
 {% endblock %}
+
+
+

@@ -22,7 +22,7 @@
                         <tr>
                             <th style="text-align:center">N° Documento</th>
                             <th style="text-align:center">Apellidos</th>
-                            <th style="text-align:center">Nombre</th>
+                            <th style="text-align:center">Nombres</th>
                             <th style="text-align:center">Código Universitario</th>
                             <th style="width: 15%; text-align:center">Correo Personal</th>
                             <th style="text-align:center">Correo USAT</th>
@@ -68,7 +68,7 @@
                             <input type="text" class="form-control" id="apellidosEstudianteMod" name="apellidosEstudianteMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="nombreEstudianteMod" class="form-label">Nombre:</label>
+                            <label for="nombreEstudianteMod" class="form-label">Nombres:</label>
                             <input type="text" class="form-control" id="nombreEstudianteMod" name="nombreEstudianteMod" required>
                         </div>
                     </div>
@@ -150,6 +150,7 @@
     </div>
 </div>
 
+<!-- MODAL CONFIRMAR -->
 <div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -244,7 +245,7 @@
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${row.idPersona}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idPersona}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-trash-alt"></i></i></button>
                             <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
@@ -264,31 +265,6 @@
                 showConfirmButton: true,
                 timer: 5000
             });
-        }
-
-        // Función para mostrar el estado de carga
-        function mostrarCargando(titulo = 'Procesando', mensaje = 'Por favor, espere...') {
-            Swal.fire({
-                title: titulo,
-                html: `
-                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                    <p class="text-muted mb-0">${mensaje}</p>
-                `,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        }
-
-        // Función para cerrar el estado de carga y mostrar alerta de resultado
-        function cerrarCargandoYMostrarAlerta(tipo, titulo, mensaje) {
-            Swal.close();
-            mostrarAlerta(tipo, titulo, mensaje);
         }
 
         // Función para cargar los géneros dinámicamente
@@ -508,12 +484,15 @@
         
         $('#formEstudiante').submit(function (e) {
             e.preventDefault();
-            mostrarCargando('Procensado', 'Por favor, espere mientras se realiza la operación.');
             if ($('#idEstudianteMod').val() === '') {
                 const username = $('#usuarioMod').val();
+                if (!username) {
+                    mostrarAlerta("warning", "Error", "Debe generar el nombre de usuario antes de guardar.");
+                    return;
+                }
                 Swal.fire({
-                    title: 'Procesando',
-                    html: 'Por favor, espere mientras se realiza la operación.',
+                    title: 'Registrando',
+                    html: 'Le estamos enviando las credenciales, por favor espere.',
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
@@ -569,7 +548,7 @@
                                 mostrarAlerta("error", "Error", "Hubo un error al agregar el estudiante.");
                             }
                         });
-                    },
+                    },                   
                     error: function (xhr, status, error) {
                         Swal.close();
                         mostrarAlerta("error", "Error", "Hubo un error al agregar el usuario.");
@@ -592,7 +571,6 @@
                     idUsuario: $('#usuarioMod').val(),
                     idEscuela: $('#escuelaMod').val()
                 };
-                mostrarCargando('Procesando', 'Por favor, espere mientras se realiza la operación.');
                 $.ajax({
                     url: '/modificar_estudiante',
                     type: 'POST',
@@ -600,15 +578,15 @@
                     data: JSON.stringify(data),
                     success: function (response) {
                         if (response.error) {
-                            cerrarCargandoYMostrarAlerta('error', 'Error', response.error);
+                            mostrarAlerta('error', 'Error', response.error);
                         } else {
-                            cerrarCargandoYMostrarAlerta('success', 'Éxito', response.mensaje);
+                            mostrarAlerta('success', 'Éxito', response.mensaje);
                             table.ajax.reload();
                             $('#modalEstudiante').modal('hide');
                         }
                     },
                     error: function (xhr, status, error) {
-                        cerrarCargandoYMostrarAlerta('error', 'Error', 'Hubo un error al modificar el estudiante.');
+                        mostrarAlerta('error', 'Error', 'Hubo un error al modificar el estudiante.');
                     }
                 });
             }

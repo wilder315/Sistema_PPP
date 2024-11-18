@@ -23,7 +23,7 @@
                         <tr>
                             <th class="text-center">N° Doc</th>
                             <th class="text-center">Apellidos</th>
-                            <th class="text-center">Nombre</th>                        
+                            <th class="text-center">Nombres</th>                        
                             <th class="text-center">Cargo</th>
                             <th style="width: 20%" class="text-center">Escuela</th>
                             <th class="text-center">Estado</th>
@@ -68,7 +68,7 @@
                             <input type="text" class="form-control" id="apellidosDocenteMod" name="apellidosDocenteMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="nombreDocenteMod" class="form-label">Nombre:</label>
+                            <label for="nombreDocenteMod" class="form-label">Nombres:</label>
                             <input type="text" class="form-control" id="nombreDocenteMod" name="nombreDocenteMod" required>
                         </div>
                     </div>
@@ -130,7 +130,6 @@
                             </div>
                         </div>                        
                     </div>
-                    </div>
 
                     <div class="mb-3">
                         <label for="escuelaMod" class="form-label">Escuela:</label>
@@ -184,6 +183,7 @@
 
 <script>
     $(document).ready(function () {
+        $('#usuarioMod').prop('disabled', true);
         if ($.fn.DataTable.isDataTable('#tabla-docente')) {
             $('#tabla-docente').DataTable().clear().destroy();
         }
@@ -249,7 +249,7 @@
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${row.idPersona}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${row.idPersona}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Eliminar"><i class="fas fa-trash-alt"></i></i></button>
                             <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${row.idPersona}" data-apellidos="${row.apellidos}" data-nombre="${row.nombre}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
@@ -320,7 +320,7 @@
         // Función para cargar los tipoDocumentos dinámicamente
         function cargarTipoDocumentos(selectedTipoDocId) {
             $.ajax({
-                url: '/datos_tipoDocumentos',
+                url: '/datos_tipoDocumentosEstudiante',
                 type: 'GET',
                 contentType: 'application/json',
                 success: function (response) {
@@ -448,7 +448,6 @@
             $('#escuelaMod').val('');
             cargarGeneros();
             cargarTipoDocumentos();
-            cargarUsuarios();
             cargarEscuelas();
             habilitarControles();
             $('#btnCancelar').show();
@@ -517,6 +516,10 @@
             mostrarCargando('Procensado', 'Por favor, espere mientras se realiza la operación.');
             if ($('#idDocenteMod').val() === '') {
                 const username = $('#usuarioMod').val();
+                if (!username) {
+                    mostrarAlerta("warning", "Error", "Debe generar el nombre de usuario antes de guardar.");
+                    return;
+                }
                 Swal.fire({
                     title: 'Procesando',
                     html: 'Por favor, espere mientras se realiza la operación.',

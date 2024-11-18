@@ -3,6 +3,11 @@ import controladores.controlador_estudiante as controlador_estudiante
 
 router_estudiante = Blueprint('router_estudiante', __name__)
 
+def cargar_foto():
+    with open("static/img/fotoPerfil.txt", "r", encoding="utf-8") as file:
+        foto = file.read()
+    return foto
+
 @router_estudiante.route("/estudiante")
 def estudiante():
     return render_template('gestion_academica/estudiante.html')
@@ -28,13 +33,14 @@ def agregar_estudiante():
     tel2 = data.get('tel2')
     correoP = data.get('correoP')
     correoUSAT = data.get('correoUSAT')
+    foto = cargar_foto()
     estado = data.get('estado')
     idGenero = data.get('idGenero')
     idTipoDoc = data.get('idTipoDoc')
     idUsuario = data.get('idUsuario')
     idEscuela = data.get('idEscuela')
 
-    resultado = controlador_estudiante.agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
+    resultado = controlador_estudiante.agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, foto, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
     return jsonify(resultado)
 
 @router_estudiante.route("/modificar_estudiante", methods=["POST"])
@@ -69,3 +75,23 @@ def eliminar_estudiante():
     idEstudiante = request.json.get('idEstudiante')
     resultado = controlador_estudiante.eliminar_estudiante(idEstudiante)
     return jsonify(resultado)
+
+
+@router_estudiante.route("/reporte_estudiantes_genero")
+def reporte_estudiantes_genero():
+    return render_template('gestion_academica/reporteEstudiantesGenero.html')
+
+@router_estudiante.route("/datos_estudiantes_genero", methods=["GET"])
+def datos_estudiantes_genero():
+    datos = controlador_estudiante.obtener_estudiantes_por_genero_escuela()
+    return jsonify(datos)
+
+
+@router_estudiante.route("/reporte_estudiantes_semestre")
+def reporte_estudiantes_semestre():
+    return render_template('gestion_academica/reporteEstudiantesSemestre.html')
+
+@router_estudiante.route("/datos_estudiantes_semestre", methods=["GET"])
+def datos_estudiantes_semestre():
+    datos = controlador_estudiante.obtener_estudiantes_por_semestre()
+    return jsonify(datos)

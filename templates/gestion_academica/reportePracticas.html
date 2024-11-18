@@ -13,42 +13,6 @@
     <h1 class="h3 mb-3"><strong>Reporte de Prácticas Por Estudiante</strong></h1>
 </div>
 
-<!-- FILTRO SUPERIOR CON COMBOX-->
-<div class="container-fluid my-4">
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <label for="semestre" class="form-label">Semestre</label>
-            <select id="semestre" class="form-select">
-                <option value="">Seleccionar Semestre</option>
-                <!-- Aquí se cargarán los semestres desde el servidor -->
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="escuela" class="form-label">Escuela</label>
-            <select id="escuela" class="form-select">
-                <option value="">Seleccionar Escuela</option>
-                <!-- Aquí se cargarán las escuelas desde el servidor -->
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="estado" class="form-label">Estado</label>
-            <select id="estado" class="form-select">
-                <option value="">Seleccionar Estado</option>
-                <!-- Aquí se cargarán los estados desde el servidor -->
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="empresa" class="form-label">Empresa</label>
-            <select id="empresa" class="form-select">
-                <option value="">Seleccionar Empresa</option>
-                <!-- Aquí se cargarán las empresas desde el servidor -->
-            </select>
-        </div>
-    </div>
-</div>
-
-
-
 <!-- Cards para mostrar los resultados de la búsqueda -->
 <div class="container-fluid my-4">
     <div class="card w-100" id="card_jefes">
@@ -56,6 +20,37 @@
             Prácticas de Estudiantes
         </div>
         <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label for="semestre" class="form-label">Semestre</label>
+                    <select id="semestre" class="form-select">
+                        <option value="">Seleccionar Semestre</option>
+                        <!-- Aquí se cargarán los semestres desde el servidor -->
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="escuela" class="form-label">Escuela</label>
+                    <select id="escuela" class="form-select">
+                        <option value="">Seleccionar Escuela</option>
+                        <!-- Aquí se cargarán las escuelas desde el servidor -->
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select id="estado" class="form-select">
+                        <option value="">Seleccionar Estado</option>
+                        <!-- Aquí se cargarán los estados desde el servidor -->
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="empresa" class="form-label">Empresa</label>
+                    <select id="empresa" class="form-select">
+                        <option value="">Seleccionar Empresa</option>
+                        <!-- Aquí se cargarán las empresas desde el servidor -->
+                    </select>
+                </div>
+            </div>
+            <div class="divider" style="border-top: 2px solid #d32f2f; margin: 20px 0"></div>
             <div class="table-responsive">
                 <table id="tabla-reporte1" class="table table-striped" style="width:100%">
                     <thead>

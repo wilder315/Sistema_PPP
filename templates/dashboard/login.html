@@ -264,28 +264,15 @@
         var username = document.getElementById("username").value;
         var password = document.getElementById("password").value;
         var recordar = document.getElementById("recordar_check").checked;
-
         if (username.trim() == "" || password.trim() == "") {
-            if (username.trim() == "" && password.trim() == "") {
-                mostrarError("warning", "No se pudo acceder al sistema",
-                    "Por favor ingrese un nombre de usuario y contraseña");
-            } else if (username.trim() == "") {
-                mostrarError("warning", "No se pudo acceder al sistema", "Por favor ingrese un nombre de usuario");
-            } else if (password.trim() == "") {
-                mostrarError("warning", "No se pudo acceder al sistema", "Por favor ingrese una contraseña");
-            }
+            mostrarError("warning", "No se pudo acceder al sistema", "Por favor ingrese un nombre de usuario y contraseña");
         } else {
             document.getElementById("loginButton").disabled = true;
             document.querySelector("#loginButton .spinner-border").classList.remove("d-none");
             fetch('/procesar_login', {
                     method: 'POST',
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                    })
+                    headers: { 'Content-type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -296,21 +283,22 @@
                             localStorage.setItem('n', data.nombre);
                             localStorage.setItem('a', data.apellido);
                             localStorage.setItem('f', data.foto);
+                            localStorage.setItem('id_persona', data.id_persona);
+                            localStorage.setItem('id_tipo_usuario', data.id_tipo_usuario);
+                            localStorage.setItem('idUsuario', data.idUsuario);
                         } else {
                             sessionStorage.setItem('username', username);
                             sessionStorage.setItem('token', data.token);
                             sessionStorage.setItem('n', data.nombre);
-                            localStorage.setItem('a', data.apellido);
+                            sessionStorage.setItem('a', data.apellido);
                             sessionStorage.setItem('f', data.foto);
+                            sessionStorage.setItem('id_persona', data.id_persona);
+                            sessionStorage.setItem('idUsuario', data.idUsuario);
                         }
                         document.getElementById("loginButton").disabled = false;
                         document.querySelector("#loginButton .spinner-border").classList.add("d-none");
-
                         mostrarAlerta("success", "Bienvenido", "Has iniciado sesión correctamente.");
-                        
-                        setTimeout(() => {
-                            window.location.href = '/index';
-                        }, 3000);
+                        setTimeout(() => { window.location.href = '/index'; }, 3000);
                     } else {
                         document.getElementById("loginButton").disabled = false;
                         document.querySelector("#loginButton .spinner-border").classList.add("d-none");

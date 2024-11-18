@@ -18,7 +18,7 @@ def obtener_docentes():
                 LEFT JOIN tipo_documento td ON p.idTipoDoc = td.idTipoDoc
                 LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
                 LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
-                WHERE u.idTipoUsuario = 2
+                WHERE u.idTipoUsuario IN (1, 2)
                 ORDER BY p.apellidos ASC, p.nombre ASC 
             """)
             column_names = [desc[0] for desc in cursor.description]
@@ -56,7 +56,7 @@ def obtener_docente_por_id(idDocente):
     finally:
         conexion.close()
 
-def agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela):
+def agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, foto, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela):
     if not tel2:
         tel2 = None
     conexion = obtener_conexion()
@@ -65,9 +65,9 @@ def agregar_docente(numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, 
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO persona (numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
+                INSERT INTO persona (numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, foto, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, foto, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela))
             conexion.commit()
             usuario_data = controlador_usuario.obtener_usuario_por_id(idUsuario)
             if not usuario_data:

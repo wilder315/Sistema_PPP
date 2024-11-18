@@ -185,7 +185,7 @@
                         return `
                             <button class="btn btn-primary btn-sm btnVer" data-id="${data.idUsuario}" title="Ver"><i class="fas fa-eye"></i></button>
                             <button class="btn btn-warning btn-sm btnModificar" data-id="${data.idUsuario}" title="Modificar"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${data.idUsuario}" data-username="${data.username}" title="Eliminar"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-danger btn-sm btnEliminar" data-id="${data.idUsuario}" data-username="${data.username}" title="Eliminar"><i class="fas fa-trash-alt"></i></i></button>
                             <button class="btn btn-secondary btn-sm btnDarDeBaja" data-id="${data.idUsuario}" data-username="${data.username}" title="Dar de Baja"><i class="fas fa-arrow-down"></i></button>
                         `;
                     }
@@ -325,6 +325,7 @@
             $('#tipoMod').val('');
             cargarTipoUsuarios();
             habilitarControles();
+            $('#btnVerContraseña').hide();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
@@ -349,6 +350,7 @@
                         $('#estadoUsuarioMod').val(response.estado);
                         cargarTipoUsuarios(response.idTipoUsuario);
                         habilitarControles();
+                        $('#btnVerContraseña').show();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();

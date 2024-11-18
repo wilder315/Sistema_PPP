@@ -37,38 +37,43 @@ def procesar_login():
             return jsonify({
                 'logeo': False,
                 'mensaje': 'El servicio se encuentra inactivo.'
-            }), 500
+            }), 500    
         username = request.json.get('username')
         password = request.json.get('password')
         usuario = controlador_usuario.obtener_usuario_con_tipopersona_por_username(username)
         if usuario is None:
             return jsonify({'mensaje': 'El usuario no existe', 'logeo': False})
         elif usuario[2] == "I":
-            return jsonify({'mensaje': 'El usuario está inactivo', 'logeo': False})
+            return jsonify({'mensaje': 'El usuario está inactivo', 'logeo': False})     
         try:
             password_almacenada = controlador_usuario.descifrar_contraseña(usuario[3])
         except Exception as e:
-            return jsonify({'mensaje': f'Error al descifrar la contraseña: {str(e)}', 'logeo': False})
+            return jsonify({'mensaje': f'Error al descifrar la contraseña: {str(e)}', 'logeo': False})  
         if password == password_almacenada:
             login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
             persona = controlador_usuario.obtener_datos_usuario(usuario[0])
             nombre = persona[0].split()[0]
             apellido = persona[1].split()[0]
             foto = persona[2]
-            session['user_id'] = usuario[0]
+            id_persona = usuario[5]
+            id_tipo_usuario = usuario[4]
+            idUsuario = usuario[0]
+            session['user_id'] = id_persona
             session.permanent = True
             return jsonify({
                 'logeo': True,
                 'nombre': nombre,
                 'apellido': apellido,
-                'foto': foto
+                'foto': foto,
+                'id_persona': id_persona,
+                'id_tipo_usuario': id_tipo_usuario,
+                'idUsuario' : idUsuario
             })
         else:
             if username not in login_attempts:
                 login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
             login_attempts[username]['attempts'] += 1
             login_attempts[username]['last_attempt_time'] = time.time()
-
             return jsonify({'mensaje': 'La contraseña es incorrecta', 'logeo': False})
     except Exception as e:
         return jsonify({'mensaje': f'Error al procesar el login: {str(e)}', 'logeo': False})
@@ -78,6 +83,11 @@ def logout():
     session.clear()
     flash('Sesión cerrada exitosamente.', 'success')
     return redirect(url_for('router_main.login'))
+
+@router_main.route('/perfil')
+@login_required
+def perfil():
+    return render_template('/dashboard/perfil.html')
 
 # Principal
 
@@ -104,11 +114,6 @@ def practicas_pre_profesionales():
 @login_required
 def home():
     return render_template('home.html')
-
-@router_main.route('/perfil')
-@login_required
-def perfil():
-    return render_template('perfil.html')
 
 # Módulo de Gestión Académica
 
@@ -239,29 +244,33 @@ def datos_horas_practica_escuela():
 def practicas_terminadas():
     return render_template('ppp/informePracticasTerminadas.html')
 
+
+
+@router_main.route("/semestres")
+def obtener_semestres():
+    try:
+        datos = controlador_informeAlumno.obtener_semestres()
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @router_main.route("/datos_practicas_terminadas")
-@login_required
 def datos_practicas_terminadas():
     try:
-        # Obtener mes y año de los parámetros de la URL
-        mes = request.args.get('mes', type=int)
-        anio = request.args.get('anio', type=int)
+        id_semestre = request.args.get('semestre', type=int)
+        if not id_semestre:
+            return jsonify({"error": "Semestre no especificado"}), 400
         
-        # Si no se proporcionan mes y año, usar los valores actuales
-        if not mes or not anio:
-            from datetime import datetime
-            fecha_actual = datetime.now()
-            mes = fecha_actual.month
-            anio = fecha_actual.year
-        
-        # Llamar al controlador con los parámetros
-        datos = controlador_informeAlumno.obtener_practicas_terminadas_mes(mes, anio)
+        datos = controlador_informeAlumno.obtener_practicas_terminadas_semestre(id_semestre)
         
         if isinstance(datos, dict) and "error" in datos:
             return jsonify({"error": datos["error"]}), 500
         return jsonify(datos)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
 @router_main.route("/dashboard-tendencias")
 @login_required
@@ -283,3 +292,28 @@ def datos_dashboard_tendencias():
 @login_required
 def reporte_estudiantes_practicas():
     return render_template('gestion_academica/reportePracticas.html') 
+
+
+@router_main.route("/escuelas")
+def obtener_lista_escuelas():
+    try:
+        datos = controlador_informeAlumno.obtener_escuelas()
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@router_main.route("/instituciones_por_escuela")
+def obtener_instituciones_escuela():
+    try:
+        id_escuela = request.args.get('escuela', type=int)
+        if not id_escuela:
+            return jsonify({"error": "Escuela no especificada"}), 400
+        
+        datos = controlador_informeAlumno.obtener_instituciones_por_escuela(id_escuela)
+        if isinstance(datos, dict) and "error" in datos:
+            return jsonify({"error": datos["error"]}), 500
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

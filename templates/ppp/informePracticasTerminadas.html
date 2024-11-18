@@ -1,11 +1,11 @@
 {% extends "/ppp/home.html" %}
-{% block titulo %} Prácticas Terminadas del Mes {% endblock %}
+{% block titulo %} Prácticas Terminadas por Semestre {% endblock %}
 {% block contenido %}
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Prácticas Terminadas del Mes</li>
+        <li class="breadcrumb-item active" aria-current="page">Prácticas Terminadas por Semestre</li>
     </ol>
 </nav>
 
@@ -15,26 +15,14 @@
             Alumnos que Completaron sus Prácticas
         </div>
         <div class="card-body">
-            <!-- Selector de mes y año -->
+            <!-- Selector de semestre -->
+            <h4 style="text-align: center;">Seleccionar semestre académico:</h4>
+            <br>
             <div class="row mb-4">
                 <div class="col-md-4 mx-auto">
                     <div class="input-group">
-                        <select class="form-select" id="mes_selector">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                        <select class="form-select" id="anio_selector">
-                            <!-- Se llenará dinámicamente con JavaScript -->
+                        <select class="form-select" id="semestre_selector">
+                            <option value="">Seleccione un semestre</option>
                         </select>
                         <button class="btn btn-primary" id="btn_filtrar">
                             <i class="fas fa-filter"></i> Filtrar
@@ -50,7 +38,7 @@
                         <div class="card-body text-center">
                             <h5 class="card-title text-white">Total de Alumnos que Completaron</h5>
                             <h2 class="card-text" id="total_completados">0</h2>
-                            <p class="card-text" id="mes_actual"></p>
+                            <p class="card-text" id="semestre_actual"></p>
                         </div>
                     </div>
                 </div>
@@ -61,8 +49,8 @@
                 <table id="tabla-practicas-terminadas" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="text-align:center">Nombre</th>
                             <th style="text-align:center">Apellidos</th>
+                            <th style="text-align:center">Nombres</th>
                             <th style="text-align:center">Escuela</th>
                             <th style="text-align:center">Estado</th>
                             <th style="text-align:center">Acciones</th>
@@ -105,25 +93,40 @@
 
 <script>
     $(document).ready(function () {
-        // Llenar selector de años (desde 2020 hasta el año actual)
-        const anioActual = new Date().getFullYear();
-        const anioSelector = $('#anio_selector');
-        for (let anio = anioActual; anio >= 2020; anio--) {
-            anioSelector.append(new Option(anio, anio));
-        }
-
-        // Establecer mes y año actual en los selectores
-        const fecha = new Date();
-        $('#mes_selector').val(fecha.getMonth() + 1);
-        $('#anio_selector').val(fecha.getFullYear());
+        // Cargar semestres al inicio
+        $.ajax({
+            url: '/semestres',
+            type: 'GET',
+            success: function(data) {
+                const semestreSelector = $('#semestre_selector');
+                data.forEach(function(semestre) {
+                    semestreSelector.append(new Option(semestre.nombre, semestre.id));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar semestres:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudieron cargar los semestres'
+                });
+            }
+        });
 
         // Función para actualizar la tabla
         function actualizarTabla() {
-            const mes = $('#mes_selector').val();
-            const anio = $('#anio_selector').val();
-            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            
-            $('#mes_actual').text(meses[mes - 1] + ' ' + anio);
+            const semestre = $('#semestre_selector').val();
+            if (!semestre) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: 'Por favor seleccione un semestre'
+                });
+                return;
+            }
+
+            const semestreTexto = $('#semestre_selector option:selected').text();
+            $('#semestre_actual').text(semestreTexto);
 
             if ($.fn.DataTable.isDataTable('#tabla-practicas-terminadas')) {
                 $('#tabla-practicas-terminadas').DataTable().destroy();
@@ -135,13 +138,12 @@
                 responsive: true,
                 autoWidth: false,
                 searching: true,
-                order: [[1, 'asc']],
+                order: [[0, 'asc']],
                 ajax: {
                     url: "/datos_practicas_terminadas",
                     type: "GET",
                     data: {
-                        mes: mes,
-                        anio: anio
+                        semestre: semestre
                     },
                     dataSrc: function(json) {
                         $('#total_completados').text(json.length);
@@ -149,8 +151,8 @@
                     }
                 },
                 columns: [
-                    { data: "Nombre_Alumno", className: 'text-center' },
                     { data: "Apellidos_Alumno", className: 'text-center' },
+                    { data: "Nombre_Alumno", className: 'text-center' },
                     { data: "Escuela", className: 'text-center' },
                     { 
                         data: "Estado_Practica",
@@ -204,9 +206,6 @@
 
         // Inicializar tooltips
         $('[data-bs-toggle="tooltip"]').tooltip();
-
-        // Inicializar tabla con el mes actual
-        actualizarTabla();
     });
 </script>
 {% endblock %}

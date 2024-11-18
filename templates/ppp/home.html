@@ -134,97 +134,79 @@
                 </a>
 
                 <ul class="sidebar-nav">
-                    <li class="sidebar-header">
-                        <a class="sidebar-link" href="{{ url_for('router_main.practicas_pre_profesionales')}} "> 
-                        Módulo de Prácticas Pre Profesionales
-                        </a>
-
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#" data-bs-toggle="collapse" data-bs-target="#informesDropdown" aria-expanded="false" aria-controls="informesDropdown">
-                                <i class="fas fa-file-alt fa-lg"></i>
-                                <span class="align-middle">Informes</span>
-                            </a>
-                            <ul class="collapse sidebar-submenu" id="informesDropdown">
-                                <li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}">
-                                        <i class="far fa-file fa-lg"></i>
-                                        <span class="align-middle">Informe Inicial Estudiante</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEmpresa') }}">
-                                        <i class="fas fa-file fa-lg"></i>
-                                        <span class="align-middle">Informe Inicial Empresa</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEstudiante') }}">
-                                        <i class="far fa-file-alt fa-lg"></i>
-                                        <span class="align-middle">Informe Final Estudiante</span>
-                                    </a>
-                                </li>
-                                <li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEmpresa') }}">
-                                        <i class="fas fa-file-alt fa-lg"></i>
-                                        <span class="align-middle">Informe Final Empresa</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        
+                    <li class="sidebar-header" id="tituloInicio">Inicio</li>                   
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.perfil') }}">
+                            <i class="fas fa-address-card fa-lg"></i>
+                            <span class="align-middle">Perfil</span>
+                        </a>
+                    </li>
+        
+                    <li class="sidebar-header" id="tituloPracticas" style="display: none;">Módulo de Prácticas Pre Profesionales</li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}" id="practicas" style="display: none;">
                             <i class="fas fa-graduation-cap fa-lg"></i>
                             <span class="align-middle">Prácticas Pre Profesionales</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-header">
-                        Reportes
+                    <li class="sidebar-header" id="tituloInformes" style="display: none;">Informes</li>
+                    <li  class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}" id="informeInicialEstudiante" style="display: none;">
+                            <i class="far fa-file fa-lg"></i>
+                            <span class="align-middle">Informe Inicial Estudiante</span>
+                        </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.InformesAlumno') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEmpresa') }}" id="informeInicialEmpresa" style="display: none;">
+                            <i class="fas fa-file fa-lg"></i>
+                            <span class="align-middle">Informe Inicial Empresa</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEstudiante') }}" id="informeFinalEstudiante" style="display: none;">
+                            <i class="far fa-file-alt fa-lg"></i>
+                            <span class="align-middle">Informe Final Estudiante</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.informeFinalEmpresa') }}" id="informeFinalEmpresa" style="display: none;">
+                            <i class="fas fa-file-alt fa-lg"></i>
+                            <span class="align-middle">Informe Final Empresa</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-header" id="tituloReportes" style="display: none;">Reportes</li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.InformesAlumno') }}" id="informesAlumno" style="display: none;">
                             <i class="fas fa-chart-line fa-lg"></i>
                             <span class="align-middle">Informes por Alumno</span>
                         </a>
                     </li>
-                    <!-- <li class="sidebar-item">
-                        <a class="sidebar-link" href="">
-                            <i class="fas fa-chart-bar fa-lg"></i>
-                            <span class="align-middle">Reporte 2</span>
-                        </a>
-                    </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="">
-                            <i class="fas fa-chart-area fa-lg"></i>
-                            <span class="align-middle">Reporte 3</span>
-                        </a>
-                    </li> -->
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.horas_practica') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.horas_practica') }}" id="horasPractica" style="display: none;">
                             <i class="fas fa-chart-area fa-lg"></i>
                             <span class="align-middle">Horas de práctica</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.horas_practica_escuela') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.horas_practica_escuela') }}" id="horasPracticaEscuela" style="display: none;">
                             <i class="fas fa-chart-area fa-lg"></i>
                             <span class="align-middle">Horas de práctica por escuela</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.practicas_terminadas') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.practicas_terminadas') }}" id="practicasTerminadas" style="display: none;">
                             <i class="fas fa-chart-area fa-lg"></i>
                             <span class="align-middle">Prácticas terminadas del mes</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.dashboard_tendencias') }}">
+                        <a class="sidebar-link" href="{{ url_for('router_main.dashboard_tendencias') }}" id="dashboardTendencias" style="display: none;">
                             <i class="fas fa-chart-area fa-lg"></i>
                             <span class="align-middle">Dashboard de Tendencias</span>
                         </a>
                     </li>
-                </ul>
+                </ul>                
             </div>
         </nav>
         {% endblock %}
@@ -312,20 +294,38 @@
         document.addEventListener('DOMContentLoaded', function () {
             var fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
             let usuario = localStorage.getItem('username') || sessionStorage.getItem('username');
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            if (!token) {
-                alert('Debes iniciar sesión para acceder a esta página.');
-                window.location.href = '/login';
-            } else {
-                if (fotoBase64) {
+            const idTipoUsuario = localStorage.getItem('id_tipo_usuario') || sessionStorage.getItem('id_tipo_usuario');
+            if (fotoBase64) {
                 document.getElementById('github-profile-pic').src = 'data:image/jpeg;base64,' + fotoBase64;
             }
             if (usuario) {
                 document.getElementById('usernamenav').textContent = usuario;
             }
-            }         
+            if (idTipoUsuario === '1' || idTipoUsuario === '2') {
+                document.getElementById('tituloPracticas').style.display = 'flex';
+                document.getElementById('tituloInformes').style.display = 'flex';
+                document.getElementById('tituloReportes').style.display = 'flex';
+                document.getElementById('practicas').style.display = 'flex';
+                document.getElementById('informeInicialEstudiante').style.display = 'flex';
+                document.getElementById('informeFinalEstudiante').style.display = 'flex';
+                document.getElementById('informeInicialEmpresa').style.display = 'flex';
+                document.getElementById('informeFinalEmpresa').style.display = 'flex';
+                document.getElementById('informesAlumno').style.display = 'flex';
+                document.getElementById('horasPractica').style.display = 'flex';
+                document.getElementById('horasPracticaEscuela').style.display = 'flex';
+                document.getElementById('practicasTerminadas').style.display = 'flex';
+                document.getElementById('dashboardTendencias').style.display = 'flex';
+            } else if (idTipoUsuario === '3') {
+                document.getElementById('tituloInformes').style.display = 'flex';
+                document.getElementById('informeInicialEstudiante').style.display = 'flex';
+                document.getElementById('informeFinalEstudiante').style.display = 'flex';
+            } else if (idTipoUsuario === '4') {
+                document.getElementById('tituloInformes').style.display = 'flex';
+                document.getElementById('informeInicialEmpresa').style.display = 'flex';
+                document.getElementById('informeFinalEmpresa').style.display = 'flex';
+            }
         });
-    </script>
+    </script>    
     {% block scripts %}{% endblock %}
 </body>
 
