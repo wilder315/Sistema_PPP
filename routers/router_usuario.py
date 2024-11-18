@@ -22,6 +22,11 @@ def obtener_usuario_por_id(idUsuario):
     usuarios = controlador_usuario.obtener_usuario_por_id(idUsuario)
     return jsonify(usuarios)
 
+@router_usuario.route("/obtener_informacion_completa_persona/<int:idPersona>", methods=["GET"])
+def obtener_informacion_completa_persona(idPersona):
+    informacion = controlador_usuario.obtener_informacion_completa_persona(idPersona)
+    return jsonify(informacion)
+
 @router_usuario.route("/agregar_usuario", methods=["POST"])
 def agregar_usuario():
     username = request.json.get('username')
@@ -29,6 +34,34 @@ def agregar_usuario():
     idTipoUsuario = request.json.get('idTipoUsuario')
     resultado = controlador_usuario.agregar_usuario(username, estado, idTipoUsuario)
     return jsonify(resultado)
+
+@router_usuario.route("/actualizar_contraseña", methods=["POST"])
+def actualizar_contraseña():
+    id_usuario = request.json.get('idUsuario')
+    nueva_password = request.json.get('nuevaPassword')
+    resultado = controlador_usuario.actualizar_contraseña(id_usuario, nueva_password)
+    return jsonify(resultado)
+
+@router_usuario.route("/validar_contraseña_actual", methods=["POST"])
+def validar_contraseña_actual():
+    id_usuario = request.json.get('idUsuario')
+    contraseña_actual = request.json.get('contraseñaActual')
+
+    if not id_usuario or not contraseña_actual:
+        return jsonify({"error": "ID de usuario y contraseña actual son requeridos"}), 400
+
+    usuario = controlador_usuario.obtener_usuario_por_id(id_usuario)
+    if usuario is None:
+        return jsonify({"error": "Usuario no encontrado."}), 404
+
+    try:
+        password_almacenada = controlador_usuario.descifrar_contraseña(usuario['password'])
+        if contraseña_actual == password_almacenada:
+            return jsonify({"valida": True})
+        else:
+            return jsonify({"valida": False})
+    except Exception as e:
+        return jsonify({"error": f"Error al validar la contraseña: {str(e)}"}), 500
 
 @router_usuario.route("/modificar_usuario", methods=["POST"])
 def modificar_usuario():

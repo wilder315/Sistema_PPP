@@ -9,75 +9,108 @@
     </ol>
 </nav>
 
-<div class="container-perfil">
-  <div class="row align-items-stretch">
-      <div class="col-md-6 d-flex flex-column">
-          <div class="card flex-grow-1 mb-3">
-            <div class="card-header bg-red-usat text-white position-relative d-flex align-items-center">
-                Credenciales
-                <div id="falsodiv"></div>
-                <button id="btnEditarCredenciales">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-            </div>      
-              <div class="card-body">
-                  <div class="row">
-                      <div class="col-md-6 mb-3">
-                          <label for="usuario" class="form-label">Usuario:</label>
-                          <input type="text" class="form-control" id="usuario" readonly>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                          <label for="contraseña" class="form-label">Contraseña:</label>
-                          <input type="password" class="form-control" id="contraseña" readonly>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="card flex-grow-1">
-              <div class="card-header bg-red-usat text-white d-flex justify-content-between align-items-center">
-                  <span class="header-text">Mis Datos</span>
-                  <div id="falsodiv"></div>
-                  <button id="btnEditarDatos">
-                      <i class="fas fa-pencil-alt"></i>
-                  </button>
-              </div>   
-              <div class="card-body">
-                  <div class="row">
-                      <div class="col-md-6 mb-3">
-                          <label for="correoPersonal" class="form-label">Correo Personal:</label>
-                          <input type="email" class="form-control" id="correoPersonal">
-                      </div>
-                      <div class="col-md-6 mb-3">
-                          <label for="telefono1" class="form-label">Teléfono 1:</label>
-                          <input type="text" class="form-control" id="telefono1">
-                      </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-md-6 mb-3">
-                          <label for="telefono2" class="form-label">Teléfono 2:</label>
-                          <input type="text" class="form-control" id="telefono2">
-                      </div>
-                      <div class="col-md-6 mb-3">
-                          <label for="genero" class="form-label">Género:</label>
-                          <input type="text" class="form-control" id="genero" readonly>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="col-md-6 d-flex flex-column">
-          <div class="card flex-grow-1 d-flex flex-column justify-content-center align-items-center">
-              <h2 class="text-center mb-4" id="apellidosNombres">Apellidos y Nombre</h2>
-              <div class="position-relative mb-4">
-                  <img src="/static/img/default-profile.png" alt="Foto de Perfil" id="fotoPerfil" class="foto-perfil">
-                  <div class="foto-perfil-hover">
-                      <span>Haz click para cambiar</span>
-                      <input type="file" id="inputFotoPerfil" accept="image/*" style="display: none;">
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+<div class="container-fluid my-4">
+    <div class="card flex-grow-1 mb-3">
+        <div class="card-header bg-red-usat text-white position-relative d-flex align-items-center">
+            <span id="apellidosNombres"></span>
+        </div>
+    </div>
+    <div class="row align-items-stretch">
+        <div class="col-md-6 d-flex flex-column">
+            <div class="card flex-grow-1 mb-3">
+                <div class="card-header bg-red-usat text-white position-relative d-flex align-items-center">
+                    Credenciales
+                    <div id="falsodiv"></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ndoc" class="form-label">N° Documento:</label>
+                            <input type="text" class="form-control" id="ndoc" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="usuario" class="form-label">Usuario:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="usuario" readonly>
+                                <button type="button"  style=" border: 1px solid #ddd;" class="btn btn-outline-secondary" id="btnCambiarContraseña" data-bs-toggle="modal" data-bs-target="#modalCredenciales">
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card flex-grow-1 d-flex flex-column justify-content-center align-items-center mb-3">
+                <img src="/static/img/default-profile.png" alt="Foto de Perfil" id="fotoPerfil" class="foto-perfil">
+                <div class="foto-perfil-hover">
+                    <span>Haz click para cambiar</span>
+                    <input type="file" id="inputFotoPerfil" accept="image/*" style="display: none;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex flex-column">
+            <div class="card flex-grow-1 mb-3">
+                <div class="card-header bg-red-usat text-white d-flex justify-content-between align-items-center">
+                    <span class="header-text">Mis Datos</span>
+                    <button id="btnEditarDatos" data-bs-toggle="modal" data-bs-target="#modalDatos">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="codUniversitario" class="form-label">Código Universitario:</label>
+                            <input type="text" class="form-control" id="codUniversitario" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cargo" class="form-label">Cargo:</label>
+                            <input type="text" class="form-control" id="cargo" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="genero" class="form-label">Género:</label>
+                            <input type="text" class="form-control" id="genero" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="escuelap" class="form-label">Escuela:</label>
+                            <input type="text" class="form-control" id="escuelap" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card flex-grow-1">
+                <div class="card-header bg-red-usat text-white d-flex justify-content-between align-items-center">
+                    <span class="header-text">Contactos</span>
+                    <button id="btnEditarContactos" data-bs-toggle="modal" data-bs-target="#modalContactos">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="correoPersonal" class="form-label">Correo Personal:</label>
+                            <input type="email" class="form-control" id="correoPersonal" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="correoU" class="form-label">Correo USAT:</label>
+                            <input type="text" class="form-control" id="correoU" name="correoU" readonly>
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono1" class="form-label">Teléfono 1:</label>
+                            <input type="text" class="form-control" id="telefono1" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="telefono2" class="form-label">Teléfono 2:</label>
+                            <input type="text" class="form-control" id="telefono2" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- MODAL CREDENCIALES -->
@@ -85,30 +118,87 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title"></h5>
+                <h5 class="modal-title" id="modal-title1">Cambiar Credenciales</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="formCredenciales">
-                    <input type="hidden" id="idUsuarioMod" name="idUsuarioMod">
+                    <input type="hidden" id="idUsuario" name="idUsuario">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="usernameMod" class="form-label">Usuario:</label>
-                            <input type="text" class="form-control" id="usernameMod" name="usernameMod" required>
+                            <input type="text" class="form-control" id="usernameMod" name="usernameMod" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="contraseñaMod" class="form-label">Contraseña Actual:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="contraseñaMod" name="contraseñaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('contraseñaMod')" onmouseup="ocultarPassword('contraseñaMod')" onmouseleave="ocultarPassword('contraseñaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>         
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="nuevaMod" class="form-label">Nueva Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="nuevaMod" name="nuevaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('nuevaMod')" onmouseup="ocultarPassword('nuevaMod')" onmouseleave="ocultarPassword('nuevaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>                 
+                        </div>
+                        <div class="col-md-6 mb-3 position-relative">
+                            <label for="confirmadaMod" class="form-label">Confirmar Contraseña:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirmadaMod" name="confirmadaMod" required>
+                                <button type="button" style=" border: 1px solid #ddd;"  class="btn btn-outline-secondary" onmousedown="mostrarPassword('confirmadaMod')" onmouseup="ocultarPassword('confirmadaMod')" onmouseleave="ocultarPassword('confirmadaMod')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <label id="errorMensaje" class="form-text d-none"></label>
+                    <div class="text-end">
+                        <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardarCredenciales">Guardar</button>
+                    </div>   
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DATOS -->
+<div class="modal fade" id="modalDatos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title2"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDatos">
+                    <input type="hidden" id="idUsuarioMod" name="idUsuarioMod">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="correoMod" class="form-label">Correo Personal:</label>
+                            <input type="text" class="form-control" id="correoMod" name="correoMod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="contraseñaMod" class="form-label">Contraseña Actual:</label>
-                            <input type="text" class="form-control" id="contraseñaMod" name="contraseñaMod" required>
+                            <label for="tel1Mod" class="form-label">Teléfono 1:</label>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="nuevaMod" class="form-label">Nueva Contraseña:</label>
-                            <input type="text" class="form-control" id="nuevaMod" name="nuevaMod" required>
+                            <label for="tel2Mod" class="form-label">Teléfono 2:</label>
+                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="confirmadaMod" class="form-label">Confirmar Contraseña:</label>
-                            <input type="text" class="form-control" id="confirmadaMod" name="confirmadaMod" required>
+                            <label for="generoMod" class="form-label">Género:</label>
+                            <input type="text" class="form-control" id="generoMod" name="generoMod" required>
                         </div>
                     </div> 
                     <div class="text-end">
@@ -121,8 +211,154 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const nombreUsuario = localStorage.getItem('n') || sessionStorage.getItem('n');
+        const apellidoUsuario = localStorage.getItem('a') || sessionStorage.getItem('a');
+        const fotoBase64 = localStorage.getItem('f') || sessionStorage.getItem('f');
+        const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+        const idPersona = localStorage.getItem('id_persona') || sessionStorage.getItem('id_persona');
+        const idTipoUsuario = localStorage.getItem('id_tipo_usuario') || sessionStorage.getItem('id_tipo_usuario');
+        const idUsuario = localStorage.getItem('idUsuario') || sessionStorage.getItem('idUsuario');
+        if (nombreUsuario && apellidoUsuario) {
+            document.getElementById('apellidosNombres').textContent = `Bienvenido a tu perfil, ${nombreUsuario} ${apellidoUsuario}`;
+        }
+        if (username) {
+            document.getElementById('usuario').value = username;
+            document.getElementById('usernameMod').value = username;
+            document.getElementById('usernameMod').setAttribute('readonly', true);
+        }
+        if (fotoBase64) {
+            document.getElementById('fotoPerfil').src = 'data:image/jpeg;base64,' + fotoBase64;
+        }
+        if (idUsuario) {
+            document.getElementById('idUsuario').value = idUsuario;
+        }
+        cargarDatos(idPersona);
+        const nuevaMod = document.getElementById('nuevaMod');
+        const confirmadaMod = document.getElementById('confirmadaMod');
+        const errorMensaje = document.getElementById('errorMensaje');
+        nuevaMod.addEventListener('input', validarContraseñas);
+        confirmadaMod.addEventListener('input', validarContraseñas);
+        document.getElementById('btnGuardarCredenciales').addEventListener('click', guardarCredenciales);
+        console.log(document.getElementById('idUsuario').value);
+    });
+
+    function cargarDatos(idPersona) {
+        $.ajax({
+            url: '/obtener_informacion_completa_persona/' + idPersona,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.error) {
+                    mostrarAlerta("error", "Error", response.error);
+                } else {
+                    $('#ndoc').val(response.numDoc);
+                    $('#correoPersonal').val(response.correoPersonal);
+                    $('#telefono1').val(response.tel1);
+                    $('#telefono2').val(response.tel2);
+                    $('#codUniversitario').val(response.codUniversitario);
+                    $('#cargo').val(response.cargo);
+                    $('#escuelap').val(response.escuela);
+                    $('#genero').val(response.genero);
+                    $('#correoU').val(response.correoUSAT);
+                }
+            },
+            error: function () {
+                mostrarAlerta("error", "Error", "Hubo un error al obtener la información.");
+            }
+        });
+    }
+
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
+
+    function mostrarPassword(id) {
+        document.getElementById(id).type = 'text';
+    }
+
+    function ocultarPassword(id) {
+        document.getElementById(id).type = 'password';
+    }
+
+    document.querySelectorAll('.eye-btn').forEach(button => {
+        const inputId = button.previousElementSibling.getAttribute('id');
+        button.addEventListener('mousedown', () => mostrarPassword(inputId));
+        button.addEventListener('mouseup', () => ocultarPassword(inputId));
+        button.addEventListener('mouseleave', () => ocultarPassword(inputId));
+    });
+
+    function validarContraseñas() {
+        const nuevaMod = document.getElementById('nuevaMod').value;
+        const confirmadaMod = document.getElementById('confirmadaMod').value;
+        const errorMensaje = document.getElementById('errorMensaje');
+        if (nuevaMod === confirmadaMod && nuevaMod !== '') {
+            errorMensaje.classList.remove('d-none');
+            errorMensaje.textContent = "Las contraseñas coinciden";
+            errorMensaje.style.color = 'green';
+        } else if (nuevaMod !== confirmadaMod) {
+            errorMensaje.classList.remove('d-none');
+            errorMensaje.textContent = "Las contraseñas no coinciden";
+            errorMensaje.style.color = 'red';
+        } else {
+            errorMensaje.classList.add('d-none');
+        }
+    }
+
+    function guardarCredenciales(e) {
+        e.preventDefault();
+        const idUsuario = document.getElementById('idUsuario').value;
+        
+        const contraseñaActual = document.getElementById('contraseñaMod').value;
+        const nuevaContraseña = document.getElementById('nuevaMod').value;
+        if (!contraseñaActual || !nuevaContraseña) {
+            mostrarAlerta("warning", "Campos incompletos", "Por favor, complete todos los campos.");
+            return;
+        }
+        fetch('/validar_contraseña_actual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idUsuario: idUsuario, contraseñaActual: contraseñaActual })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarAlerta("error", "Error", data.error);
+            } else if (!data.valida) {
+                mostrarAlerta("error", "Error", "La contraseña actual es incorrecta.");
+            } else {
+                fetch('/actualizar_contraseña', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idUsuario: idUsuario, nuevaPassword: nuevaContraseña })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        mostrarAlerta("error", "Error", data.error);
+                    } else {
+                        mostrarAlerta("success", "Éxito", "La contraseña ha sido actualizada correctamente.");
+                        $('#modalCredenciales').modal('hide');
+                    }
+                })
+                .catch(() => {
+                    mostrarAlerta("error", "Error", "Hubo un problema al actualizar la contraseña.");
+                });
+            }
+        })
+        .catch(() => {
+            mostrarAlerta("error", "Error", "Hubo un problema al validar la contraseña actual.");
+        });
+    }
+</script>
 {% endblock %}
 
-<script>
 
-</script>
+

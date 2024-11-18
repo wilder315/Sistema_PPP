@@ -96,11 +96,14 @@ def descifrar_contraseña(encrypted_password):
     decrypted_password = unpadder.update(decrypted_padded_password) + unpadder.finalize()
     return decrypted_password.decode()
 
-def actualizar_contraseña(id_usuario, nueva_password_cifrada):
+def actualizar_contraseña(id_usuario, nueva_password):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
+        # Cifrar la nueva contraseña
+        nueva_password_cifrada = cifrar_contraseña(nueva_password)
+
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE usuario
@@ -284,12 +287,74 @@ def obtener_usuarios_docentes():
 def obtener_usuario_con_tipopersona_por_username(username):
     conexion = obtener_conexion()
     usuario = None
-    with conexion.cursor() as cursor:
-        cursor.execute(
-            "SELECT idUsuario, username, estado, password FROM usuario WHERE username =  %s", (username))
-        usuario = cursor.fetchone()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    u.idUsuario, 
+                    u.username, 
+                    u.estado, 
+                    u.password, 
+                    u.idTipoUsuario, 
+                    p.idPersona
+                FROM usuario u
+                JOIN persona p ON u.idUsuario = p.idUsuario
+                WHERE u.username = %s
+            """, (username,))
+            usuario = cursor.fetchone()
+    except Exception as e:
+        print(f"Error al obtener usuario: {str(e)}")
+    finally:
+        conexion.close()
     return usuario
+
+def obtener_informacion_completa_persona(idPersona):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.numDoc,
+                    COALESCE(p.codUniversitario, 'Sin Código') AS codUniversitario,
+                    COALESCE(p.cargo, 'No asignado') AS cargo,
+                    COALESCE(p.correoP, 'No registrado') AS correoPersonal,
+                    COALESCE(p.tel1, 'No registrado') AS tel1,
+                    COALESCE(p.tel2, 'No registrado') AS tel2,
+                    COALESCE(g.nombre, 'No especificado') AS genero,
+                    COALESCE(e.nombre, 'No asignada') AS escuela,
+                    COALESCE(i.razonSocial, 'No asignada') AS institucion,
+                    COALESCE(p.correoUSAT, 'No registrado') AS correoUSAT
+                FROM 
+                    persona p
+                LEFT JOIN genero g ON p.idGenero = g.idGenero
+                LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
+                LEFT JOIN institucion i ON i.idPersona = p.idPersona
+                WHERE 
+                    p.idPersona = %s;
+            """, (idPersona,))
+            row = cursor.fetchone()
+            if row:
+                informacion = {
+                    'numDoc': row[0],
+                    'codUniversitario': row[1],
+                    'cargo': row[2],
+                    'correoPersonal': row[3],
+                    'tel1': row[4],
+                    'tel2': row[5],
+                    'genero': row[6],
+                    'escuela': row[7],
+                    'institucion': row[8],
+                    'correoUSAT': row[9]
+                }
+                return informacion
+            return {"error": "No se encontró información para la persona indicada."}
+    except Exception as e:
+        print(f"Error al obtener la información de la persona: {str(e)}")
+        return {"error": str(e)}
+    finally:
+        conexion.close()
 
 def obtener_usuario_por_username(username):
     conexion = obtener_conexion()
@@ -314,7 +379,7 @@ def obtener_datos_usuario (id):
     usuario = None
     with conexion.cursor() as cursor:
         cursor.execute(
-            "SELECT p.nombre, p.apellidos, p.foto FROM persona p inner join usuario u on p.idusuario = u.idusuario WHERE u.idusuario = %s", (id,))
+            "SELECT p.nombre, p.apellidos, p.foto, p.idUsuario FROM persona p inner join usuario u on p.idusuario = u.idusuario WHERE u.idusuario = %s", (id,))
         usuario = cursor.fetchone()
     conexion.close()
     return usuario

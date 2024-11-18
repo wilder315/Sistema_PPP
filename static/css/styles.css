@@ -3,6 +3,135 @@
     src: url(/static/css/Arial_Greek_Regular.ttf);
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.main-content {
+    position: relative;
+    background-color: rgba(166, 39, 43, 0.4);
+    height: calc(100% - 100px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/static/img/usatentrada.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    z-index: -1;
+}
+
+.index-title {
+    font-size: 4rem;
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 3px 3px 0 rgb(57, 57, 57);
+}
+
+.module-button {
+    width: 220px;
+    height: 220px;
+    padding: 10px;
+    background-color: #E33439;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+}
+
+.module-button:hover {
+    background-color: #ffffff;
+    color: #E33439;
+    cursor: pointer;
+}
+
+.module-button img {
+    width: 35%;
+    height: 35%;
+    margin-top: 8%;
+}
+
+@media (max-width: 576px) {
+    .module-button {
+        width: 180px;
+        height: 180px;
+        font-size: 1rem;
+    }
+}
+
+.footer {
+    background-color: #cfcfcf;
+    text-align: center;
+    padding: 20px 0;
+    color: rgb(92, 92, 92);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.navbar-custom {
+    background-color: #E33439;
+}
+
+.navbar-custom .navbar-text {
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.navbar-custom .nav-link {
+    color: white;
+    font-weight: bold;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #e0e0e0;
+}
+.avatar {
+    width: 40px; /* Ajusta el tamaño de la imagen según sea necesario */
+    height: 40px; /* Ajusta el tamaño de la imagen según sea necesario */
+    border-radius: 50%; /* Hace la imagen circular */
+    border: 1px solid white; /* Aplica un borde blanco delgado */
+    object-fit: cover; /* Asegura que la imagen se ajuste al contenedor */
+    background-color: lightgray;
+    margin-top: -10px;
+    margin-bottom: -10px;
+}
+
 /* Color principal para botones y cuadros con mensajes */
 .bg-red-usat{
     background-color: #E33439;
@@ -267,19 +396,27 @@ filter: brightness(0.5);
 }
 
 .foto-perfil {
-    width: 50%;
-    width: 50%;
+    max-width: 50%;
+    height: 90%;
     border-radius: 50%;
     border: 2px solid #E33439;
     object-fit: cover;
+    background-color: lightgray;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    display: block;
+    position: relative;
 }
 
 .foto-perfil-hover {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 100%;
+    max-width: 45%;
+    max-height: 90%;
     background: rgba(0, 0, 0, 0.5);
     color: white;
     display: flex;
@@ -340,6 +477,28 @@ filter: brightness(0.5);
     transition: color 0.3s;
 }
 
+#btnEditarContactos {
+    color: #ffffff; /* Color blanco por defecto */
+    background: none;
+    border: none;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alineado a la derecha */
+    padding-right: 15px; /* Espacio a la derecha */
+    transition: color 0.3s;
+}
+
+
 #btnEditarCredenciales:hover {
     color: #000000; /* Cambia a negro al pasar el cursor */
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.text-center {
+    text-align: center;
 }

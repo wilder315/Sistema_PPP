@@ -37,38 +37,43 @@ def procesar_login():
             return jsonify({
                 'logeo': False,
                 'mensaje': 'El servicio se encuentra inactivo.'
-            }), 500
+            }), 500    
         username = request.json.get('username')
         password = request.json.get('password')
         usuario = controlador_usuario.obtener_usuario_con_tipopersona_por_username(username)
         if usuario is None:
             return jsonify({'mensaje': 'El usuario no existe', 'logeo': False})
         elif usuario[2] == "I":
-            return jsonify({'mensaje': 'El usuario está inactivo', 'logeo': False})
+            return jsonify({'mensaje': 'El usuario está inactivo', 'logeo': False})     
         try:
             password_almacenada = controlador_usuario.descifrar_contraseña(usuario[3])
         except Exception as e:
-            return jsonify({'mensaje': f'Error al descifrar la contraseña: {str(e)}', 'logeo': False})
+            return jsonify({'mensaje': f'Error al descifrar la contraseña: {str(e)}', 'logeo': False})  
         if password == password_almacenada:
             login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
             persona = controlador_usuario.obtener_datos_usuario(usuario[0])
             nombre = persona[0].split()[0]
             apellido = persona[1].split()[0]
             foto = persona[2]
-            session['user_id'] = usuario[0]
+            id_persona = usuario[5]
+            id_tipo_usuario = usuario[4]
+            idUsuario = usuario[0]
+            session['user_id'] = id_persona
             session.permanent = True
             return jsonify({
                 'logeo': True,
                 'nombre': nombre,
                 'apellido': apellido,
-                'foto': foto
+                'foto': foto,
+                'id_persona': id_persona,
+                'id_tipo_usuario': id_tipo_usuario,
+                'idUsuario' : idUsuario
             })
         else:
             if username not in login_attempts:
                 login_attempts[username] = {'attempts': 0, 'last_attempt_time': 0}
             login_attempts[username]['attempts'] += 1
             login_attempts[username]['last_attempt_time'] = time.time()
-
             return jsonify({'mensaje': 'La contraseña es incorrecta', 'logeo': False})
     except Exception as e:
         return jsonify({'mensaje': f'Error al procesar el login: {str(e)}', 'logeo': False})
