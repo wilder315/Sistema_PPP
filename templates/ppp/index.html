@@ -22,15 +22,9 @@
 <style>
     .small-box {
         display: flex;
-        flex-direction: column; 
-        justify-content: center; 
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        main-height: 100%;  
-        border-radius: 10px; 
-        position: relative; 
-        margin-bottom: 1px; /* Espacio inferior entre cajas */
         height: 120px;  /* Reducir la altura del card */
         border-radius: 10px;
         position: relative;
@@ -47,13 +41,6 @@
         height: 100%;
     }
 
-    .small-box .icon {
-        color: rgba(0, 0, 0, 0.15);
-        font-size: 70px;  
-        position: absolute;  
-        top: 10px;  
-        right: 15px;  
-        z-index: 0; 
     .small-box h1 {
         font-size: 3rem; /* Reducir tamaño del número */
         color: white;
@@ -66,28 +53,16 @@
         font-size: 1.3rem; /* Ajustar tamaño del texto */
     }
 
-    .small-box h1 {
-        color: white; 
-        font-weight: bold; 
-        font-size: 3rem;
-        display: block; 
     .small-box span {
         font-size: 3rem; /* Reducir tamaño del número */
         color: white;
         margin-bottom: 0;
     }
-    
-    .numero-con-icono {
-        display: flex;
-        justify-content: space-between; /* Alinea el número y el ícono en extremos opuestos */
-        align-items: center;
 
     /* Estilo del icono al lado derecho */
     .small-box i {
         font-size: 3rem; /* Reducir tamaño del icono */
         color: white;
-        font-weight: bold;
-        font-size: 3rem;
         margin-right: 0px; /* Espacio entre el icono y el texto */
     }
     
@@ -121,16 +96,11 @@
         <div class="row">
 
             <!-- PRIMERA COLUMNA -->
-            <div class="col-lg-3 col-md-6 mb-4">
             <div class="col-lg-3 col-md-6 mb-2">
                 <div class="small-box bg-info ">
                     <div class="inner">
-                        <h1 class="numero-con-icono">
                         <div class="numero-con-icono">
                             <span>{{ estadisticas['registrados'] }}</span>
-                            <i class="fas fa-user-graduate icono-pleateado"></i>
-                        </h1>
-                        <h4>Estudiantes Registrados</h4>
                             <h4>Estudiantes Registrados</h4>
                         </div>
                         <i class="fas fa-user-graduate icono-pleateado"></i>
@@ -139,19 +109,11 @@
             </div>
 
             <!-- SEGUNDA COLUMNA -->
-            <div class="col-lg-3 col-md-6 mb-4">
             <div class="col-lg-3 col-md-6 mb-2">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h1 class="numero-con-icono">
                         <div class="numero-con-icono">
                             <span>{{ estadisticas['proceso'] }}</span>
-                            <i class="fas fa-briefcase"></i> <!-- Ícono plateado -->
-                        </h1>
-                        <h4>Prácticas en Curso</h4>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
                             <h4>Prácticas en Curso</h4>
                         </div>
                         <i class="fas fa-briefcase"></i> <!-- Ícono plateado -->
@@ -160,19 +122,11 @@
             </div>
 
             <!-- TERCERA COLUMNA -->
-            <div class="col-lg-3 col-md-6 mb-4">
             <div class="col-lg-3 col-md-6 mb-2">
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h1 class="numero-con-icono">
                         <div class="numero-con-icono">
                             <span>{{ estadisticas['espera_informes'] }}</span>
-                            <i class="fas fa-file-alt"></i> <!-- Ícono plateado -->
-                        </h1>
-                        <h4>Espera de Informes</h4>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-person-add"></i>
                             <h4>Espera de Informes</h4>
                         </div>
                         <i class="fas fa-file-alt"></i> <!-- Ícono plateado -->
@@ -181,19 +135,11 @@
             </div>
 
             <!-- CUARTA COLUMNA -->
-            <div class="col-lg-3 col-md-6 mb-4">
             <div class="col-lg-3 col-md-6 mb-2">
                 <div class="small-box bg-primary shadow-sm roundeds">
                     <div class="inner">
-                        <h1 class="numero-con-icono">
                         <div class="numero-con-icono">
                             <span>{{ estadisticas['finalizada'] }}</span>
-                            <i class="fas fa-check-circle"></i>
-                        </h1>
-                        <h4>Prácticas Finalizas</h4>
-                    </div>
-                    <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
                             <h4>Prácticas Finalizas</h4>
                         </div>
                         <i class="fas fa-check-circle"></i>
@@ -203,7 +149,6 @@
 
         </div> 
 
-        <div class="row mt-3">
         <div class="row mt-0">
             <!-- Custom tabs (Charts with tabs)-->
             <div class="col-lg-6 mb-4">
@@ -211,7 +156,6 @@
                     <div class="card-header bg-red-usat text-white">
                         <h3 class="card-title" style="color: white !important;">
                             <i class="fas fa-chart-pie mr-1"></i>
-                            Gráfico Estudiantes por Semestre
                             Gráfico Estudiantes registrados por los últimos 4 Semestres
                         </h3>
                         <div class="card-tools">
@@ -239,7 +183,6 @@
                     <div class="card-header bg-red-usat text-white" >
                         <h3 class="card-title" style="color: white !important;">
                             <i class="far fa-chart-bar"></i>
-                            Gráfico de Prácticas Iniciadas y Finalizadas
                             Gráfico de Prácticas Profesionales Iniciadas vs Finalizadas
                         </h3>
                     </div>
@@ -346,7 +289,6 @@
         });
         
 
-    /**# Gráfico de Torta */
         /**# Gráfico de Torta */
         const totalConFecha = {{ ppp_finalizadas['total_con_fecha']}}; 
         const totalSinFecha = {{ ppp_finalizadas['total_sin_fecha']}}; 
