@@ -18,15 +18,15 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tabla-docente" class="table table-striped tabla-docentes" style="width:100%">
+                <table id="tabla-docente" class="table table-striped tabla-docentes text-start" style="width:100%">
                     <thead>
                         <tr>
-                            <th class="text-center">N° Doc</th>
-                            <th class="text-center">Apellidos</th>
-                            <th class="text-center">Nombres</th>                        
-                            <th class="text-center">Cargo</th>
-                            <th style="width: 20%" class="text-center">Escuela</th>
-                            <th class="text-center">Estado</th>
+                            <th class="text-start">N° Doc</th>
+                            <th class="text-start">Apellidos</th>
+                            <th class="text-start">Nombres</th>                        
+                            <th class="text-start">Cargo</th>
+                            <th style="width: 20%" class="text-start">Escuela</th>
+                            <th class="text-start">Estado</th>
                             <th class="text-center">Opciones</th>
                         </tr>
                     </thead>
@@ -54,7 +54,9 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">N° Documento:</label>
-                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required>
+                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="8" 
+                                pattern="\d{1,8}" title="Solo números, máximo 8 caracteres" required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="cargoMod" class="form-label">Cargo:</label>
@@ -65,32 +67,30 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="apellidosDocenteMod" class="form-label">Apellidos:</label>
-                            <input type="text" class="form-control" id="apellidosDocenteMod" name="apellidosDocenteMod" required>
+                            <input type="text" class="form-control" id="apellidosDocenteMod" name="apellidosDocenteMod" required
+                                pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras" 
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nombreDocenteMod" class="form-label">Nombres:</label>
-                            <input type="text" class="form-control" id="nombreDocenteMod" name="nombreDocenteMod" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="correoPMod" class="form-label">Correo Personal:</label>
-                            <input type="email" class="form-control" id="correoPMod" name="correoPMod" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="correoUSATMod" class="form-label">Correo USAT:</label>
-                            <input type="email" class="form-control" id="correoUSATMod" name="correoUSATMod" required>
+                            <input type="text" class="form-control" id="nombreDocenteMod" name="nombreDocenteMod" required
+                                pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras" 
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono 1:</label>
-                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" 
+                                pattern="\d{9}" title="Debe ingresar 9 números" required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tel2Mod" class="form-label">Teléfono 2 (opcional):</label>
-                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="9">
+                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="9" 
+                                pattern="\d{9}" title="Debe ingresar 9 números"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
                     </div>
 
@@ -145,26 +145,6 @@
                         <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
                     </div>            
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-center fw-bold" id="modal-title-confirmar"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <p><span id="texto-confirmar"></span><strong id="nombreDocenteConfirmar"></strong>?</p>
-                <input type="hidden" id="idDocenteConfirmar" name="idDocenteConfirmar">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="confirmarDocente">Aceptar</button>
             </div>
         </div>
     </div>
