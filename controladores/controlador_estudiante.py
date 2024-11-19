@@ -93,7 +93,7 @@ def agregar_estudiante(numDoc, nombre, apellidos, codUniversitario, tel1, tel2, 
     finally:
         conexion.close()
 
-def modificar_estudiante(idEstudiante, numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela):
+def modificar_estudiante(idEstudiante, numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idEscuela):
     if not tel2:
         tel2 = None
     conexion = obtener_conexion()
@@ -104,10 +104,9 @@ def modificar_estudiante(idEstudiante, numDoc, nombre, apellidos, codUniversitar
             cursor.execute("""
                 UPDATE persona
                 SET numDoc = %s, nombre = %s, apellidos = %s, codUniversitario = %s, tel1 = %s, tel2 = %s, 
-                    correoP = %s, correoUSAT = %s, estado = %s, idGenero = %s, idTipoDoc = %s, 
-                    idUsuario = %s, idEscuela = %s
+                    correoP = %s, correoUSAT = %s, estado = %s, idGenero = %s, idTipoDoc = %s, idEscuela = %s
                 WHERE idPersona = %s
-            """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idUsuario, idEscuela, idEstudiante))
+            """, (numDoc, nombre, apellidos, codUniversitario, tel1, tel2, correoP, correoUSAT, estado, idGenero, idTipoDoc, idEscuela, idEstudiante))
             conexion.commit()
             return {"mensaje": "Estudiante modificado correctamente"}
     except Exception as e:

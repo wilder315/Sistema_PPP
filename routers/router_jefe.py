@@ -53,7 +53,6 @@ def modificar_jefe():
     idGenero = data.get('idGenero')
     idTipoDoc = data.get('idTipoDoc')
     idPersona = data.get('idPersona')
-
     resultado = controlador_jefe.modificar_jefe(numDoc, nombre, apellidos, tel1, correoP, cargo, estado, idGenero, idTipoDoc, idPersona)
     return jsonify(resultado)
 
