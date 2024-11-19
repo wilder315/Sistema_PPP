@@ -57,7 +57,9 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="abreviaturaEscuelaMod" class="form-label">Abreviatura:</label>
-                            <input type="text" class="form-control" id="abreviaturaEscuelaMod" name="abreviaturaEscuelaMod" required>
+                            <input type="text" class="form-control" id="abreviaturaEscuelaMod" name="abreviaturaEscuelaMod" maxlength="4" required
+                                pattern="[A-Za-z]{1,4}" title="Solo letras, máximo 4 caracteres"
+                                oninput="this.value = this.value.replace(/[^A-Za-z]/g, '').slice(0, 4)">
                         </div>
                     </div>
                     

@@ -49,62 +49,93 @@
                     <input type="hidden" id="idInstitucionMod" name="idInstitucionMod">
 
                     <div class="row">
+                        <!-- Validación de RUC: Solo 11 dígitos numéricos -->
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">RUC:</label>
-                            <input type="text" class="form-control form-control-sm" id="numDocMod" required>
+                            <input type="text" class="form-control form-control-sm" id="numDocMod" name="numDocMod" required
+                                pattern="\d{11}" title="Debe contener 11 dígitos" maxlength="11"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)">
                         </div>
+
+                        <!-- Validación de Giro: Solo letras -->
                         <div class="col-md-6 mb-3">
                             <label for="giroMod" class="form-label">Giro:</label>
-                            <input type="text" class="form-control form-control-sm" id="giroMod" required>
+                            <input type="text" class="form-control form-control-sm" id="giroMod" name="giroMod" required
+                                pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras y espacios"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="razonSocialMod" class="form-label">Razón Social:</label>
-                        <input type="text" class="form-control form-control-sm" id="razonSocialMod" required>
+                        <input type="text" class="form-control form-control-sm" id="razonSocialMod" name="razonSocialMod" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="direccionMod" class="form-label">Dirección:</label>
-                        <input type="text" class="form-control form-control-sm" id="direccionMod" required>
+                        <input type="text" class="form-control form-control-sm" id="direccionMod" name="direccionMod" required>
                     </div>
 
-                    <div class="row">             
+                    <div class="row">
+                        <!-- Validación de Correo -->
                         <div class="col-md-6 mb-3">
                             <label for="correoMod" class="form-label">Correo:</label>
-                            <input type="email" class="form-control form-control-sm" id="correoMod" required>
+                            <input type="email" class="form-control form-control-sm" id="correoMod" name="correoMod" required>
                         </div>
+
+                        <!-- Validación de Teléfono: Solo números, máximo 9 -->
                         <div class="col-md-6 mb-3">
                             <label for="telMod" class="form-label">Teléfono:</label>
-                            <input type="text" class="form-control form-control-sm" id="telMod" required>
+                            <input type="text" class="form-control form-control-sm" id="telMod" name="telMod" required
+                                pattern="\d{9}" title="Debe contener 9 dígitos" maxlength="9"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
                     </div>
 
                     <div class="row">
+                        <!-- Validación de País -->
                         <div class="col-md-6 mb-3">
-                            <label for="paisMod" class="form-label">Pais:</label>
-                            <select id="paisMod" class="form-control form-control-sm" required></select>
+                            <label for="paisMod" class="form-label">País:</label>
+                            <select id="paisMod" class="form-control form-control-sm" name="paisMod" required>
+                                <!-- Opciones dinámicas -->
+                            </select>
                         </div>
+
+                        <!-- Validación de Departamento: Solo números -->
                         <div class="col-md-6 mb-3">
                             <label for="departamentoMod" class="form-label">Departamento:</label>
-                            <select id="departamentoMod" class="form-control form-control-sm" required></select>
+                            <select id="departamentoMod" class="form-control form-control-sm" name="departamentoMod" required
+                                pattern="\d+" title="Solo números">
+                                <!-- Opciones dinámicas -->
+                            </select>
                         </div>
                     </div>
 
                     <div class="row">
+                        <!-- Validación de Provincia: Solo números -->
                         <div class="col-md-6 mb-3">
                             <label for="provinciaMod" class="form-label">Provincia:</label>
-                            <select id="provinciaMod" class="form-control form-control-sm" required></select>
+                            <select id="provinciaMod" class="form-control form-control-sm" name="provinciaMod" required
+                                pattern="\d+" title="Solo números">
+                                <!-- Opciones dinámicas -->
+                            </select>
                         </div>
+
+                        <!-- Validación de Distrito: Solo números -->
                         <div class="col-md-6 mb-3">
                             <label for="distritoMod" class="form-label">Distrito:</label>
-                            <select id="distritoMod" class="form-control form-control-sm" required></select>
+                            <select id="distritoMod" class="form-control form-control-sm" name="distritoMod" required
+                                pattern="\d+" title="Solo números">
+                                <!-- Opciones dinámicas -->
+                            </select>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="jefeMod" class="form-label">Representante Legal:</label>
-                        <select id="jefeMod" class="form-control form-control-sm" required></select>
+                        <select id="jefeMod" class="form-control form-control-sm" name="jefeMod" required>
+                            <!-- Opciones dinámicas -->
+                        </select>
                     </div>
 
                     <div class="text-end">

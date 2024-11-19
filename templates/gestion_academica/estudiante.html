@@ -54,7 +54,9 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">N° Documento:</label>
-                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required>
+                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required
+                            pattern="\d{1,8}" title="Solo números, máximo 8 caracteres" required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="codUniversitarioMod" class="form-label">Código Universitario:</label>
@@ -65,11 +67,15 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="apellidosEstudianteMod" class="form-label">Apellidos:</label>
-                            <input type="text" class="form-control" id="apellidosEstudianteMod" name="apellidosEstudianteMod" required>
+                            <input type="text" class="form-control" id="apellidosEstudianteMod" name="apellidosEstudianteMod" required
+                            pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras" 
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nombreEstudianteMod" class="form-label">Nombres:</label>
-                            <input type="text" class="form-control" id="nombreEstudianteMod" name="nombreEstudianteMod" required>
+                            <input type="text" class="form-control" id="nombreEstudianteMod" name="nombreEstudianteMod" required
+                            pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras y espacios"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                     </div>
                     <div class="row">
@@ -86,11 +92,15 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono 1:</label>
-                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required
+                            pattern="\d{9}" title="Debe contener 9 dígitos" maxlength="9"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tel2Mod" class="form-label">Teléfono 2 (opcional):</label>
-                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="9">
+                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="9"
+                            pattern="\d{9}" title="Debe contener 9 dígitos" maxlength="9"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
                     </div>
 
@@ -231,13 +241,13 @@
             processing: true,
             serverSide: false,
             columns: [
-                { data: "numDoc", className: 'text-center' },
+                { data: "numDoc"},
                 { data: "apellidos"},
                 { data: "nombre" },           
-                { data: "codUniversitario", className: 'text-center' },
-                { data: "correoP",},
-                { data: "correoUSAT",},
-                { data: "tel1", className: 'text-center' },
+                { data: "codUniversitario"},
+                { data: "correoP"},
+                { data: "correoUSAT"},
+                { data: "tel1"},
                 {
                     data: null,
                     className: 'text-center',

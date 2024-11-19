@@ -19,7 +19,7 @@
                     <thead>
                         <tr>
                             <th class="text-center">ID</th>
-                            <th style="width: 22%" class="text-center">Username</th>
+                            <th style="width: 22%" class="text-center">Usuarios</th>
                             <th class="text-center">Estado</th>
                             <th class="text-center">Tipo</th>
                             <th class="text-center">Opciones</th>
@@ -159,10 +159,10 @@
                 dataSrc: ''
             },
             columns: [
-                { data: "idUsuario", className: 'text-center' },
+                { data: "idUsuario"},
                 { data: "username" },
-                { data: "estado", className: 'text-center', render: data => data === 'A' ? 'Activo' : 'Inactivo' },
-                { data: "tipo" , className: 'text-center', 
+                { data: "estado", render: data => data === 'A' ? 'Activo' : 'Inactivo' },
+                { data: "tipo", 
                     render: function(data) {
                         switch(data) {
                             case 'P':

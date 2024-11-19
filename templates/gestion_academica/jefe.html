@@ -39,7 +39,7 @@
 </div>
 
 <!-- MODAL JEFE -->
- <div class="modal fade" id="modalJefe" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalJefe" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -53,7 +53,9 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">N° Documento:</label>
-                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="12" required>
+                            <input type="text" class="form-control" id="numDocMod" name="numDocMod" maxlength="8" 
+                                pattern="\d{1,8}" title="Solo números, máximo 8 caracteres" required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                         </div> 
                         <div class="col-md-6 mb-3">
                             <label for="cargoMod" class="form-label">Cargo:</label>
@@ -64,13 +66,18 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="apellidosJefeMod" class="form-label">Apellidos:</label>
-                            <input type="text" class="form-control" id="apellidosJefeMod" name="apellidosJefeMod" required>
+                            <input type="text" class="form-control" id="apellidosJefeMod" name="apellidosJefeMod" required
+                                pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras y espacios"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="nombreJefeMod" class="form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="nombreJefeMod" name="nombreJefeMod" required>
+                            <input type="text" class="form-control" id="nombreJefeMod" name="nombreJefeMod" required
+                                pattern="[A-Za-zÀ-ÿ\u00f1\u00d1\s]+" title="Solo letras y espacios"
+                                oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\u00f1\u00d1\s]/g, '')">
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="correoPMod" class="form-label">Correo Personal:</label>
@@ -78,9 +85,10 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono:</label>
-                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" required>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" 
+                                pattern="\d{9}" title="Debe ingresar 9 números" required
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
                         </div>
-                        
                     </div>
 
                     <div class="row">
