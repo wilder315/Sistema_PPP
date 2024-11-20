@@ -337,18 +337,6 @@
                                         </div>
                                     </div>                      
                                 </div>
-                                 <!--
-                                <div class="row mb-3">                     
-                                    <div class="col-md-6">
-                                        <label for="fechainicialestudiante" class="form-label">Fecha Subido:</label>
-                                        <input type="date" class="form-control" id="fechainicialestudiante" name="fechainicialestudiante">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="fechainicialinstitucion" class="form-label">Fecha Subido:</label>
-                                        <input type="date" class="form-control" id="fechainicialinstitucion" name="fechainicialinstitucion">
-                                    </div>
-                                </div>
-                                -->
                             </div>
                             <div class="tab-pane fade" id="ifinales" role="tabpanel" aria-labelledby="ifinales-tab">
                                 <div class="row mb-3">                     
@@ -365,18 +353,6 @@
                                         </div>
                                     </div>                      
                                 </div>
-                                <!--
-                                <div class="row mb-3">                     
-                                    <div class="col-md-6">
-                                        <label for="fechafinalestudiante" class="form-label">Fecha Subido:</label>
-                                        <input type="date" class="form-control" id="fechafinalestudiante" name="fechafinalestudiante">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="fechafinalinstitucion" class="form-label">Fecha Subido:</label>
-                                        <input type="date" class="form-control" id="fechafinalinstitucion" name="fechafinalinstitucion">
-                                    </div>
-                                </div>
-                                -->
                             </div>
                             <div class="tab-pane fade" id="constancia" role="tabpanel" aria-labelledby="constancia-tab">
                                 <div class="row mb-3">                     
@@ -385,13 +361,7 @@
                                             <label for="constancia" class="form-check-label ms-2">Constancia de PPP:</label>
                                             <input type="checkbox" class="form-check-input" id="constancia" name="constancia">                      
                                         </div>
-                                    </div>
-                                    <!--
-                                    <div class="col-md-6">
-                                        <label for="fechaconstancia" class="form-label">Fecha Subido:</label>
-                                        <input type="date" class="form-control" id="fechaconstancia" name="fechaconstancia">
-                                    </div> 
-                                    -->                
+                                    </div>          
                                 </div>
                             </div>
                             <div class="text-end">
@@ -407,6 +377,45 @@
 </div>
 
 <script>
+    // Evento para cuando cargas la página
+    document.addEventListener('DOMContentLoaded', function() {
+        limpiarControles();
+    });
+    
+    // Evento para Cancelar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        window.location.reload();
+    });
+    
+    // Función para deshabilitar los tabs
+    function disableTabs() {
+        const tabs = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.add('disabled');
+            tab.setAttribute('aria-disabled', 'true');
+            tab.setAttribute('tabindex', '-1');
+        });
+        tabContents.forEach(content => {
+            content.classList.add('disabled');
+        });
+    }
+
+    // Función para habilitar los tabs
+    function enableTabs() {
+        const tabs = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.remove('disabled');
+            tab.removeAttribute('aria-disabled');
+            tab.removeAttribute('tabindex');
+        });
+        tabContents.forEach(content => {
+            content.classList.remove('disabled');
+        });
+    }
+    
+    // Función para limpiar controles
     function limpiarControles() {
         document.getElementById('fechaInicio').value = '';
         document.getElementById('horario').value = '';
@@ -427,43 +436,10 @@
         modalidadRadios.forEach(radio => {
             radio.checked = false;
         });
+        disableTabs();
     }
 
-    document.getElementById('btnCancelar').addEventListener('click', function() {
-        window.location.reload();
-    });
-    
-    function disableTabs() {
-        const tabs = document.querySelectorAll('.nav-link');
-        const tabContents = document.querySelectorAll('.tab-pane');
-        
-        tabs.forEach(tab => {
-            tab.classList.add('disabled');
-            tab.setAttribute('aria-disabled', 'true');
-            tab.setAttribute('tabindex', '-1'); // Evitar que las pestañas sean focusables
-        });
-
-        tabContents.forEach(content => {
-            content.classList.add('disabled');
-        });
-    }
-
-    function enableTabs() {
-        const tabs = document.querySelectorAll('.nav-link');
-        const tabContents = document.querySelectorAll('.tab-pane');
-        
-        tabs.forEach(tab => {
-            tab.classList.remove('disabled');
-            tab.removeAttribute('aria-disabled');
-            tab.removeAttribute('tabindex');
-        });
-
-        tabContents.forEach(content => {
-            content.classList.remove('disabled');
-        });
-    }
-    disableTabs();
-
+    // Función para obtener el último ID
     function obtenerUltimoID() {
         const inputID = document.getElementById('id');
         if (inputID.value === '') {
@@ -478,6 +454,7 @@
         enableTabs();
     }
 
+    // Evento para cargar los últimos semestres actuales dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_ultimos_semestres')
             .then(response => response.json())
@@ -493,6 +470,7 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para cargar los últimos semestres finales dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_ultimos_semestres')
             .then(response => response.json())
@@ -500,7 +478,7 @@
                 const select = document.getElementById('semestrefinal');
                 data.forEach(semestre => {
                     const option = document.createElement('option');
-                    option.value = semestre.id;
+                    option.value = semestre.idSemestre;
                     option.textContent = semestre.nombre;   
                     select.appendChild(option);
                 });
@@ -508,6 +486,7 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para cargar los tipos de práctica dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_tipo_practicas')
             .then(response => response.json())
@@ -523,6 +502,7 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para cargar las líneas de desarrollo dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_lineas_desarrollo')
             .then(response => response.json())
@@ -538,6 +518,7 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para cargar las instituciones dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_instituciones')
             .then(response => response.json())
@@ -553,6 +534,7 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento al seleccionar una institución
     document.getElementById('razonsocial').addEventListener('change', function() {
         const numDocInstitucion = this.value;
         if (numDocInstitucion) {
@@ -560,14 +542,12 @@
         }
     });
 
+    // Función para cargar datos de la institución
     function obtenerDatosInstitucion(numDocInstitucion) {
         const jefeInput = document.getElementById('jefe');
         const giroInput = document.getElementById('giroinstitucion');
-
-        // Limpiar los campos antes de cargar los datos
         jefeInput.value = '';
         giroInput.value = '';
-
         fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
             .then(response => {
                 if (!response.ok) {
@@ -591,7 +571,7 @@
             });
     }
 
-
+    // Evento para cargar los estados dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_estados')
             .then(response => response.json())
@@ -607,31 +587,27 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Función para mostrar y recuperar estudiantes en el dropdown-search
     const inputEstudiante = document.getElementById('estudiante');
     const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
     let idPersona = 0;
-
     inputEstudiante.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
         fetch('/datos_estudiantes')
             .then(response => response.json())
             .then(data => {
                 dropdownEstudiantes.innerHTML = '';
-
-                // Filtrar los resultados
                 const resultados = data.filter(estudiante => 
                     `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
                 );
-
                 if (resultados.length > 0) {
                     resultados.forEach(estudiante => {
                         const li = document.createElement('li');
                         li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
-                        li.dataset.id = estudiante.idPersona; // Usar dataset para almacenar el ID
+                        li.dataset.id = estudiante.idPersona;
                         li.addEventListener('click', () => {
                             inputEstudiante.value = li.textContent;
-                            idPersona = li.dataset.id; // Recuperar el ID correctamente
-                            console.log(`ID Persona seleccionado: ${idPersona}`); // Verificar el ID recuperado
+                            idPersona = li.dataset.id;
                             $('#idPersonaMod').val(response.idPersona);
                             dropdownEstudiantes.classList.remove('show');
                             handleEstudianteChange();
@@ -647,14 +623,15 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para el click en estudiantes
     document.addEventListener('click', function(event) {
         if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
             dropdownEstudiantes.classList.remove('show');
         }
     });
 
+    // Función para calcular horas pendientes
     function calcularHorasPendientes(){
-        document.getElementById('horaspractica').value = 0;
         const requeridas = parseFloat(document.getElementById('horasrequeridas').value) || 0;
         const practica = parseFloat(document.getElementById('horaspractica').value) || 0;
         const pendientes = requeridas - practica;
@@ -666,6 +643,7 @@
     document.getElementById('horaspractica').addEventListener('input', calcularHorasPendientes);
     document.getElementById('estudiante').addEventListener('input', calcularHorasPendientes)
   
+    // Función para Guardar prácticas
     document.getElementById('btnGuardar').addEventListener('click', function() {
         const fechaInicio = document.getElementById('fechaInicio').value;
         const horario = document.getElementById('horario').value;
@@ -679,7 +657,6 @@
         const numDocInstitucion = document.getElementById('razonsocial').value;
         const idTipoPractica = document.getElementById('tipo_practica').value;
         const idPersona = document.getElementById('idPersonaMod').value;
-        
         if (!fechaInicio || !modalidad || !horario || !area || !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas || !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona) {
             alert("Todos los campos son requeridos.");
             return;
@@ -713,7 +690,6 @@
                 console.log("Práctica agregada correctamente:", data.mensaje);
                 alert("Práctica agregada correctamente");
                 limpiarControles();
-                disableTabs();
             }
         })
         .catch(error => {
@@ -723,7 +699,6 @@
     });
 
     function cargarDatosPractica(data) {
-        // Asignar datos de la práctica a los controles
         document.getElementById('fechaInicio').value = data.fechaInicio ? formatFechaParaInput(data.fechaInicio) : '';
         document.getElementById('fechaFin').value = data.fechaFin ? formatFechaParaInput(data.fechaFin) : '';
         document.getElementById('horario').value = data.horario || '';
@@ -735,35 +710,37 @@
         document.getElementById('semestrea').value = data.idSemestre || '';
         document.getElementById('lineadesarrollo').value = data.idLinea || '';
         document.getElementById('razonsocial').value = data.numDocInstitucion || '';
+        document.getElementById('estadopractica').value = data.idEstado || '';
+        document.getElementById('estadovigencia').value = data.estadoVigencia || '';
         document.getElementById('tipo_practica').value = data.idTipoPractica || '';
         document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
-        idPersona = data.idPersona; // Almacenar el ID de la persona
-
-        // Obtener giro y jefe de la institución seleccionada
+        idPersona = data.idPersona;
         if (data.numDocInstitucion) {
             obtenerDatosInstitucion(data.numDocInstitucion);
         }
     }
-
+    
+    function cargarDatosInforme(data) {
+        document.getElementById('inicialestudiante').checked = data.informe1 || false;
+        document.getElementById('inicialinstitucion').checked = data.informe2 || false;
+        document.getElementById('finalestudiante').checked = data.informe3 || false;
+        document.getElementById('finalinstitucion').checked = data.informe4 || false;
+    }
 
 
     document.getElementById('btnBuscarID').addEventListener('click', function (event) {
-        event.preventDefault(); // Evitar recargar la página
-        const idPractica = document.getElementById('id').value;
-        
+        event.preventDefault();
+        const idPractica = document.getElementById('id').value;    
         if (!idPractica) {
             alert("Por favor, ingrese un ID válido para buscar.");
             return;
         }
-
-        // Llamada a la ruta con el parámetro idPractica en la URL
         fetch(`/obtener_practica_por_id/${idPractica}`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     mostrarAlerta("error", "Error", data.error);
                     limpiarControles();
-                    disableTabs();
                 } else {
                     cargarDatosPractica(data);
                     enableTabs();
@@ -784,41 +761,47 @@
         return `${year}-${month}-${day}`;
     }
 
-    // Función para manejar la búsqueda de práctica por estudiante
     document.getElementById('btnBuscarE').addEventListener('click', function (event) {
-        event.preventDefault(); // Evitar recargar la página
-        const idEstudiante = idPersona; // Usaremos el idPersona obtenido al seleccionar el estudiante
-
-        if (!idEstudiante) {
-            alert("Por favor, seleccione un estudiante válido para buscar.");
-            return;
-        }
-
-        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    mostrarAlerta("error", "Error", data.error);
-                    limpiarControles();
-                    disableTabs();
-                } else if (data.mensaje) {
-                    mostrarAlerta("info", "Información", data.mensaje);
-                    limpiarControles();
-                    disableTabs();
-                } else {
-                    // Asignar el ID de la práctica al input id="id"
-                    document.getElementById('id').value = data.idPractica || '';
-                    document.getElementById('id').disabled = true;
-                    // Cargar los datos de la práctica
-                    cargarDatosPractica(data);
-                    enableTabs();
-                }
-            })
-            .catch(error => {
-                console.error("Error al buscar la práctica del estudiante:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
-            });
+    event.preventDefault();
+    const idEstudiante = idPersona;
+    if (!idEstudiante) {
+        alert("Por favor, seleccione un estudiante válido para buscar.");
+        return;
+    }
+    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarAlerta("error", "Error", data.error);
+                limpiarControles();
+            } else if (data.mensaje) {
+                mostrarAlerta("info", "Información", data.mensaje);
+                limpiarControles();
+            } else {
+                document.getElementById('id').value = data.idPractica || '';
+                document.getElementById('id').disabled = true;
+                cargarDatosPractica(data);
+                enableTabs();
+                fetch(`/informes_practica/${data.idPractica}`)
+                    .then(response => response.json())
+                    .then(informeData => {
+                        if (informeData.error) {
+                            console.error("Error al cargar los informes:", informeData.error);
+                        } else {
+                            cargarDatosInforme(informeData);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar los informes de la práctica:", error);
+                    });
+            }
+        })
+        .catch(error => {
+            console.error("Error al buscar la práctica del estudiante:", error);
+            mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+        });
     });
+
 
 
 </script>

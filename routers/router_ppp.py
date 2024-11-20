@@ -27,6 +27,11 @@ def obtener_practica_por_estudiante(id_estudiante):
     practica = controlador_practicas.obtener_practica_por_estudiante(id_estudiante)
     return jsonify(practica)
 
+@router_practicas.route("/informes_practica/<int:idPractica>", methods=["GET"])
+def informes_practica(idPractica):
+    informes = controlador_practicas.informes_practica(idPractica)
+    return jsonify(informes)
+
 @router_practicas.route("/agregar_practica", methods=["POST"])
 def agregar_practica():
     data = request.json

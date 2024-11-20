@@ -53,7 +53,7 @@ def obtener_practica_por_id(id_practica):
                     p.fechaInicio, p.fechaFin, p.horario, p.modalidad, p.area,
                     p.numeroHorasPPP, p.numeroHorasPendientes, p.numeroHorasRealizadas,
                     p.idSemestre, p.idLinea, p.numDocInstitucion, p.idTipoPractica,
-                    e.apellidos, e.nombre, p.idPersona
+                    e.apellidos, e.nombre, p.idPersona, p.idPractica, p.idEstado, p.estadoVigencia, p.semestreFinal
                 FROM practicas_preprofesionales p
                 JOIN persona e ON p.idPersona = e.idPersona
                 WHERE p.idPractica = %s
@@ -75,7 +75,11 @@ def obtener_practica_por_id(id_practica):
                     "idTipoPractica": practica[11],
                     "apellidosEstudiante": practica[12],
                     "nombreEstudiante": practica[13],
-                    "idPersona": practica[14]
+                    "idPersona": practica[14],
+                    "idPractica": practica[15],
+                    "idEstado": practica[16],
+                    "estadoVigencia": practica[17],
+                    "semestreFinal": practica[18]
                 }
     except Exception as e:
         print(f"Error al obtener práctica: {str(e)}")
@@ -134,6 +138,63 @@ def obtener_practica_por_estudiante(id_estudiante):
     finally:
         conexion.close()
 
+def informes_practica(idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(""" 
+                SELECT 
+                    p.idPractica,
+                    EXISTS (
+                        SELECT 1 
+                        FROM informes_practicas_preprofesionales dipp
+                        JOIN informe i ON dipp.IidInforme = i.idInforme
+                        WHERE dipp.idPractica = p.idPractica 
+                        AND i.idTipoInforme = 1 
+                        AND i.estado = 'A'
+                    ) AS informe1,
+                    EXISTS (
+                        SELECT 1 
+                        FROM informes_practicas_preprofesionales dipp
+                        JOIN informe i ON dipp.IidInforme = i.idInforme
+                        WHERE dipp.idPractica = p.idPractica 
+                        AND i.idTipoInforme = 2 
+                        AND i.estado = 'A'
+                    ) AS informe2,
+                    EXISTS (
+                        SELECT 1 
+                        FROM informes_practicas_preprofesionales dipp
+                        JOIN informe i ON dipp.IidInforme = i.idInforme
+                        WHERE dipp.idPractica = p.idPractica 
+                        AND i.idTipoInforme = 3 
+                        AND i.estado = 'A'
+                    ) AS informe3,
+                    EXISTS (
+                        SELECT 1 
+                        FROM informes_practicas_preprofesionales dipp
+                        JOIN informe i ON dipp.IidInforme = i.idInforme
+                        WHERE dipp.idPractica = p.idPractica 
+                        AND i.idTipoInforme = 4 
+                        AND i.estado = 'A'
+                    ) AS informe4
+                FROM 
+                    practicas_preprofesionales p
+                WHERE 
+                    p.idPractica = %s
+            """, (idPractica,))
+            row = cursor.fetchone()
+            if row:
+                columnas = [desc[0] for desc in cursor.description]
+                informes_dict = dict(zip(columnas, row))
+                return informes_dict
+            else:
+                return {"error": "Práctica no encontrada"}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
 
 def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona):
     # Validaciones
