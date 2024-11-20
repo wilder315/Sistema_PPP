@@ -16,9 +16,29 @@
             Prácticas Pre Profesionales
         </div>
         <div class="card-body scrollable">
+            <form action="" method="POST">
                 <!-- Encabezado -->
                 <fieldset>   
-                    <div class="row">      
+                    <div class="row">
+                        <div class="col-3">
+                            <label for="id" class="form-label">ID:</label>
+                            <div class="d-flex align-items-end">
+                                <input type="text" class="form-control me-2" id="id" name="id" required>
+                                <button id="btnBuscarID" type="submit" class="btn btn-secondary me-2">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                                <button id="btnNuevo" type="submit" class="btn btn-primary d-flex align-items-center" onclick="obtenerUltimoID()">
+                                    <i class="fas fa-plus me-1"></i> Nuevo
+                                </button>
+                            </div>
+                        </div>                                         
+                        <div class="col"></div>  
+                        <div class="col-2">
+                            <label for="semestrea" class="form-label">Semestre Académico:</label>
+                            <select class="form-select" id="semestrea" name="semestrea" required>
+                                <option value="" disabled selected>Seleccionar semestre</option>
+                            </select>
+                        </div>
                         <div class="col-5">
                             <label for="estudiante" class="form-label">Estudiante:</label>
                             <div class="d-flex align-items-end">
@@ -31,19 +51,8 @@
                                 <button id="btnBuscarE" type="submit" class="btn btn-secondary">
                                     <i class="bi bi-search"></i>
                                 </button>
-                                <button id="btnNuevo" type="submit" class="btn btn-primary d-flex align-items-center" style="margin-left: 5px;" onclick="obtenerUltimoID()">
-                                    <i class="fas fa-plus me-1"></i> Nuevo
-                                </button>
                             </div>
-                        </div>   
-                        <div class="col-2">
-                            <label for="semestrea" class="form-label">Semestre Académico:</label>
-                            <select class="form-select" id="semestrea" name="semestrea" required>
-                                <option value="" disabled selected>Seleccionar semestre</option>
-                            </select>
-                        </div>                                   
-                        <div class="col"></div>  
-                        <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                        </div> 
                         <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
                     </div>   
                 </fieldset>
@@ -284,6 +293,7 @@
                         </div>
                     </div>
                 </div>       
+            </form>
         </div>
     </div>
 </div>
@@ -752,25 +762,14 @@
         const fechaFinInput = document.getElementById('fechaFin');
         const tabPPP = document.querySelector('#ppp-tab');
         const bootstrapTab = new bootstrap.Tab(tabPPP);
-        const inicialEstudianteCheck = document.getElementById('inicialestudiante');
-        const inicialInstitucionCheck = document.getElementById('inicialinstitucion');
-        const finalEstudianteCheck = document.getElementById('finalestudiante');
-        const finalInstitucionCheck = document.getElementById('finalinstitucion');
-        const allChecksSelected =
-            inicialEstudianteCheck.checked &&
-            inicialInstitucionCheck.checked &&
-            finalEstudianteCheck.checked &&
-            finalInstitucionCheck.checked;
-        if (fechaFinInput.value && allChecksSelected) {
-            mostrarAlerta("success", "Listo", "Aún estoy programando lo demás.");
-        } else {
+        if (fechaFinInput.value) {
+            mostrarAlerta("success", "Listo", "Aún estoy programando lo demás xd.");
+        } else {  
             bootstrapTab.show();
             fechaFinInput.focus();
-            if (!allChecksSelected) {
-                mostrarAlerta("warning", "Faltan Informes", "No puedes finalizar una práctica sin todos los informes aprobados.");
-            }
         }
     });
+
 
     // Evento cuando fecha final cambia
     document.getElementById('fechaFin').addEventListener('change', function () {
