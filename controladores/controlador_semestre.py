@@ -139,6 +139,27 @@ def dar_de_baja_semestre(idSemestre):
     finally:
         conexion.close()
         
+def obtener_semestre_por_fecha(fecha_fin):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT idSemestre
+                FROM semestre_academico
+                WHERE %s BETWEEN fechaInicio AND fechaFin
+            """, (fecha_fin,))
+            resultado = cursor.fetchone()
+            if resultado:
+                return {"idSemestre": resultado[0]}
+            else:
+                return {"mensaje": "No se encontró un semestre para la fecha proporcionada."}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
 ######################################## código del dashboard 02 #########################
 
 def obtener_datos_dashboard2(idEscuela, idSemestre):

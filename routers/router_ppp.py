@@ -35,6 +35,7 @@ def informes_practica(idPractica):
 @router_practicas.route("/agregar_practica", methods=["POST"])
 def agregar_practica():
     data = request.json
+    idPractica = data.get('idPractica')
     fechaInicio = data.get('fechaInicio')
     horario = data.get('horario')
     modalidad = data.get('modalidad')
@@ -48,7 +49,7 @@ def agregar_practica():
     idTipoPractica = data.get('idTipoPractica')
     idPersona = data.get('idPersona')
     
-    resultado = controlador_practicas.agregar_practica(fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona)
+    resultado = controlador_practicas.agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona)
     return jsonify(resultado)
 
 @router_practicas.route("/modificar_practica", methods=["POST"])

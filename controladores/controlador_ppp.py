@@ -197,22 +197,16 @@ def informes_practica(idPractica):
         conexion.close()
 
 def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona):
-    # Validaciones
     if not fechaInicio or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
         return {"error": "Todos los campos son requeridos."}
-
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-
     try:
         with conexion.cursor() as cursor:
-            # Verificar si el idPractica ya existe
             cursor.execute("SELECT idPractica FROM practicas_preprofesionales WHERE idPractica = %s", (idPractica,))
             practica_existente = cursor.fetchone()
-
             if practica_existente:
-                # Actualizar los campos permitidos
                 cursor.execute("""
                     UPDATE practicas_preprofesionales
                     SET horario = %s, modalidad = %s, area = %s,
@@ -224,7 +218,6 @@ def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHo
                 conexion.commit()
                 return {"mensaje": "Práctica actualizada correctamente"}
             else:
-                # Insertar nueva práctica
                 cursor.execute("""
                     INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, horario, modalidad, area,
                                                             numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
