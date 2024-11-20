@@ -331,6 +331,7 @@ def obtener_ultimo_id():
     return practicas
 
 ############################# REPORTES ESTUDIANTES PRÁCTICAS #############################
+############################# REPORTES ESTUDIANTES PRACTICAS#############################
 def reporte_practicas_estudiantes(idSemestre, idEscuela, idEstado, numDoc): 
     conexion = obtener_conexion()
     if not conexion:
