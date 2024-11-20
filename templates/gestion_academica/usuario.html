@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="text-end">
-                        <button type="button" class="btn btn-primary" id="btnVerContraseña">Ver Contraseña</button>
+                        <button type="button" class="btn btn-info" id="btnVerContraseña">Ver Contraseña</button>
                         <button type="button" class="btn btn-danger" id="btnCancelar" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
                         <button type="button" class="btn btn-danger" id="btnCerrar" data-bs-dismiss="modal">Cerrar</button>
@@ -350,7 +350,7 @@
                         $('#estadoUsuarioMod').val(response.estado);
                         cargarTipoUsuarios(response.idTipoUsuario);
                         habilitarControles();
-                        $('#btnVerContraseña').show();
+                        $('#btnVerContraseña').hide();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
                         $('#btnCerrar').hide();

@@ -23,6 +23,11 @@ def obtener_semestre_por_id(idSemestre):
     semestres = controlador_semestre.obtener_semestre_por_id(idSemestre)
     return jsonify(semestres)
 
+@router_semestre.route("/obtener_semestre_por_fecha/<string:fechaFin>", methods=["GET"])
+def obtener_semestre_por_fecha(fechaFin):
+    semestre = controlador_semestre.obtener_semestre_por_fecha(fechaFin)
+    return jsonify(semestre)
+
 @router_semestre.route("/agregar_semestre", methods=["POST"])
 def agregar_semestre():
     nombre = request.json.get('nombre')

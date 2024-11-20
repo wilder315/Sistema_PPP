@@ -9,91 +9,7 @@
     </ol>
 </nav>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-    body {
-        overflow: hidden;
-    }
-    .scrollable {
-      height: 42%;
-      overflow-y: auto;
-    }
-    fieldset {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-    }
-    .form-label {
-        margin-bottom: 5px;
-        
-    }
-    .nav-tabs .nav-link {
-        color: black;
-        background-color: #f1f1f1;
-        border: 1px solid #dee2e6;
-        border-radius: 5px 5px 0 0;
-    }
 
-    .nav-tabs .nav-link.active {
-        color: black;
-        background-color: white;
-        border-bottom-color: transparent;
-    }
-    .tab-pane {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 15px;
-    }
-    .custom-combo {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    }
-
-    .custom-combo input {
-        width: 100%;
-        border-radius: 0.25rem;
-        padding-right: 1.5rem;
-    }
-
-    #dropdown-estudiantes {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        border-top: none;
-        background-color: white;
-        display: none; /* Solo se muestra cuando hay opciones */
-        z-index: 1000;
-    }
-
-    #dropdown-estudiantes.show {
-        display: block;
-    }
-
-    #dropdown-estudiantes li {
-        padding: 8px 12px;
-        cursor: pointer;
-    }
-
-    #dropdown-estudiantes li:hover {
-        background-color: #f0f0f0;
-    }
-
-    .disabled {
-        pointer-events: none; /* Desactiva la interacción */
-        opacity: 0.6; /* Cambia la opacidad para el efecto visual */
-    }
-
-    .disabled .form-control,
-    .disabled .form-select,
-    .disabled .form-check-input {
-        background-color: #e9ecef; /* Color de fondo para inputs deshabilitados */
-        color: #6c757d; /* Color de texto para inputs deshabilitados */
-    }
-</style>
 <div class="container-fluid my-4">
     <div class="card w-100" style="height: 100%;">
         <div class="card-header bg-red-usat text-white">
@@ -143,232 +59,238 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <!-- Tab Datos de la Práctica -->
-                        <legend>Datos de la Práctica Pre Profesional</legend>
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="ppp-tab" data-bs-toggle="tab" href="#ppp" role="tab" aria-controls="ppp" aria-selected="true">Datos de la PPP</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="institucion-tab" data-bs-toggle="tab" href="#institucion" role="tab" aria-controls="institucion" aria-selected="false">Datos de la Institución</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="estado-tab" data-bs-toggle="tab" href="#estado" role="tab" aria-controls="estado" aria-selected="false">Estado</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="supervision-tab" data-bs-toggle="tab" href="#supervision" role="tab" aria-controls="supervision" aria-selected="false">Supervisión</a>
-                            </li>
-                        </ul>
+                        <div class="practicas-tabs">
+                            <!-- Tab Datos de la Práctica -->
+                            <legend>Datos de la Práctica Pre Profesional</legend>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="ppp-tab" data-bs-toggle="tab" href="#ppp" role="tab" aria-controls="ppp" aria-selected="true">Datos de la PPP</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="institucion-tab" data-bs-toggle="tab" href="#institucion" role="tab" aria-controls="institucion" aria-selected="false">Datos de la Institución</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="estado-tab" data-bs-toggle="tab" href="#estado" role="tab" aria-controls="estado" aria-selected="false">Estado</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="supervision-tab" data-bs-toggle="tab" href="#supervision" role="tab" aria-controls="supervision" aria-selected="false">Supervisión</a>
+                                </li>
+                            </ul>
 
-                        <!-- Contenido de cada Tab -->
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="ppp" role="tabpanel" aria-labelledby="ppp-tab">
-                                <div class="row mb-3">
-                                    <div class="col-md-5">
-                                        <label for="fechaInicio" class="form-label">Fecha Inicial:</label>
-                                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label for="fechaFin" class="form-label">Fecha Final:</label>
-                                        <input type="date" class="form-control" id="fechaFin" name="fechaFin">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Modalidad:</label>
-                                        <div class="col-md-6 d-flex align-items-center">
-                                            <div class="form-check me-3">
-                                                <input type="radio" class="form-check-input" id="modalidadP" name="modalidad" value="P" required checked>
-                                                <label class="form-check-label" for="modalidadP">P</label>
+                            <!-- Contenido de cada Tab -->
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="ppp" role="tabpanel" aria-labelledby="ppp-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-5">
+                                            <label for="fechaInicio" class="form-label">Fecha Inicial:</label>
+                                            <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label for="fechaFin" class="form-label">Fecha Final:</label>
+                                            <input type="date" class="form-control" id="fechaFin" name="fechaFin">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Modalidad:</label>
+                                            <div class="col-md-6 d-flex align-items-center">
+                                                <div class="form-check me-3">
+                                                    <input type="radio" class="form-check-input" id="modalidadP" name="modalidad" value="P" required checked>
+                                                    <label class="form-check-label" for="modalidadP">P</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="modalidadV" name="modalidad" value="V" required>
+                                                    <label class="form-check-label" for="modalidadV">V</label>
+                                                </div>                                           
                                             </div>
+                                        </div>
+                                    </div>                         
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="horario" class="form-label">Horario:</label>
+                                            <input type="text" class="form-control" id="horario" name="horario">
+                                        </div>
+                                    </div>                           
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="horasrequeridas" class="form-label">Horas Requeridas:</label>
+                                            <input type="number" class="form-control" id="horasrequeridas" name="horasrequeridas" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="horaspendientes" class="form-label">Horas Pendientes:</label>
+                                            <input type="number" class="form-control" id="horaspendientes" name="horaspendientes">
+                                        </div>
+                                    </div>                           
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="horaspractica" class="form-label">Horas de Práctica:</label>
+                                            <input type="number" class="form-control" id="horaspractica" name="horaspractica" value="0">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="requiere" class="form-label">Requiere nuevas PPP</label>
                                             <div class="form-check">
-                                                <input type="radio" class="form-check-input" id="modalidadV" name="modalidad" value="V" required>
-                                                <label class="form-check-label" for="modalidadV">V</label>
-                                            </div>                                           
+                                                <input type="checkbox" class="form-check-input" id="requiere" name="requiere" disabled>
+                                                <label for="requiere" class="form-check-label ms-2"></label>
+                                            </div>
+                                        </div>                                    
+                                    </div>                           
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="tipo_practica" class="form-label">Tipo:</label>
+                                            <select class="form-select" id="tipo_practica" name="tipo_practica" required>
+                                                <option value="" disabled selected>Seleccionar tipo de práctica</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="area" class="form-label">Área:</label>
+                                            <input type="text" class="form-control" id="area" name="area" required>
                                         </div>
                                     </div>
-                                </div>                         
-                                <div class="row mb-3">
-                                    <div class="col">
-                                        <label for="horario" class="form-label">Horario:</label>
-                                        <input type="text" class="form-control" id="horario" name="horario">
-                                    </div>
-                                </div>                           
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="horasrequeridas" class="form-label">Horas Requeridas:</label>
-                                        <input type="number" class="form-control" id="horasrequeridas" name="horasrequeridas" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="horaspendientes" class="form-label">Horas Pendientes:</label>
-                                        <input type="number" class="form-control" id="horaspendientes" name="horaspendientes">
-                                    </div>
-                                </div>                           
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="horaspractica" class="form-label">Horas de Práctica:</label>
-                                        <input type="number" class="form-control" id="horaspractica" name="horaspractica" value="0">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="requiere" class="form-label">Requiere nuevas PPP</label>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="requiere" name="requiere" disabled>
-                                            <label for="requiere" class="form-check-label ms-2"></label>
+                                </div>
+                                <div class="tab-pane fade" id="institucion" role="tabpanel" aria-labelledby="institucion-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="razonsocial" class="form-label">Razón Social:</label>
+                                            <select class="form-select" id="razonsocial" name="razonsocial" required>
+                                                <option value="" disabled selected>Seleccionar razón social</option>
+                                            </select>
                                         </div>
-                                    </div>                                    
-                                </div>                           
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="tipo_practica" class="form-label">Tipo:</label>
-                                        <select class="form-select" id="tipo_practica" name="tipo_practica" required>
-                                            <option value="" disabled selected>Seleccionar tipo de práctica</option>
-                                        </select>
+                                        <div class="col-md-6">
+                                            <label for="giroinstitucion" class="form-label">Giro:</label>
+                                            <input type="text" class="form-control" id="giroinstitucion" name="giroinstitucion" required>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="area" class="form-label">Área:</label>
-                                        <input type="text" class="form-control" id="area" name="area" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="institucion" role="tabpanel" aria-labelledby="institucion-tab">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="razonsocial" class="form-label">Razón Social:</label>
-                                        <select class="form-select" id="razonsocial" name="razonsocial" required>
-                                            <option value="" disabled selected>Seleccionar razón social</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="giroinstitucion" class="form-label">Giro:</label>
-                                        <input type="text" class="form-control" id="giroinstitucion" name="giroinstitucion" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="lineadesarrollo" class="form-label">Línea de Desarrollo:</label>
-                                        <select class="form-select" id="lineadesarrollo" name="lineadesarrollo" required>
-                                            <option value="" disabled selected>Seleccionar línea de desarrollo</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="jefe" class="form-label">Jefe Inmediato:</label>
-                                        <input type="text" class="form-control" id="jefe" name="jefe" required disabled>
-                                    </div>
-                                </div>  
-                            </div>
-                            <div class="tab-pane fade" id="estado" role="tabpanel" aria-labelledby="estado-tab">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="estadopractica" class="form-label">Estado de la Práctica:</label>
-                                        <select class="form-select" id="estadopractica" name="estadopractica">
-                                            <option value="" disabled selected>Seleccionar estado</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="estadovigencia" class="form-label">Estado de Vigencia:</label>
-                                        <select class="form-select" id="estadovigencia" name="estadovigencia">
-                                            <option value="" disabled selected>Seleccionar estado</option>
-                                            <option value="P">En Proceso</option>
-                                            <option value="F">Finalizada</option>
-                                            <option value="C">Cancelada</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="semestrefinal" class="form-label">Semestre Finalización:</label>
-                                        <select class="form-select" id="semestrefinal" name="semestrefinal">
-                                            <option value="" disabled selected>Seleccionar semestre</option>
-                                        </select>
-                                    </div>
-                                </div> 
-                            </div>
-                            <div class="tab-pane fade" id="supervision" role="tabpanel" aria-labelledby="supervision-tab">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="fechasupervision" class="form-label">Fecha:</label>
-                                        <input type="date" class="form-control" id="fechasupervision" name="fechasupervision">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="estadosupervision" class="form-label">Estado:</label>
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" id="estadosupervision" name="estadosupervision">
-                                            <label for="estadosupervision" class="form-check-label ms-2"></label>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="lineadesarrollo" class="form-label">Línea de Desarrollo:</label>
+                                            <select class="form-select" id="lineadesarrollo" name="lineadesarrollo" required>
+                                                <option value="" disabled selected>Seleccionar línea de desarrollo</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="jefe" class="form-label">Jefe Inmediato:</label>
+                                            <input type="text" class="form-control" id="jefe" name="jefe" required disabled>
                                         </div>
                                     </div>  
                                 </div>
-                                <div class="mb-3">
-                                    <label for="funciones" class="form-label">Funciones:</label>
-                                    <textarea class="form-control" id="funciones" name="funciones" rows="3"></textarea>
+                                <div class="tab-pane fade" id="estado" role="tabpanel" aria-labelledby="estado-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="estadopractica" class="form-label">Estado de la Práctica:</label>
+                                            <select class="form-select" id="estadopractica" name="estadopractica">
+                                                <option value="" disabled selected>Seleccionar estado</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="estadovigencia" class="form-label">Estado de Vigencia:</label>
+                                            <select class="form-select" id="estadovigencia" name="estadovigencia">
+                                                <option value="" disabled selected>Seleccionar estado</option>
+                                                <option value="P">En Proceso</option>
+                                                <option value="F">Finalizada</option>
+                                                <option value="C">Cancelada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="semestrefinal" class="form-label">Semestre Finalización:</label>
+                                            <select class="form-select" id="semestrefinal" name="semestrefinal">
+                                                <option value="" disabled selected>Seleccionar semestre</option>
+                                            </select>
+                                        </div>
+                                    </div> 
                                 </div>
-                                <div class="mb-3">
-                                    <label for="observacion" class="form-label">Observación:</label>
-                                    <textarea class="form-control" id="observacion" name="observacion" rows="3"></textarea>
-                                </div>  
+                                <div class="tab-pane fade" id="supervision" role="tabpanel" aria-labelledby="supervision-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="fechasupervision" class="form-label">Fecha:</label>
+                                            <input type="date" class="form-control" id="fechasupervision" name="fechasupervision">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="estadosupervision" class="form-label">Estado:</label>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="estadosupervision" name="estadosupervision">
+                                                <label for="estadosupervision" class="form-check-label ms-2"></label>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="funciones" class="form-label">Funciones:</label>
+                                        <textarea class="form-control" id="funciones" name="funciones" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="observacion" class="form-label">Observación:</label>
+                                        <textarea class="form-control" id="observacion" name="observacion" rows="3"></textarea>
+                                    </div>  
+                                </div>
                             </div>
                         </div>
+                        
                     </div>
                     <div class="col-md-6">
-                        <!-- Tab Cumplimiento de los Informes -->
-                        <legend>Cumplimiento de los Informes</legend>
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="iiniciales-tab" data-bs-toggle="tab" href="#iiniciales" role="tab" aria-controls="iiniciales" aria-selected="true">Informes Iniciales</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="ifinales-tab" data-bs-toggle="tab" href="#ifinales" role="tab" aria-controls="ifinales" aria-selected="false">Informes Finales</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="constancia-tab" data-bs-toggle="tab" href="#constancia" role="tab" aria-controls="constancia" aria-selected="false">Ficha de Evaluación - Constancia de PPP</a>
-                            </li>
-                        </ul>
-                        <!-- Contenido de cada Tab -->
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="iiniciales" role="tabpanel" aria-labelledby="iiniciales-tab">
-                                <div class="row mb-3">                     
-                                    <div class="col-md-6">     
-                                        <div class="form-check">
-                                            <label for="inicialestudiante" class="form-label">Informe Inicial (Estudiante):</label>
-                                            <input type="checkbox" class="form-check-input" id="inicialestudiante" name="inicialestudiante">
+                        <div class="practicas-tabs">
+                            <!-- Tab Cumplimiento de los Informes -->
+                            <legend>Cumplimiento de los Informes</legend>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="iiniciales-tab" data-bs-toggle="tab" href="#iiniciales" role="tab" aria-controls="iiniciales" aria-selected="true">Informes Iniciales</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="ifinales-tab" data-bs-toggle="tab" href="#ifinales" role="tab" aria-controls="ifinales" aria-selected="false">Informes Finales</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="constancia-tab" data-bs-toggle="tab" href="#constancia" role="tab" aria-controls="constancia" aria-selected="false">Ficha de Evaluación - Constancia de PPP</a>
+                                </li>
+                            </ul>
+                            <!-- Contenido de cada Tab -->
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="iiniciales" role="tabpanel" aria-labelledby="iiniciales-tab">
+                                    <div class="row mb-3">                     
+                                        <div class="col-md-6">     
+                                            <div class="form-check">
+                                                <label for="inicialestudiante" class="form-label">Informe Inicial (Estudiante):</label>
+                                                <input type="checkbox" class="form-check-input" id="inicialestudiante" name="inicialestudiante"readonly >
+                                            </div>
                                         </div>
+                                        <div class="col-md-6">                                        
+                                            <div class="form-check">
+                                                <label for="inicialinstitucion" class="form-label">Informe Inicial (Institución):</label>
+                                                <input type="checkbox" class="form-check-input" id="inicialinstitucion" name="inicialinstitucion"readonly >
+                                            </div>
+                                        </div>                      
                                     </div>
-                                    <div class="col-md-6">                                        
-                                        <div class="form-check">
-                                            <label for="inicialinstitucion" class="form-label">Informe Inicial (Institución):</label>
-                                            <input type="checkbox" class="form-check-input" id="inicialinstitucion" name="inicialinstitucion">
-                                        </div>
-                                    </div>                      
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="ifinales" role="tabpanel" aria-labelledby="ifinales-tab">
-                                <div class="row mb-3">                     
-                                    <div class="col-md-6">                                       
-                                        <div class="form-check">
-                                            <label for="finalestudiante" class="form-label">Informe Final (Estudiante):</label>
-                                            <input type="checkbox" class="form-check-input" id="finalestudiante" name="finalestudiante">
+                                <div class="tab-pane fade" id="ifinales" role="tabpanel" aria-labelledby="ifinales-tab">
+                                    <div class="row mb-3">                     
+                                        <div class="col-md-6">                                       
+                                            <div class="form-check">
+                                                <label for="finalestudiante" class="form-label">Informe Final (Estudiante):</label>
+                                                <input type="checkbox" class="form-check-input" id="finalestudiante" name="finalestudiante" readonly>
+                                            </div>
                                         </div>
+                                        <div class="col-md-6">                                    
+                                            <div class="form-check">
+                                                <label for="finalinstitucion" class="form-label">Informe Final (Institución):</label>
+                                                <input type="checkbox" class="form-check-input" id="finalinstitucion" name="finalinstitucion" readonly>
+                                            </div>
+                                        </div>                      
                                     </div>
-                                    <div class="col-md-6">                                    
-                                        <div class="form-check">
-                                            <label for="finalinstitucion" class="form-label">Informe Final (Institución):</label>
-                                            <input type="checkbox" class="form-check-input" id="finalinstitucion" name="finalinstitucion">
-                                        </div>
-                                    </div>                      
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="constancia" role="tabpanel" aria-labelledby="constancia-tab">
-                                <div class="row mb-3">                     
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <label for="constancia" class="form-check-label ms-2">Constancia de PPP:</label>
-                                            <input type="checkbox" class="form-check-input" id="constancia" name="constancia">                      
-                                        </div>
-                                    </div>          
+                                <div class="tab-pane fade" id="constancia" role="tabpanel" aria-labelledby="constancia-tab">
+                                    <div class="row mb-3">                     
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <label for="constancia" class="form-check-label ms-2">Constancia de PPP:</label>
+                                                <input type="checkbox" class="form-check-input" id="constancia" name="constancia">                      
+                                            </div>
+                                        </div>          
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="text-end">
-                                <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
-                                <button id="btnGuardar" type="submit" class="btn btn-primary" style="margin-top: 15px;">Guardar</button>
-                            </div>
-                        </div> 
+                                <div class="text-end">
+                                    <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
+                                    <button id="btnGuardar" type="submit" class="btn btn-primary" style="margin-top: 15px;">Guardar</button>
+                                    <button id="btnFinalizar" type="submit" class="btn btn-success" style="margin-top: 15px;">Finalizar Práctica</button>
+                                </div>
+                            </div> 
+                        </div>
                     </div>
                 </div>       
             </form>
@@ -377,6 +299,19 @@
 </div>
 
 <script>
+    document.getElementById('inicialestudiante').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
+    document.getElementById('inicialinstitucion').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
+    document.getElementById('finalestudiante').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
+    document.getElementById('finalinstitucion').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
+
     // Evento para cuando cargas la página
     document.addEventListener('DOMContentLoaded', function() {
         limpiarControles();
@@ -386,11 +321,31 @@
     document.getElementById('btnCancelar').addEventListener('click', function() {
         window.location.reload();
     });
-    
+
+    // Función para formatear la fecha
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+        
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                html: mensaje,
+                showConfirmButton: true,
+                timer: 5000
+            });
+        }
+
     // Función para deshabilitar los tabs
     function disableTabs() {
-        const tabs = document.querySelectorAll('.nav-link');
-        const tabContents = document.querySelectorAll('.tab-pane');
+        const tabs = document.querySelectorAll('.practicas-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.practicas-tabs .tab-pane');
         tabs.forEach(tab => {
             tab.classList.add('disabled');
             tab.setAttribute('aria-disabled', 'true');
@@ -399,12 +354,13 @@
         tabContents.forEach(content => {
             content.classList.add('disabled');
         });
+        $('#btnFinalizar').hide();
     }
 
     // Función para habilitar los tabs
     function enableTabs() {
-        const tabs = document.querySelectorAll('.nav-link');
-        const tabContents = document.querySelectorAll('.tab-pane');
+        const tabs = document.querySelectorAll('.practicas-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.practicas-tabs .tab-pane');
         tabs.forEach(tab => {
             tab.classList.remove('disabled');
             tab.removeAttribute('aria-disabled');
@@ -413,6 +369,7 @@
         tabContents.forEach(content => {
             content.classList.remove('disabled');
         });
+        $('#btnFinalizar').show();
     }
     
     // Función para limpiar controles
@@ -643,8 +600,9 @@
     document.getElementById('horaspractica').addEventListener('input', calcularHorasPendientes);
     document.getElementById('estudiante').addEventListener('input', calcularHorasPendientes)
   
-    // Función para Guardar prácticas
+    // Función para Guardar o Actualizar prácticas
     document.getElementById('btnGuardar').addEventListener('click', function() {
+        event.preventDefault();
         const fechaInicio = document.getElementById('fechaInicio').value;
         const horario = document.getElementById('horario').value;
         const modalidad = document.querySelector('input[name="modalidad"]:checked').value;
@@ -657,8 +615,9 @@
         const numDocInstitucion = document.getElementById('razonsocial').value;
         const idTipoPractica = document.getElementById('tipo_practica').value;
         const idPersona = document.getElementById('idPersonaMod').value;
-        if (!fechaInicio || !modalidad || !horario || !area || !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas || !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona) {
-            alert("Todos los campos son requeridos.");
+        const idPractica = document.getElementById('id').value;  
+        if (!idPractica || !fechaInicio || !modalidad || !horario || !area || !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas || !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona) {
+            mostrarAlerta("warning", "Advertencia", "Todos los campos son requeridos.");
             return;
         }
         fetch('/agregar_practica', {
@@ -667,6 +626,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                idPractica,
                 fechaInicio,
                 horario,
                 modalidad,
@@ -684,20 +644,19 @@
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                console.error("Error al agregar la práctica:", data.error);
-                alert("Error al agregar la práctica: " + data.error);
+                mostrarAlerta("error", "Éxito", data.error);
             } else {
-                console.log("Práctica agregada correctamente:", data.mensaje);
-                alert("Práctica agregada correctamente");
+                mostrarAlerta("success", "Éxito", data.mensaje);
                 limpiarControles();
             }
         })
         .catch(error => {
             console.error("Error en la solicitud:", error);
-            alert("Hubo un error al realizar la solicitud.");
+            mostrarAlerta("error", "Error en la solicitud", "Hubo un error al realizar la solicitud.");
         });
     });
 
+    // Función para cargar datos de la práctica
     function cargarDatosPractica(data) {
         document.getElementById('fechaInicio').value = data.fechaInicio ? formatFechaParaInput(data.fechaInicio) : '';
         document.getElementById('fechaFin').value = data.fechaFin ? formatFechaParaInput(data.fechaFin) : '';
@@ -714,12 +673,14 @@
         document.getElementById('estadovigencia').value = data.estadoVigencia || '';
         document.getElementById('tipo_practica').value = data.idTipoPractica || '';
         document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
-        idPersona = data.idPersona;
+        document.getElementById('idPersonaMod').value = data.idPersona || '';
+        calcularHorasPendientes();
         if (data.numDocInstitucion) {
             obtenerDatosInstitucion(data.numDocInstitucion);
         }
     }
     
+    // Función para cargar cumplimiento de los informes
     function cargarDatosInforme(data) {
         document.getElementById('inicialestudiante').checked = data.informe1 || false;
         document.getElementById('inicialinstitucion').checked = data.informe2 || false;
@@ -727,12 +688,12 @@
         document.getElementById('finalinstitucion').checked = data.informe4 || false;
     }
 
-
+    // Función para buscar por ID
     document.getElementById('btnBuscarID').addEventListener('click', function (event) {
         event.preventDefault();
         const idPractica = document.getElementById('id').value;    
         if (!idPractica) {
-            alert("Por favor, ingrese un ID válido para buscar.");
+            mostrarAlerta("warning", "Advertencia", "Por favor, ingrese un ID válido para buscar.");
             return;
         }
         fetch(`/obtener_practica_por_id/${idPractica}`)
@@ -753,19 +714,12 @@
             });
     });
 
-    function formatFechaParaInput(fecha) {
-        const date = new Date(fecha);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate() + 1).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
+    // Función para buscar por Estudiante
     document.getElementById('btnBuscarE').addEventListener('click', function (event) {
     event.preventDefault();
     const idEstudiante = idPersona;
     if (!idEstudiante) {
-        alert("Por favor, seleccione un estudiante válido para buscar.");
+        mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
         return;
     }
     fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
@@ -802,6 +756,52 @@
         });
     });
 
+    // Función para Finalizar Práctica
+    document.getElementById('btnFinalizar').addEventListener('click', function (event) {
+        event.preventDefault();
+        const fechaFinInput = document.getElementById('fechaFin');
+        const tabPPP = document.querySelector('#ppp-tab');
+        const bootstrapTab = new bootstrap.Tab(tabPPP);
+        if (fechaFinInput.value) {
+            mostrarAlerta("success", "Listo", "Aún estoy programando lo demás xd.");
+        } else {  
+            bootstrapTab.show();
+            fechaFinInput.focus();
+        }
+    });
+
+
+    // Evento cuando fecha final cambia
+    document.getElementById('fechaFin').addEventListener('change', function () {
+        const fechaFin = this.value;
+        const tabEstado = document.querySelector('#estado-tab');
+        const bootstrapTab = new bootstrap.Tab(tabEstado);
+        if (!fechaFin) {
+            console.error("No se seleccionó una fecha válida.");
+            return;
+        }
+        fetch(`/obtener_semestre_por_fecha/${fechaFin}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error al obtener el semestre por fecha.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                const selectSemestre = document.getElementById('semestrefinal');
+                if (!data || !data.idSemestre) {
+                    console.warn("No se encontró un semestre para la fecha seleccionada.");
+                    selectSemestre.selectedIndex = 0;
+                    return;
+                }
+                selectSemestre.value = data.idSemestre;
+                bootstrapTab.show();
+                selectSemestre.focus();
+            })
+            .catch(error => {
+                console.error("Error en la solicitud para obtener el semestre:", error);
+            });
+    });
 
 
 </script>

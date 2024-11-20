@@ -114,4 +114,4 @@ def descifrar_contraseña():
         password_descifrada = controlador_usuario.descifrar_contraseña(password_cifrada)
         return jsonify({'password': password_descifrada})
     except Exception as e:
-        return jsonify({'error': f'Error al descifrar la contraseña: {str(e)}'})
+        return jsonify({'error': f'Error al descifrar la contraseña: Este es un usuario de prueba.'})
