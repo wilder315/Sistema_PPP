@@ -19,6 +19,7 @@ def obtener_instituciones():
                 INNER JOIN provincia pro on pro.idProvincia = dis.idProvincia
                 INNER JOIN departamento dep on dep.idDepartamento = pro.idDepartamento
                 INNER JOIN pais pa on pa.idPais = dep.idPais
+                ORDER BY i.razonSocial ASC
             """
             )
             column_names = [desc[0] for desc in cursor.description]
