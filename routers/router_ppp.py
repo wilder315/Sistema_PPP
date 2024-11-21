@@ -32,11 +32,15 @@ def verificar_practica_activa_route(id_estudiante):
     practica = controlador_practicas.verificar_practica_activa(id_estudiante)
     return jsonify({"practica_activa": practica})
 
-
 @router_practicas.route("/informes_practica/<int:idPractica>", methods=["GET"])
 def informes_practica(idPractica):
     informes = controlador_practicas.informes_practica(idPractica)
     return jsonify(informes)
+
+@router_practicas.route("/supervisiones_practica/<int:idPractica>", methods=["GET"])
+def supervisiones_practica(idPractica):
+    supervisiones = controlador_practicas.obtener_supervisiones(idPractica)
+    return jsonify(supervisiones)
 
 @router_practicas.route("/agregar_practica", methods=["POST"])
 def agregar_practica():
@@ -54,8 +58,12 @@ def agregar_practica():
     numDocInstitucion = data.get('numDocInstitucion')
     idTipoPractica = data.get('idTipoPractica')
     idPersona = data.get('idPersona')
-    
-    resultado = controlador_practicas.agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona)
+    supervisiones = data.get('supervisiones', [])
+    resultado = controlador_practicas.agregar_practica(
+        idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, 
+        numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, 
+        numDocInstitucion, idTipoPractica, idPersona, supervisiones
+    )
     return jsonify(resultado)
 
 @router_practicas.route("/modificar_practica", methods=["POST"])
@@ -73,7 +81,6 @@ def modificar_practica():
     numDocInstitucion = data.get('numDocInstitucion')
     idEstado = data.get('idEstado')
     idTipoPractica = data.get('idTipoPractica')
-    
     resultado = controlador_practicas.modificar_practica(idPractica, fechaInicio, fechaFin, modalidad, area, numeroHorasPPP, numDocEstudiante, idSemestre, idLinea, numDocInstitucion, idEstado, idTipoPractica)
     return jsonify(resultado)
 
@@ -88,6 +95,11 @@ def cambiar_estado_practica():
     idPractica = request.json.get('idPractica')
     nuevo_estado = request.json.get('nuevo_estado')
     resultado = controlador_practicas.cambiar_estado_practica(idPractica, nuevo_estado)
+    return jsonify(resultado)
+
+@router_practicas.route("/finalizar_practica/<int:idPractica>", methods=["POST"])
+def finalizar_practica_route(idPractica):
+    resultado = controlador_practicas.finalizar_practica(idPractica)
     return jsonify(resultado)
 
 @router_practicas.route("/practicas_activas", methods=["GET"])
