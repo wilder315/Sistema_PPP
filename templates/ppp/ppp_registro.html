@@ -926,6 +926,7 @@
     document.getElementById('btnFinalizar').addEventListener('click', function (event) {
         event.preventDefault();
         const fechaFinInput = document.getElementById('fechaFin');
+        const semestreSelect = document.getElementById('semestrefinal');
         const tabPPP = document.querySelector('#ppp-tab');
         const bootstrapTab = new bootstrap.Tab(tabPPP);
         const inicialEstudianteCheck = document.getElementById('inicialestudiante');
@@ -938,31 +939,42 @@
             inicialInstitucionCheck.checked &&
             finalEstudianteCheck.checked &&
             finalInstitucionCheck.checked;
-            if (fechaFinInput.value && allChecksSelected) {
-                fetch(`/finalizar_practica/${idPractica}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+        if (fechaFinInput.value && semestreSelect.value && allChecksSelected) {
+            fetch(`/finalizar_practica/${idPractica}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fechaFin: fechaFinInput.value,
+                    semestreFinal: semestreSelect.value
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        mostrarAlerta("error", "Error", data.error);
-                        console.error("Error al finalizar la práctica:", data.error);
-                    } else {
-                        mostrarAlerta("success", "Éxito", data.mensaje);
-                        limpiarControles();
-                        disableTabs();
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al finalizar la práctica:", error);
-                    mostrarAlerta("error", "Error", "Hubo un error al finalizar la práctica.");
-                });
-            } else {
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                    console.error("Error al finalizar la práctica:", data.error);
+                } else {
+                    mostrarAlerta("success", "Éxito", data.mensaje);
+                    limpiarControles();
+                    disableTabs();
+                }
+            })
+            .catch(error => {
+                console.error("Error al finalizar la práctica:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al finalizar la práctica.");
+            });
+        } else {
             bootstrapTab.show();
             fechaFinInput.focus();
+
+            if (!fechaFinInput.value) {
+                mostrarAlerta("warning", "Falta Fecha", "Por favor, ingrese la fecha de finalización.");
+            }
+            if (!semestreSelect.value) {
+                mostrarAlerta("warning", "Falta Semestre", "Por favor, seleccione el semestre final.");
+            }
             if (!allChecksSelected) {
                 mostrarAlerta("warning", "Faltan Informes", "No puedes finalizar una práctica sin todos los informes aprobados.");
             }

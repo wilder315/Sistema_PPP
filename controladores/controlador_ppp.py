@@ -389,7 +389,7 @@ def cambiar_estado_practica(idPractica, nuevo_estado):
     finally:
         conexion.close()
 
-def finalizar_practica(idPractica):
+def finalizar_practica(idPractica, fechaFin, semestreFinal):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -397,9 +397,9 @@ def finalizar_practica(idPractica):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE practicas_preprofesionales
-                SET idEstado = %s, estadoVigencia = %s
+                SET idEstado = %s, estadoVigencia = %s, fechaFin = %s, semestreFinal = %s
                 WHERE idPractica = %s
-            """, (4, 'F', idPractica))
+            """, (4, 'F', fechaFin, semestreFinal, idPractica))
             conexion.commit()
             return {"mensaje": f"La práctica ha sido finalizada correctamente."}
     except Exception as e:

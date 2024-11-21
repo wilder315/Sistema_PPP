@@ -99,7 +99,12 @@ def cambiar_estado_practica():
 
 @router_practicas.route("/finalizar_practica/<int:idPractica>", methods=["POST"])
 def finalizar_practica_route(idPractica):
-    resultado = controlador_practicas.finalizar_practica(idPractica)
+    data = request.json
+    fechaFin = data.get('fechaFin')
+    semestreFinal = data.get('semestreFinal')
+    if not fechaFin or not semestreFinal:
+        return jsonify({"error": "Fecha de finalización y semestre final son obligatorios."})
+    resultado = controlador_practicas.finalizar_practica(idPractica, fechaFin, semestreFinal)
     return jsonify(resultado)
 
 @router_practicas.route("/practicas_activas", methods=["GET"])
