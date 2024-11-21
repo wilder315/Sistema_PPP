@@ -80,15 +80,23 @@ def modificar_genero(idGenero, nombre, estado):
 
 def eliminar_genero(idGenero):
     if not idGenero:
-        return {"error": "El ID del genero es requerido."}
+        return {"error": "El ID del género es requerido."}    
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."}   
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM persona
+                WHERE idGenero = %s
+            """, (idGenero,))
+            referencia_persona = cursor.fetchone()[0]     
+            if referencia_persona > 0:
+                return {"error": "No se puede eliminar un género en uso."}
             cursor.execute("DELETE FROM genero WHERE idGenero = %s", (idGenero,))
             conexion.commit()
-            return {"mensaje": "Genero eliminado correctamente"}
+            return {"mensaje": "Género eliminado correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

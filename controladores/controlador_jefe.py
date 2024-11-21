@@ -6,28 +6,35 @@ def obtener_jefes():
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-
     jefes = []
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT p.numDoc, p.apellidos, p.nombre, p.correoP, p.tel1, p.cargo, p.idPersona
-                FROM persona p LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                SELECT 
+                    p.numDoc, 
+                    p.apellidos, 
+                    p.nombre, 
+                    p.correoP, 
+                    p.tel1, 
+                    p.cargo, 
+                    p.idPersona,
+                    i.razonSocial AS institucion
+                FROM persona p 
+                LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                LEFT JOIN institucion i ON p.idPersona = i.idPersona
                 WHERE u.idTipoUsuario = 4
-                ORDER BY p.apellidos ASC, p.nombre ASC 
+                ORDER BY p.apellidos ASC, p.nombre ASC
             """)
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
             for row in rows:
                 jefe_dict = dict(zip(column_names, row))
                 jefes.append(jefe_dict)
-            
     except Exception as e:
         return {"error": str(e)}
     finally:
         conexion.close()
-
-    return jefes 
+    return jefes
 
 def obtener_jefe_por_id(idJefe): 
     conexion = obtener_conexion()
@@ -108,12 +115,20 @@ def modificar_jefe(numDoc, nombre, apellidos, telf1, correoP,cargo, estado, idGe
         
 def eliminar_jefe(idJefe):  
     if not idJefe: 
-        return {"error": "El id del jefe es requerido"}
+        return {"error": "El ID del jefe es requerido."}    
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM institucion
+                WHERE idPersona = %s
+            """, (idJefe,))
+            pertenece_a_institucion = cursor.fetchone()[0]
+            if pertenece_a_institucion > 0:
+                return {"error": "No se puede eliminar un jefe que está vinculado a una institución."}
             cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idJefe,))
             idUsuario = cursor.fetchone()
             if not idUsuario:
@@ -121,7 +136,7 @@ def eliminar_jefe(idJefe):
             cursor.execute("DELETE FROM persona WHERE idPersona = %s", (idJefe,))
             cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario[0],))           
             conexion.commit()
-            return {"mensaje": "Jefe y usuario eliminados correctamente"}
+            return {"mensaje": "Jefe y usuario eliminados correctamente."}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

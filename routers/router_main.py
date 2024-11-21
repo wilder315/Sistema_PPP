@@ -143,10 +143,7 @@ def escuela():
 def estudiante():
     return render_template('/gestion_academica/estudiante.html')
 
-@router_main.route('/jefe')
-@no_cache_and_login_required
-def jefe(): 
-    return render_template('/gestion_academica/jefe.html')
+
 
 @router_main.route("/facultad")
 @no_cache_and_login_required
@@ -157,11 +154,6 @@ def facultad():
 @no_cache_and_login_required
 def genero():
     return render_template('gestion_academica/genero.html') 
-
-@router_main.route("/institucion")
-@no_cache_and_login_required
-def institucion():
-    return render_template('gestion_academica/institucion.html') 
 
 @router_main.route("/semestre")
 @no_cache_and_login_required
@@ -184,6 +176,21 @@ def linea_desarrollo():
 @no_cache_and_login_required
 def ppp_registro():
     return render_template('ppp_registro.html')
+
+@router_main.route('/listapracticas')
+@no_cache_and_login_required
+def listapracticas():
+    return render_template('ppp/practicas.html')
+
+@router_main.route("/institucion")
+@no_cache_and_login_required
+def institucion():
+    return render_template('ppp/institucion.html') 
+
+@router_main.route('/jefe')
+@no_cache_and_login_required
+def jefe(): 
+    return render_template('ppp/jefe.html')
 
 @router_main.route("/InformeInicialEstudiante")
 @no_cache_and_login_required

@@ -107,14 +107,23 @@ def modificar_semestre(idSemestre, nombre, fechaInicio, fechaFin, estado):
 
 def eliminar_semestre(idSemestre):
     if not idSemestre:
-        return {"error": "El ID del semestre es requerido."}
+        return {"error": "El ID del semestre es requerido."}  
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE idSemestre = %s
+            """, (idSemestre,))
+            referencia_practica = cursor.fetchone()[0]
+            
+            if referencia_practica > 0:
+                return {"error": "No se puede eliminar un semestre en uso."}
             cursor.execute("DELETE FROM semestre_academico WHERE idSemestre = %s", (idSemestre,))
-            conexion.commit()
+            conexion.commit()       
             return {"mensaje": "Semestre eliminado correctamente"}
     except Exception as e:
         conexion.rollback()

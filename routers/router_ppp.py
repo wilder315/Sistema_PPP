@@ -7,6 +7,10 @@ router_practicas = Blueprint('router_practicas', __name__)
 def practicas():
     return render_template('ppp/ppp_registro.html')
 
+@router_practicas.route("/listapracticas")
+def listapracticas():
+    return render_template('ppp/practicas.html')
+
 @router_practicas.route("/datos_practicas", methods=["GET"])
 def datos_practicas():
     practicas = controlador_practicas.obtener_practicas()

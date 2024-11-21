@@ -133,23 +133,38 @@
                         style="max-width: 160px; display: flex;">
                 </a>
 
-                <ul class="sidebar-nav">
-                    <li class="sidebar-header" id="tituloInicio">Inicio</li>                   
+                <ul class="sidebar-nav">                
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.perfil') }}">
                             <i class="fas fa-address-card fa-lg"></i>
                             <span class="align-middle">Perfil</span>
                         </a>
                     </li>
-        
                     <li class="sidebar-header" id="tituloPracticas" style="display: none;">Módulo de Prácticas Pre Profesionales</li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.institucion') }}">
+                            <i class="far fa-building fa-lg"></i>
+                            <span class="align-middle">Instituciones</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.jefe') }}">
+                            <i class="fas fa-briefcase fa-lg"></i>
+                            <span class="align-middle">Jefes</span>
+                        </a>
+                    </li>
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}" id="practicas" style="display: none;">
                             <i class="fas fa-graduation-cap fa-lg"></i>
                             <span class="align-middle">Prácticas Pre Profesionales</span>
                         </a>
                     </li>
-
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('router_main.listapracticas') }}" id="listapracticas" style="display: none;">
+                            <i class="fas fa-graduation-cap fa-lg"></i>
+                            <span class="align-middle">Lista de Prácticas</span>
+                        </a>
+                    </li>
                     <li class="sidebar-header" id="tituloInformes" style="display: none;">Informes</li>
                     <li  class="sidebar-item">
                         <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}" id="informeInicialEstudiante" style="display: none;">
@@ -315,6 +330,7 @@
                 document.getElementById('tituloInformes').style.display = 'flex';
                 document.getElementById('tituloReportes').style.display = 'flex';
                 document.getElementById('practicas').style.display = 'flex';
+                document.getElementById('listapracticas').style.display = 'flex';
                 document.getElementById('informeInicialEstudiante').style.display = 'flex';
                 document.getElementById('informeFinalEstudiante').style.display = 'flex';
                 document.getElementById('informeInicialEmpresa').style.display = 'flex';

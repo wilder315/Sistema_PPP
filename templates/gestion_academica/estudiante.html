@@ -20,14 +20,14 @@
                 <table id="tabla-estudiante" class="table table-striped tabla-estudiantes" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="text-align:center">N° Documento</th>
-                            <th style="text-align:center">Apellidos</th>
-                            <th style="text-align:center">Nombres</th>
-                            <th style="text-align:center">Código Universitario</th>
+                            <th style="width: 9%; text-align:center">N° Documento</th>
+                            <th style="width: 11%; text-align:center">Apellidos</th>
+                            <th style="width: 11%; text-align:center">Nombres</th>
+                            <th style="width: 9%; text-align:center">Código</th>
                             <th style="width: 15%; text-align:center">Correo Personal</th>
-                            <th style="text-align:center">Correo USAT</th>
-                            <th style="text-align:center">Teléfono</th>
-                            <th style="text-align:center">Opciones</th>
+                            <th style="width: 15%; text-align:center">Correo USAT</th>
+                            <th style="width: 8%; text-align:center">Teléfono</th>
+                            <th style="width: 12%; text-align:center">Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -241,13 +241,13 @@
             processing: true,
             serverSide: false,
             columns: [
-                { data: "numDoc"},
+                { data: "numDoc", className: 'text-center' },
                 { data: "apellidos"},
                 { data: "nombre" },           
-                { data: "codUniversitario"},
+                { data: "codUniversitario", className: 'text-center' },
                 { data: "correoP"},
-                { data: "correoUSAT"},
-                { data: "tel1"},
+                { data: "correoUSAT", className: 'text-center'},
+                { data: "tel1", className: 'text-center'},
                 {
                     data: null,
                     className: 'text-center',
