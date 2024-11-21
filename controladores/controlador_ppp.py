@@ -114,7 +114,7 @@ def obtener_practica_por_estudiante(id_estudiante):
                     "fechaFin": practica[1],
                     "horario": practica[2],
                     "modalidad": practica[3],
-                    "area": practica[4],
+                    "area": practica[4],    
                     "numeroHorasPPP": practica[5],
                     "numeroHorasPendientes": practica[6],
                     "numeroHorasRealizadas": practica[7],
@@ -135,6 +135,29 @@ def obtener_practica_por_estudiante(id_estudiante):
     except Exception as e:
         print(f"Error al obtener la práctica del estudiante: {str(e)}")
         return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def verificar_practica_activa(id_estudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return None
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE idPersona = %s
+                  AND estadoVigencia = 'P'
+            """, (id_estudiante,))
+            resultado = cursor.fetchone()
+            if resultado and resultado[0] > 0:
+                return True
+            else:
+                return False
+    except Exception as e:
+        print(f"Error al verificar práctica activa: {str(e)}")
+        return None
     finally:
         conexion.close()
 

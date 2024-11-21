@@ -9,7 +9,23 @@
     </ol>
 </nav>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+<style>
+    body {
+        overflow: hidden;
+    }
+    .scrollable {
+    height: 42%;
+    overflow-y: auto;
+    }
+    fieldset {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    .form-label {
+        margin-bottom: 5px;
+        
+    }
+</style>
 <div class="container-fluid my-4">
     <div class="card w-100" style="height: 100%;">
         <div class="card-header bg-red-usat text-white">
@@ -19,7 +35,7 @@
                 <!-- Encabezado -->
                 <fieldset>   
                     <div class="row">      
-                        <div class="col-5">
+                        <div class="col-4">
                             <label for="estudiante" class="form-label">Estudiante:</label>
                             <div class="d-flex align-items-end">
                                 <div class="flex-grow-1 me-2">
@@ -31,9 +47,6 @@
                                 <button id="btnBuscarE" type="submit" class="btn btn-secondary">
                                     <i class="bi bi-search"></i>
                                 </button>
-                                <button id="btnNuevo" type="submit" class="btn btn-primary d-flex align-items-center" style="margin-left: 5px;" onclick="obtenerUltimoID()">
-                                    <i class="fas fa-plus me-1"></i> Nuevo
-                                </button>
                             </div>
                         </div>   
                         <div class="col-2">
@@ -41,8 +54,14 @@
                             <select class="form-select" id="semestrea" name="semestrea" required>
                                 <option value="" disabled selected>Seleccionar semestre</option>
                             </select>
-                        </div>                                   
-                        <div class="col"></div>  
+                        </div>
+                                                 
+                        <div class="col-2">
+                            <label class="form-label">ㅤ</label>
+                            <button id="btnNuevo" class="btn btn-primary d-flex align-items-center" style="margin-left: 5px;" onclick="nuevaPractica()">
+                                <i class="fas fa-plus me-1"></i> Nueva Práctica
+                            </button>
+                        </div>  
                         <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
                         <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
                     </div>   
@@ -146,7 +165,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label for="giroinstitucion" class="form-label">Giro:</label>
-                                            <input type="text" class="form-control" id="giroinstitucion" name="giroinstitucion" required>
+                                            <input type="text" class="form-control" id="giroinstitucion" name="giroinstitucion" required readonly>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -158,7 +177,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label for="jefe" class="form-label">Jefe Inmediato:</label>
-                                            <input type="text" class="form-control" id="jefe" name="jefe" required disabled>
+                                            <input type="text" class="form-control" id="jefe" name="jefe" required readonly>
                                         </div>
                                     </div>  
                                 </div>
@@ -289,6 +308,7 @@
 </div>
 
 <script>
+    
     document.getElementById('inicialestudiante').addEventListener('click', function (e) {
         e.preventDefault(); // Evita el cambio de estado
     });
@@ -373,6 +393,9 @@
         document.getElementById('giroinstitucion').value = '';
         document.getElementById('jefe').value = '';
         document.getElementById('estudiante').value = '';
+        document.getElementById('estudiante').disabled = false;
+        document.getElementById('dropdown-estudiantes').disabled = false;
+        document.getElementById('btnNuevo').disabled = false;
         document.getElementById('id').value = '';
         document.getElementById('id').disabled = false;
         document.getElementById('semestrea').selectedIndex = 0;
@@ -386,19 +409,57 @@
         disableTabs();
     }
 
-    // Función para obtener el último ID
-    function obtenerUltimoID() {
-        const inputID = document.getElementById('id');
-        if (inputID.value === '') {
-            fetch('/obtener_ultimo_id')
-                .then(response => response.json())
-                .then(data => {
-                    inputID.value = data[0].ultimoID;
-                })
-                .catch(error => console.error('Error al obtener el último ID:', error));
+    // Función para nueva práctica
+    function nuevaPractica() {
+        const estudianteInput = document.getElementById('estudiante');
+        const idEstudiante = idPersona; // Asumiendo que idPersona almacena el ID del estudiante
+        const semestreInput = document.getElementById('semestrea');
+
+        // Verificar si los campos de estudiante y semestre están completos
+        if (!estudianteInput.value.trim()) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante.");
+            return;
         }
-        inputID.disabled = true;
-        enableTabs();
+        if (!semestreInput.value) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un semestre.");
+            return;
+        }
+
+        // Verificar si el estudiante ya tiene una práctica activa
+        fetch(`/verificar_practica_activa/${idEstudiante}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", "Hubo un error al verificar la práctica activa.");
+                    console.error("Error al verificar la práctica activa:", data.error);
+                    return;
+                }
+                if (data.practica_activa) {
+                    // Si el estudiante ya tiene una práctica activa
+                    mostrarAlerta("info", "Información", "Este estudiante ya tiene una práctica en proceso.");
+                    return;
+                }
+
+                // Si no hay práctica activa, proceder con la creación de una nueva práctica
+                const inputID = document.getElementById('id');
+                if (inputID.value === '') {
+                    fetch('/obtener_ultimo_id')
+                        .then(response => response.json())
+                        .then(data => {
+                            inputID.value = data[0].ultimoID;
+                        })
+                        .catch(error => console.error('Error al obtener el último ID:', error));
+                }
+                inputID.disabled = true;
+                enableTabs();
+                document.getElementById('estudiante').disabled = true;
+                document.getElementById('estudiante').disabled = true;
+                document.getElementById('btnNuevo').disabled = true;
+            })
+            .catch(error => {
+                console.error("Error al verificar la práctica activa:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar la práctica activa.");
+            });
     }
 
     // Evento para cargar los últimos semestres actuales dinámicamente
@@ -678,73 +739,53 @@
         document.getElementById('finalinstitucion').checked = data.informe4 || false;
     }
 
-    // Función para buscar por ID
-    document.getElementById('btnBuscarID').addEventListener('click', function (event) {
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
         event.preventDefault();
-        const idPractica = document.getElementById('id').value;    
-        if (!idPractica) {
-            mostrarAlerta("warning", "Advertencia", "Por favor, ingrese un ID válido para buscar.");
+        const idEstudiante = idPersona;
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
-        fetch(`/obtener_practica_por_id/${idPractica}`)
+        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     mostrarAlerta("error", "Error", data.error);
                     limpiarControles();
+                } else if (data.mensaje) {
+                    mostrarAlerta("info", "Información", data.mensaje);
+                    limpiarControles();
                 } else {
+                    const idInput = document.getElementById('id');
+                    if (idInput) {
+                        idInput.value = data.idPractica || '';
+                        idInput.disabled = true;
+                    }
                     cargarDatosPractica(data);
+                    document.getElementById('estudiante').disabled = true;
+                    document.getElementById('estudiante').disabled = true;
                     enableTabs();
-                    document.getElementById('id').disabled = true;
+                    fetch(`/informes_practica/${data.idPractica}`)
+                        .then(response => response.json())
+                        .then(informeData => {
+                            if (informeData.error) {
+                                console.error("Error al cargar los informes:", informeData.error);
+                            } else {
+                                cargarDatosInforme(informeData);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al buscar los informes de la práctica:", error);
+                        });
                 }
             })
             .catch(error => {
-                console.error("Error al buscar la práctica:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica.");
+                console.error("Error al buscar la práctica del estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
             });
     });
 
-    // Función para buscar por Estudiante
-    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
-    event.preventDefault();
-    const idEstudiante = idPersona;
-    if (!idEstudiante) {
-        mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
-        return;
-    }
-    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                mostrarAlerta("error", "Error", data.error);
-                limpiarControles();
-            } else if (data.mensaje) {
-                mostrarAlerta("info", "Información", data.mensaje);
-                limpiarControles();
-            } else {
-                document.getElementById('id').value = data.idPractica || '';
-                document.getElementById('id').disabled = true;
-                cargarDatosPractica(data);
-                enableTabs();
-                fetch(`/informes_practica/${data.idPractica}`)
-                    .then(response => response.json())
-                    .then(informeData => {
-                        if (informeData.error) {
-                            console.error("Error al cargar los informes:", informeData.error);
-                        } else {
-                            cargarDatosInforme(informeData);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error al buscar los informes de la práctica:", error);
-                    });
-            }
-        })
-        .catch(error => {
-            console.error("Error al buscar la práctica del estudiante:", error);
-            mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
-        });
-    });
 
     // Función para Finalizar Práctica
     document.getElementById('btnFinalizar').addEventListener('click', function (event) {
