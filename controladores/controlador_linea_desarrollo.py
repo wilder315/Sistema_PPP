@@ -88,12 +88,20 @@ def eliminar_linea_desarrollo(idLinea):
         return {"error": "El ID de la Línea es requerido."}
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."}    
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE idLinea = %s
+            """, (idLinea,))
+            referencia_practica = cursor.fetchone()[0]         
+            if referencia_practica > 0:
+                return {"error": "No se puede eliminar una línea de desarrollo en uso."}
             cursor.execute("DELETE FROM linea_desarrollo WHERE idLinea = %s", (idLinea,))
-            conexion.commit()
-            return {"mensaje": "Linea de desarrollo eliminada correctamente"}
+            conexion.commit()       
+            return {"mensaje": "Línea de desarrollo eliminada correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

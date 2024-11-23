@@ -13,32 +13,19 @@
     body {
         overflow: hidden;
     }
+    .scrollable {
+    height: 42%;
+    overflow-y: auto;
+    }
     fieldset {
         margin-bottom: 20px;
         padding-bottom: 15px;
     }
     .form-label {
         margin-bottom: 5px;
-    }
-    .nav-tabs .nav-link {
-        color: black;
-        background-color: #f1f1f1;
-        border: 1px solid #dee2e6;
-        border-radius: 5px 5px 0 0;
-    }
-    .nav-tabs .nav-link.active {
-        color: black;
-        background-color: white;
-        border-bottom-color: transparent;
-    }
-    .tab-pane {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 15px;
+        
     }
 </style>
-
 <div class="container-fluid my-4">
     <div class="card w-100" style="height: 100%;">
         <div class="card-header bg-red-usat text-white">
@@ -46,30 +33,45 @@
         </div>
         <div class="card-body scrollable">
             <form id="form-informe">
-                <div class="mb-3">
-                    <label for="idPractica" class="form-label">Seleccionar Práctica:</label>
-                    <select class="form-control" id="idPractica" name="idPractica" required>
-                        <option value="" selected disabled>Seleccione una práctica</option>
-                    </select>
-                </div>
                 <!-- Encabezado -->
-                <div class="row">
+                <fieldset>   
+                    <div class="row">      
+                        <div class="col-5">
+                            <label for="estudiante" class="form-label">Estudiante:</label>
+                            <div class="d-flex align-items-end">
+                                <div class="flex-grow-1 me-2">
+                                    <div class="custom-combo">
+                                        <input type="text" id="estudianteb" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
+                                        <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
+                                    </div>
+                                </div>
+                                <button id="btnBuscarE" type="submit" class="btn btn-secondary">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>                                     
+                        <div class="col"></div>  
+                        <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
+                    </div>   
+                </fieldset>
+                <div class="row">    
                     <div class="col-md-6">
-                        <!-- Tab Datos del Estudiante y Empresa -->
-                        <ul class="nav nav-tabs" id="datosTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="estudiante-tab" data-bs-toggle="tab" href="#estudiante" role="tab" aria-controls="estudiante" aria-selected="true">Datos del Estudiante</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="empresa-tab" data-bs-toggle="tab" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">Datos de la Empresa</a>
-                            </li>
-                        </ul>
+                        <div class="datos-tabs">
+                            <!-- Tab Datos del Estudiante y Empresa -->
+                            <ul class="nav nav-tabs" id="datosTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="estudiante-tab" data-bs-toggle="tab" href="#estudiante" role="tab" aria-controls="estudiante" aria-selected="true">Datos del Estudiante</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="empresa-tab" data-bs-toggle="tab" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">Datos de la Institución</a>
+                                </li>
+                            </ul>
 
-                        <div class="tab-content" id="datosTabContent">
-                            <!-- Datos del Estudiante -->
-                            <div class="tab-pane fade show active" id="estudiante" role="tabpanel" aria-labelledby="estudiante-tab">
-                                <fieldset>
-                                    <div class="row">
+                            <div class="tab-content" id="datosTabContent">
+                                <!-- Datos del Estudiante -->
+                                <div class="tab-pane fade show active" id="estudiante" role="tabpanel" aria-labelledby="estudiante-tab">
+                                    <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="nombre" class="form-label">Nombres:</label>
                                             <input type="text" class="form-control" id="nombre" name="nombre" value="{{ session['nombre'] }}" readonly>
@@ -79,7 +81,7 @@
                                             <input type="text" class="form-control" id="apellidos" name="apellidos" value="{{ session['apellidos'] }}" readonly>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
+                                    <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="codigo" class="form-label">Código del Estudiante:</label>
                                             <input type="text" class="form-control" id="codigo" name="codigo" value="{{ session['codigo'] }}" readonly>
@@ -89,20 +91,15 @@
                                             <input type="text" class="form-control" id="semestre" name="semestre" value="{{ session['semestre'] }}" readonly>
                                         </div>
                                     </div>
-                                </fieldset>
-                            </div>
+                                </div>
 
-                            <!-- Datos de la Empresa -->
-                            <div class="tab-pane fade" id="empresa" role="tabpanel" aria-labelledby="empresa-tab">
-                                <fieldset>
-                                    <div class="row">
+                                <!-- Datos de la Empresa -->
+                                <div class="tab-pane fade" id="empresa" role="tabpanel" aria-labelledby="empresa-tab">
+                                    <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="institucion" class="form-label">Nombre de la Institución:</label>
                                             <select class="form-control" id="institucion" name="institucion" required>
                                                 <option value="" selected disabled>Seleccione una institución</option>
-                                                {% for institucion in instituciones %}
-                                                <option value="{{ institucion['numDoc'] }}">{{ institucion['razonSocial'] }}</option>
-                                                {% endfor %}
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -110,7 +107,7 @@
                                             <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" readonly>
                                         </div>
                                     </div>
-                                    <div class="row mt-3">
+                                    <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="apellido_responsable" class="form-label">Apellido del Responsable:</label>
                                             <input type="text" class="form-control" id="apellido_responsable" name="apellido_responsable" readonly>
@@ -120,101 +117,104 @@
                                             <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
                                         </div>
                                     </div>
-                                </fieldset>
+                                </div>
                             </div>
-                        </div>
+                        </div>    
                     </div>
 
                     <div class="col-md-6">
-                        <!-- Tab Duración, Objetivos y Plan de Trabajo -->
-                        <ul class="nav nav-tabs" id="practicaTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="duracion-tab" data-bs-toggle="tab" href="#duracion" role="tab" aria-controls="duracion" aria-selected="true">Duración</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="objetivos-tab" data-bs-toggle="tab" href="#objetivos" role="tab" aria-controls="objetivos" aria-selected="false">Objetivos</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="plan-tab" data-bs-toggle="tab" href="#plan" role="tab" aria-controls="plan" aria-selected="false">Plan de Trabajo</a>
-                            </li>
-                        </ul>
+                        <div class="datos-tabs">
+                            <!-- Tab Duración, Objetivos y Plan de Trabajo -->
+                            <ul class="nav nav-tabs" id="practicaTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="duracion-tab" data-bs-toggle="tab" href="#duracion" role="tab" aria-controls="duracion" aria-selected="true">Duración</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="objetivos-tab" data-bs-toggle="tab" href="#objetivos" role="tab" aria-controls="objetivos" aria-selected="false">Objetivos</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="plan-tab" data-bs-toggle="tab" href="#plan" role="tab" aria-controls="plan" aria-selected="false">Plan de Trabajo</a>
+                                </li>
+                            </ul>
 
-                        <div class="tab-content" id="practicaTabContent">
-                            <!-- Duración de la Práctica -->
-                            <div class="tab-pane fade show active" id="duracion" role="tabpanel" aria-labelledby="duracion-tab">
-                                <fieldset>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
-                                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                            <div class="tab-content" id="practicaTabContent">
+                                <!-- Duración de la Práctica -->
+                                <div class="tab-pane fade show active" id="duracion" role="tabpanel" aria-labelledby="duracion-tab">
+                                    <fieldset>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="fecha_fin" class="form-label">Fecha de Término:</label>
+                                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="fecha_fin" class="form-label">Fecha de Término:</label>
-                                            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                    </fieldset>
+                                </div>
+
+                                <!-- Objetivos de la Práctica -->
+                                <div class="tab-pane fade" id="objetivos" role="tabpanel" aria-labelledby="objetivos-tab">
+                                    <fieldset>
+                                        <div class="d-flex mb-2">
+                                            <button type="button" class="btn btn-primary btn-sm" id="agregarObjetivo" ><i class="fas fa-plus"></i> Agregar Objetivo</button>
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" id="eliminarObjetivo"><i class="fas fa-trash-alt"></i></i> Eliminar</button>
                                         </div>
-                                    </div>
-                                </fieldset>
-                            </div>
+                                        <table class="table table-bordered" id="tabla-objetivos">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 15%;" class="text-center">Nº</th>
+                                                    <th>Objetivo</th>
+                                                    <th style="width: 10%;">Seleccionar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="numero_objetivo[]" placeholder="1" required></td>
+                                                    <td><input type="text" class="form-control" name="objetivo[]" placeholder="Descripción del objetivo" required></td>
+                                                    <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fieldset>
+                                </div>
 
-                            <!-- Objetivos de la Práctica -->
-                            <div class="tab-pane fade" id="objetivos" role="tabpanel" aria-labelledby="objetivos-tab">
-                                <fieldset>
-                                    <div class="d-flex mb-2">
-                                        <button type="button" class="btn btn-primary btn-sm" id="agregarObjetivo" ><i class="fas fa-plus"></i> Agregar Objetivo</button>
-                                        <button type="button" class="btn btn-danger btn-sm ms-2" id="eliminarObjetivo"><i class="fas fa-trash-alt"></i></i> Eliminar</button>
-                                    </div>
-                                    <table class="table table-bordered" id="tabla-objetivos">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 15%;" class="text-center">Nº</th>
-                                                <th>Objetivo</th>
-                                                <th style="width: 10%;">Seleccionar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><input type="text" class="form-control" name="numero_objetivo[]" placeholder="1" required></td>
-                                                <td><input type="text" class="form-control" name="objetivo[]" placeholder="Descripción del objetivo" required></td>
-                                                <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </fieldset>
-                            </div>
-
-                            <!-- Plan de Trabajo -->
-                            <div class="tab-pane fade" id="plan" role="tabpanel" aria-labelledby="plan-tab">
-                                <fieldset>
-                                    <div class="d-flex mb-2">
-                                        <button type="button" class="btn btn-primary btn-sm" id="agregarPlanTrabajo"><i class="fas fa-plus"></i> Agregar Semana</button>
-                                        <button type="button" class="btn btn-danger btn-sm ms-2" id="eliminarPlanTrabajo"><i class="fas fa-trash-alt"></i></i> Eliminar</button>
-                                    </div>
-                                    <table class="table table-bordered" id="tabla-plan-trabajo">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 10%;">Semana</th>
-                                                <th>Fechas</th>
-                                                <th>Actividades</th>
-                                                <th>Horas</th>
-                                                <th style="width: 10%;">Seleccionar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><input type="text" class="form-control" name="semana[]" placeholder="1" required></td>
-                                                <td>
-                                                    <input type="date" class="form-control" name="fecha_inicio[]" required>
-                                                    <input type="date" class="form-control" name="fecha_fin[]" required>
-                                                </td>
-                                                <td><input type="text" class="form-control" name="actividad[]" placeholder="Descripción de la actividad" required></td>
-                                                <td><input type="number" class="form-control" name="horas[]" placeholder="Horas" required></td>
-                                                <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </fieldset>
+                                <!-- Plan de Trabajo -->
+                                <div class="tab-pane fade" id="plan" role="tabpanel" aria-labelledby="plan-tab">
+                                    <fieldset>
+                                        <div class="d-flex mb-2">
+                                            <button type="button" class="btn btn-primary btn-sm" id="agregarPlanTrabajo"><i class="fas fa-plus"></i> Agregar Semana</button>
+                                            <button type="button" class="btn btn-danger btn-sm ms-2" id="eliminarPlanTrabajo"><i class="fas fa-trash-alt"></i></i> Eliminar</button>
+                                        </div>
+                                        <table class="table table-bordered" id="tabla-plan-trabajo">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 10%;">Semana</th>
+                                                    <th>Fechas</th>
+                                                    <th>Actividades</th>
+                                                    <th>Horas</th>
+                                                    <th style="width: 10%;">Seleccionar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" class="form-control" name="semana[]" placeholder="1" required></td>
+                                                    <td>
+                                                        <input type="date" class="form-control" name="fecha_inicio[]" required>
+                                                        <input type="date" class="form-control" name="fecha_fin[]" required>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="actividad[]" placeholder="Descripción de la actividad" required></td>
+                                                    <td><input type="number" class="form-control" name="horas[]" placeholder="Horas" required></td>
+                                                    <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fieldset>
+                                </div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
                 <div class="text-end">
@@ -262,35 +262,11 @@
     });
 
     // Función para cargar las prácticas dinámicamente
-    function cargarPracticas(selectedPracticaId) {
-    $.ajax({
-        url: '/obtener_practicas_informe_inicial',
-        type: 'GET',
-        contentType: 'application/json',
-        success: function (response) {
-            var practicaSelect = $('#idPractica');
-            practicaSelect.empty();
-            practicaSelect.append('<option value="" disabled selected>Seleccione una práctica</option>');
-            response.forEach(function (practica) {
-                var selected = parseInt(practica.idPractica) === parseInt(selectedPracticaId) ? 'selected' : '';  
-                practicaSelect.append(`<option value="${practica.idPractica}" ${selected}>ID: ${practica.idPractica} - Estudiante: ${practica.estudiante}</option>`);
-            });
-        },
-        error: function (xhr, status, error) {
-            mostrarAlerta("error", "Error", "Hubo un error al cargar las prácticas.");
-        }
-    });
-}
+
 
     // Eliminar filas seleccionadas del plan de trabajo
     $('#eliminarPlanTrabajo').on('click', function() {
         $('.seleccionar-plan:checked').closest('tr').remove();
-    });
-
-    // Enviar el formulario con AJAX y mostrar alerta de éxito
-    $(document).ready(function() {
-        cargarInstituciones();
-        cargarPracticas();
     });
 
     // Enviar el formulario con AJAX y mostrar alerta de éxito
@@ -332,69 +308,153 @@
         });
     });
 
-    // Obtener datos del responsable de la institución seleccionada
-    $('#institucion').on('change', function() {
-        const numDoc = $(this).val();
-
-        if (numDoc) {
-            $.ajax({
-                url: `/informe/get_institucion_responsable/${numDoc}`,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        $('#nombre_responsable').val(response.nombre_responsable);
-                        $('#apellido_responsable').val(response.apellido_responsable);
-                        $('#cargo_responsable').val(response.cargo_responsable);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message || 'No se encontraron datos para la institución seleccionada.',
-                            confirmButtonText: 'Aceptar'
-                        });
-                        $('#nombre_responsable, #apellido_responsable, #cargo_responsable').val('');
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un error al obtener los datos del responsable.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                    $('#nombre_responsable, #apellido_responsable, #cargo_responsable').val('');
-                }
-            });
+    // Evento al seleccionar una institución
+    document.getElementById('institucion').addEventListener('change', function() {
+        const numDocInstitucion = this.value;
+        if (numDocInstitucion) {
+            obtenerDatosInstitucion(numDocInstitucion);
         }
     });
 
-    // Cargar instituciones en el select
-    function cargarInstituciones(selectedInstitucionId) {
-        $.ajax({
-            url: '/datos_instituciones',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                const institucionSelect = $('#institucion');
-                institucionSelect.empty();
-                institucionSelect.append('<option value="" disabled selected>Seleccione una institución</option>');
 
-                response.forEach(institucion => {
-                    const selected = parseInt(institucion.numDoc) === parseInt(selectedInstitucionId) ? 'selected' : '';
-                    institucionSelect.append(`<option value="${institucion.numDoc}" ${selected}>${institucion.razonSocial}</option>`);
+    // Cargar instituciones en el select
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/datos_instituciones')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('institucion');
+                data.forEach(institucion => {
+                    const option = document.createElement('option');
+                    option.value = institucion.numDoc;
+                    option.textContent = institucion.razonSocial;
+                    select.appendChild(option);
                 });
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al cargar las instituciones.',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-        });
+            })
+            .catch(error => console.error('Error:', error));
+    });
+    function obtenerDatosInstitucion(numDocInstitucion) {
+        const nombreJefeInput = document.getElementById('nombre_responsable');
+        const apellidoJefeInput = document.getElementById('apellido_responsable');
+        const cargoJefeInput = document.getElementById('cargo_responsable');
+
+        nombreJefeInput.value = '';
+        apellidoJefeInput.value = '';
+        cargoJefeInput.value = '';
+        fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos de la institución');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.length > 0) {
+                    nombreJefeInput.value = data[0].nombre;
+                    apellidoJefeInput.value = data[0].apellidos;
+                    cargoJefeInput.value = data[0].cargo;
+                } else {
+                    nombreJefeInput.value = 'No se nombre de jefe';
+                    apellidoJefeInput.value = 'No se apellido de jefe';
+                    cargoJefeInput.value = 'No se encontró cargo';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos de la institución:', error);
+                    nombreJefeInput.value = 'No se nombre de jefe';
+                    apellidoJefeInput.value = 'No se apellido de jefe';
+                    cargoJefeInput.value = 'No se encontró cargo';
+            });
     }
+
+    document.getElementById('institucion').addEventListener('change', function() {
+        const numDocInstitucion = this.value;
+        if (numDocInstitucion) {
+            obtenerDatosInstitucion(numDocInstitucion);
+        }
+    });
+    document.addEventListener('click', function(event) {
+        if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
+            dropdownEstudiantes.classList.remove('show');
+        }
+    });
+
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault();
+        const idEstudiante = idPersona; // Asegúrate de que idPersona tiene un valor válido
+        const nombreEstudianteInput = document.getElementById('nombre');
+        const apellidoEstudianteInput = document.getElementById('apellidos');
+        const codigoEstudianteInput = document.getElementById('codigo');
+
+        // Limpiar los campos antes de buscar
+        nombreEstudianteInput.value = '';
+        apellidoEstudianteInput.value = '';
+        codigoEstudianteInput.value = '';
+
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
+            return;
+        }
+
+        // Llamada a la ruta
+        fetch(`/obtener_estudiante_por_id/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos del estudiante');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && Object.keys(data).length > 0) {
+                    // Llenar los campos con los datos recibidos
+                    nombreEstudianteInput.value = data.nombre || 'Sin nombre';
+                    apellidoEstudianteInput.value = data.apellidos || 'Sin apellidos';
+                    codigoEstudianteInput.value = data.codUniversitario || 'Sin código';
+                } else {
+                    mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar el estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
+            });
+    });
+
+    // Función para mostrar y recuperar estudiantes en el dropdown-search
+    const inputEstudiante = document.getElementById('estudianteb');
+    const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
+    let idPersona = 0;
+    inputEstudiante.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_estudiantes')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEstudiantes.innerHTML = '';
+                const resultados = data.filter(estudiante => 
+                    `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(estudiante => {
+                        const li = document.createElement('li');
+                        li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
+                        li.dataset.id = estudiante.idPersona;
+                        li.addEventListener('click', () => {
+                            inputEstudiante.value = li.textContent;
+                            idPersona = li.dataset.id;
+                            $('#idPersonaMod').val(response.idPersona);
+                            dropdownEstudiantes.classList.remove('show');
+                        });
+                        dropdownEstudiantes.appendChild(li);
+                    });
+                    dropdownEstudiantes.classList.add('show');
+                } else {
+                    dropdownEstudiantes.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+
 </script>
 
 

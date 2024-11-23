@@ -70,7 +70,7 @@ def obtener_jefe(ruc):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT p.apellidos, p.nombre, i.giro 
+                SELECT p.apellidos, p.nombre, i.giro, p.cargo 
                 FROM persona p 
                 INNER JOIN institucion i ON p.idPersona = i.idPersona 
                 WHERE i.numdoc = %s
@@ -187,12 +187,20 @@ def eliminar_institucion(numDoc):
         return {"error": "El número de documento es requerido."}
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."} 
     try:
-        with conexion.cursor() as cursor:   
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE numDocInstitucion = %s
+            """, (numDoc,))
+            referencia_practica = cursor.fetchone()[0]
+            if referencia_practica > 0:
+                return {"error": "No se puede eliminar una institución que está vinculada a una práctica."}
             cursor.execute("DELETE FROM institucion WHERE numDoc = %s", (numDoc,))
             conexion.commit()
-            return {"mensaje": "Institución eliminada correctamente"}
+            return {"mensaje": "Institución eliminada correctamente."}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

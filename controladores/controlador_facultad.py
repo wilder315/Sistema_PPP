@@ -83,6 +83,14 @@ def eliminar_facultad(idFacultad):
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM escuela
+                WHERE idFacultad = %s
+            """, (idFacultad,))
+            referencia = cursor.fetchone()[0]          
+            if referencia > 0:
+                return {"error": "No se puede eliminar una facultad en uso."}
             cursor.execute("DELETE FROM facultad WHERE idFacultad = %s", (idFacultad,))
             conexion.commit()
             return {"mensaje": "Facultad eliminada correctamente"}

@@ -1,30 +1,29 @@
-{% extends "/gestion_academica/index.html" %}
+{% extends "/ppp/index.html" %}
 {% block titulo %} Instituciones {% endblock %}
 {% block contenido %}
 
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('router_main.gestion_academica') }}">Módulo de Gestión Académica</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Instituciones</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Prácticas</li>
     </ol>
 </nav>
 
 <div class="container-fluid my-4">
     <div class="card w-100">
-        <div class="card-header bg-red-usat text-white">Instituciones</div>
+        <div class="card-header bg-red-usat text-white">Prácticas</div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tabla-institucion" class="table table-striped" style="width:100%">
+                <table id="tabla-practica" class="table table-striped" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="width: 8%" class="text-center">RUC</th>
-                            <th class="text-center">Razón Social</th>
-                            <th style="width: 8%" class="text-center">Teléfono</th>
-                            <th style="width: 15%" class="text-center">Correo</th>
-                            <th style="width: 15%" class="text-center">Representante Legal</th>
-                            <th class="text-center">Ubicación</th>
-                            <th style="width: 13%" class="text-center">Opciones</th>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Estudiante</th>
+                            <th class="text-center">Institución</th>
+                            <th class="text-center">Modalidad</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Opciones</th>
                         </tr>
                     </thead>
                     <tbody>

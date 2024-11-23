@@ -503,21 +503,6 @@ filter: brightness(0.5);
     text-align: center;
 }
 
-body {
-    overflow: hidden;
-}
-.scrollable {
-  height: 42%;
-  overflow-y: auto;
-}
-fieldset {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-}
-.form-label {
-    margin-bottom: 5px;
-    
-}
 .nav-tabs .nav-link {
     color: black;
     background-color: #f1f1f1;

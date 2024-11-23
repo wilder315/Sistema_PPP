@@ -116,21 +116,30 @@ def modificar_estudiante(idEstudiante, numDoc, nombre, apellidos, codUniversitar
         conexion.close()
 
 def eliminar_estudiante(idEstudiante):
-    if not idEstudiante: 
-        return {"error": "El id del jefe es requerido"}
+    if not idEstudiante:
+        return {"error": "El ID del estudiante es requerido."}   
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."}   
     try:
         with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE idPersona = %s
+            """, (idEstudiante,))
+            referencia_practica = cursor.fetchone()[0]
+            
+            if referencia_practica > 0:
+                return {"error": "No se puede eliminar un estudiante que está vinculado a una práctica."}
             cursor.execute("SELECT idUsuario FROM persona WHERE idPersona = %s", (idEstudiante,))
             idUsuario = cursor.fetchone()
             if not idUsuario:
                 return {"error": "No se encontró el usuario asociado al estudiante."}
             cursor.execute("DELETE FROM persona WHERE idPersona = %s", (idEstudiante,))
-            cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario[0],))           
+            cursor.execute("DELETE FROM usuario WHERE idUsuario = %s", (idUsuario[0],)) 
             conexion.commit()
-            return {"mensaje": "Estudiante y usuario eliminados correctamente"}
+            return {"mensaje": "Estudiante y usuario eliminados correctamente."}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
@@ -331,3 +340,43 @@ def obtener_estudiantes_por_semestre():
         return {"error": str(e)}
     finally:
         conexion.close()    
+
+def obtener_ultima_practica_por_alumno(idPersona):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para obtener la última práctica del estudiante
+            cursor.execute("""
+                SELECT 
+                    p.idPersona,
+                    p.nombre,
+                    p.apellidos,
+                    pp.idPractica,
+                    pp.fechaInicio,
+                    pp.fechaFin,
+                    pp.modalidad,
+                    i.razonSocial AS institucion
+                FROM persona p
+                JOIN usuario u ON p.idUsuario = u.idUsuario
+                JOIN practicas_preprofesionales pp ON p.idPersona = pp.idPersona
+                JOIN institucion i ON pp.numDocInstitucion = i.numDoc
+                WHERE u.idTipoUsuario = 3 -- Solo estudiantes
+                AND p.idPersona = %s
+                ORDER BY pp.fechaFin DESC
+                LIMIT 1;
+            """, (idPersona,))
+            
+            columnas = [desc[0] for desc in cursor.description]
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                # Convierte el resultado en un diccionario
+                return dict(zip(columnas, resultado))
+            else:
+                return {"mensaje": "No se encontró ninguna práctica para el estudiante especificado."}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()

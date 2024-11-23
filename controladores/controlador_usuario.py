@@ -421,15 +421,25 @@ def obtener_tipoUsuarios():
     tipo_usuarios = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM tipo_usuario ORDER BY idTipoUsuario ASC")
-            column_names = [desc[0] for desc in cursor.description]
+            cursor.execute("""
+                SELECT 
+                    idTipoUsuario,
+                    CASE 
+                        WHEN tipo = 'DE' THEN 'Director de Escuela'
+                        WHEN tipo = 'DAP' THEN 'Docente de Apoyo PPP'
+                        WHEN tipo = 'P' THEN 'Practicante'
+                        WHEN tipo = 'JD' THEN 'Jefe Directo'
+                        ELSE tipo
+                    END AS tipoUsuario
+                FROM tipo_usuario
+                ORDER BY idTipoUsuario ASC
+            """)
             rows = cursor.fetchall()
-            for row in rows:
-                tipo_usuario_dict = dict(zip(column_names, row))
-                tipo_usuarios.append(tipo_usuario_dict)
+            tipo_usuarios = [{"idTipoUsuario": row[0], "tipoUsuario": row[1]} for row in rows]
     except Exception as e:
         return {"error": str(e)}
     finally:
         conexion.close()
     return tipo_usuarios
+
 

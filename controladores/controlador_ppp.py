@@ -114,7 +114,7 @@ def obtener_practica_por_estudiante(id_estudiante):
                     "fechaFin": practica[1],
                     "horario": practica[2],
                     "modalidad": practica[3],
-                    "area": practica[4],
+                    "area": practica[4],    
                     "numeroHorasPPP": practica[5],
                     "numeroHorasPendientes": practica[6],
                     "numeroHorasRealizadas": practica[7],
@@ -135,6 +135,29 @@ def obtener_practica_por_estudiante(id_estudiante):
     except Exception as e:
         print(f"Error al obtener la práctica del estudiante: {str(e)}")
         return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def verificar_practica_activa(id_estudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return None
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM practicas_preprofesionales
+                WHERE idPersona = %s
+                  AND estadoVigencia = 'P'
+            """, (id_estudiante,))
+            resultado = cursor.fetchone()
+            if resultado and resultado[0] > 0:
+                return True
+            else:
+                return False
+    except Exception as e:
+        print(f"Error al verificar práctica activa: {str(e)}")
+        return None
     finally:
         conexion.close()
 
@@ -196,16 +219,47 @@ def informes_practica(idPractica):
     finally:
         conexion.close()
 
-def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona):
+def obtener_supervisiones(idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo conectar a la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    idSupervision, fecha, funciones, observaciones, estado
+                FROM supervision
+                WHERE idPractica = %s
+                ORDER BY fecha ASC
+            """, (idPractica,))
+            supervisiones = cursor.fetchall()
+            supervisiones_formateadas = [
+                {
+                    "idSupervision": supervisión[0],
+                    "fecha": supervisión[1].strftime("%Y-%m-%d") if supervisión[1] else None,
+                    "funciones": supervisión[2],
+                    "observaciones": supervisión[3],
+                    "estado": supervisión[4],
+                }
+                for supervisión in supervisiones
+            ]
+            return supervisiones_formateadas
+    except Exception as e:
+        print(f"Error al obtener las supervisiones: {str(e)}")
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona, supervisiones):
     if not fechaInicio or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
         return {"error": "Todos los campos son requeridos."}
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."}  
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT idPractica FROM practicas_preprofesionales WHERE idPractica = %s", (idPractica,))
-            practica_existente = cursor.fetchone()
+            practica_existente = cursor.fetchone()        
             if practica_existente:
                 cursor.execute("""
                     UPDATE practicas_preprofesionales
@@ -215,8 +269,6 @@ def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHo
                     WHERE idPractica = %s
                 """, (horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
                       idLinea, numDocInstitucion, idTipoPractica, 'P', 1, idPractica))
-                conexion.commit()
-                return {"mensaje": "Práctica actualizada correctamente"}
             else:
                 cursor.execute("""
                     INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, horario, modalidad, area,
@@ -226,8 +278,38 @@ def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHo
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes,
                       numeroHorasRealizadas, 'P', idSemestre, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
-                conexion.commit()
-                return {"mensaje": "Práctica agregada correctamente"}
+            for supervision in supervisiones:
+                idSupervision = supervision.get('idSupervision')
+                fecha = supervision.get('fecha')
+                funciones = supervision.get('funciones')
+                observaciones = supervision.get('observaciones')
+                estado = supervision.get('estado')
+                if idSupervision:
+                    cursor.execute("""
+                        SELECT idSupervision FROM supervision WHERE idSupervision = %s
+                    """, (idSupervision,))
+                    supervision_existente = cursor.fetchone()
+                    if supervision_existente:
+                        cursor.execute("""
+                            UPDATE supervision
+                            SET fecha = %s, funciones = %s, observaciones = %s, estado = %s
+                            WHERE idSupervision = %s
+                        """, (fecha, funciones, observaciones, estado, idSupervision))
+                    else:
+                        cursor.execute("""
+                            INSERT INTO supervision (idSupervision, fecha, funciones, observaciones, estado, idPractica)
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        """, (idSupervision, fecha, funciones, observaciones, estado, idPractica))
+                else:
+                    cursor.execute("""
+                        INSERT INTO supervision (fecha, funciones, observaciones, estado, idPractica)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, (fecha, funciones, observaciones, estado, idPractica))
+            conexion.commit()
+            if practica_existente:
+                return {"mensaje": "Práctica actualizada correctamente"}
+            else:
+                return {"mensaje": "Práctica agregada correctamente"} 
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
@@ -301,6 +383,25 @@ def cambiar_estado_practica(idPractica, nuevo_estado):
             """, (nuevo_estado, idPractica))
             conexion.commit()
             return {"mensaje": "Estado de la práctica actualizado correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def finalizar_practica(idPractica, fechaFin, semestreFinal):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE practicas_preprofesionales
+                SET idEstado = %s, estadoVigencia = %s, fechaFin = %s, semestreFinal = %s
+                WHERE idPractica = %s
+            """, (4, 'F', fechaFin, semestreFinal, idPractica))
+            conexion.commit()
+            return {"mensaje": f"La práctica ha sido finalizada correctamente."}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}

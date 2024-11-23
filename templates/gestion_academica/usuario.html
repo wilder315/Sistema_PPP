@@ -159,10 +159,10 @@
                 dataSrc: ''
             },
             columns: [
-                { data: "idUsuario"},
+                { data: "idUsuario", className: 'text-center'},
                 { data: "username" },
-                { data: "estado", render: data => data === 'A' ? 'Activo' : 'Inactivo' },
-                { data: "tipo", 
+                { data: "estado", render: data => data === 'A' ? 'Activo' : 'Inactivo', className: 'text-center'},
+                { data: "tipo", className: 'text-center', 
                     render: function(data) {
                         switch(data) {
                             case 'P':
@@ -219,7 +219,7 @@
                     tipoSelect.append('<option value="" disabled selected>Seleccionar tipo de usuario</option>');
                     response.forEach(function (tipoUsuario) {
                         var selected = tipoUsuario.idTipoUsuario == selectedTipoUsuarioId ? 'selected' : '';
-                        tipoSelect.append(`<option value="${tipoUsuario.idTipoUsuario}" ${selected}>${tipoUsuario.tipo}</option>`);
+                        tipoSelect.append(`<option value="${tipoUsuario.idTipoUsuario}" ${selected}>${tipoUsuario.tipoUsuario}</option>`);
                     });
                 },
                 error: function (xhr, status, error) {
