@@ -127,84 +127,93 @@
 
         <!-- Menú Lateral (Sidebar) -->
         {% block sidebar %}
-        <nav id="sidebar" class="sidebar js-sidebar">
-            <div class="sidebar-content js-simplebar">
-                <a class="sidebar-brand" href="{{ url_for('router_main.index') }}">
-                    <img src="{{ url_for('static', filename='login/images/usat_logo_atrás.png') }}" alt="logoescuela"
-                        style="max-width: 160px; display: flex;">
-                </a>
+            <nav id="sidebar" class="sidebar js-sidebar">
+                <div class="sidebar-content js-simplebar">
+                    <a class="sidebar-brand" href="{{ url_for('router_main.index') }}">
+                        <img src="{{ url_for('static', filename='login/images/usat_logo_atrás.png') }}" alt="logoescuela"
+                            style="max-width: 160px; display: flex;">
+                    </a>
+                    <ul class="sidebar-nav">
+                        <!-- Módulo de Gestión Académica -->
+                        <li class="sidebar-item">
+                            <a class="sidebar-link collapsed" data-bs-toggle="collapse" href="#gestionAcademica" role="button" aria-expanded="false" aria-controls="gestionAcademica">
 
-                <ul class="sidebar-nav">               
-                    <li class="sidebar-header">
-                        Módulo de Gestión Académica
-                    </li>  
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.docente') }}">
-                            <i class="fas fa-chalkboard-teacher fa-lg"></i>
-                            <span class="align-middle">Docentes</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.escuela') }}">
-                            <i class="fas fa-school fa-lg"></i>
-                            <span class="align-middle">Escuelas</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.estudiante') }}">
-                            <i class="fas fa-user-graduate fa-lg"></i>
-                            <span class="align-middle">Estudiantes</span>
-                        </a>
-                    </li>                
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.facultad') }}">                           
-                            <i class="fas fa-landmark fa-lg"></i>
-                            <span class="align-middle">Facultades</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.genero') }}">
-                            <i class="fas fa-venus-mars fa-lg"></i>
-                            <span class="align-middle">Géneros</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_email.mostrar_formulario_masivo') }}">
-                            <i class="fas fa-envelope fa-lg"></i>
-                            <span class="align-middle">Mensaje Masivo</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.semestre') }}">
-                            <i class="far fa-calendar-check fa-lg"></i>
-                            <span class="align-middle">Semestres</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_main.usuario') }}">
-                            <i class="far fa-user fa-lg"></i>
-                            <span class="align-middle">Usuarios</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-header">
-                        Reportes
-                    </li>
-    
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_genero') }}">
-                            <i class="fas fa-chart-bar fa-lg"></i>
-                            <span class="align-middle">Estudiantes por Género</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_semestre') }}">
-                            <i class="fas fa-chart-line fa-lg"></i>
-                            <span class="align-middle">Estudiantes por Semestre</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                                <span class="align-middle">Módulo de Gestión Académica</span>
+                                <i class="fa fa-chevron-down ms-auto"></i>
+                            </a>
+                            <div class="collapse" id="gestionAcademica">
+                                <ul class="sidebar-nav ps-3">
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.escuela') }}">
+                                            <i class="fas fa-school fa-lg"></i>
+                                            <span class="align-middle">Escuelas</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.estudiante') }}">
+                                            <i class="fas fa-user-graduate fa-lg"></i>
+                                            <span class="align-middle">Estudiantes</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.facultad') }}">
+                                            <i class="fas fa-landmark fa-lg"></i>
+                                            <span class="align-middle">Facultades</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.genero') }}">
+                                            <i class="fas fa-venus-mars fa-lg"></i>
+                                            <span class="align-middle">Géneros</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_email.mostrar_formulario_masivo') }}">
+                                            <i class="fas fa-envelope fa-lg"></i>
+                                            <span class="align-middle">Mensaje Masivo</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.semestre') }}">
+                                            <i class="far fa-calendar-check fa-lg"></i>
+                                            <span class="align-middle">Semestres</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.usuario') }}">
+                                            <i class="far fa-user fa-lg"></i>
+                                            <span class="align-middle">Usuarios</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- Reportes -->
+                        <li class="sidebar-item">
+                            <a class="sidebar-link collapsed" data-bs-toggle="collapse" href="#reportes" role="button" aria-expanded="false" aria-controls="reportes">
+                                <span class="align-middle">Reportes</span>
+                                <i class="fa fa-chevron-down ms-auto"></i>
+                            </a>
+                            <div class="collapse" id="reportes">
+                                <ul class="sidebar-nav ps-3">
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_genero') }}">
+                                            <i class="fas fa-chart-bar fa-lg"></i>
+                                            <span class="align-middle">Estudiantes por Género</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_estudiante.reporte_estudiantes_semestre') }}">
+                                            <i class="fas fa-chart-line fa-lg"></i>
+                                            <span class="align-middle">Estudiantes por Semestre</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>      
         {% endblock %}
 
         <!-- Contenido Principal -->
@@ -300,10 +309,33 @@
                 document.getElementById('usernamenav').textContent = usuario;
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const collapsibleLinks = document.querySelectorAll('.sidebar-link[data-bs-toggle="collapse"]');
+            const defaultCollapse = document.querySelector('#gestionAcademica');
+            if (defaultCollapse) {
+                const bootstrapCollapse = new bootstrap.Collapse(defaultCollapse, { toggle: true });
+            }
+            collapsibleLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    const targetId = this.getAttribute('href').substring(1);
+                    collapsibleLinks.forEach(otherLink => {
+                        const otherTargetId = otherLink.getAttribute('href').substring(1);
+                        if (otherTargetId !== targetId) {
+                            const otherCollapse = document.getElementById(otherTargetId);
+                            if (otherCollapse && otherCollapse.classList.contains('show')) {
+                                const bootstrapCollapse = new bootstrap.Collapse(otherCollapse, { toggle: false });
+                                bootstrapCollapse.hide();
+                            }
+                        }
+                    });
+                });
+            });
+        });
+
     </script>
-    
+
     {% block scripts %}
-    
     {% endblock %}
 </body>
 
