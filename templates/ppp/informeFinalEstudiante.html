@@ -2,7 +2,7 @@
 {% block titulo %} Informe Final de Prácticas (Estudiante) {% endblock %}
 {% block contenido %}
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
-    <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: -10px;">
+    <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
         <li class="breadcrumb-item active">Informe de Prácticas (Estudiante)</li>
@@ -19,22 +19,12 @@
     .form-label {
         margin-bottom: 5px;
     }
-    .nav-tabs .nav-link {
-        color: black;
-        background-color: #f1f1f1;
-        border: 1px solid #dee2e6;
-        border-radius: 5px 5px 0 0;
+    td > textarea {
+        padding: 0;
     }
-    .nav-tabs .nav-link.active {
-        color: black;
-        background-color: white;
-        border-bottom-color: transparent;
-    }
-    .tab-pane {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 15px;
+
+    td {
+        padding: 0 !important;
     }
 </style>
 
@@ -44,107 +34,109 @@
             Informe Final de Prácticas Pre Profesionales (Estudiante)
         </div>
         <div class="card-body">
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="datos-estudiante-tab" data-bs-toggle="tab" data-bs-target="#datos-estudiante" type="button" role="tab" aria-controls="datos-estudiante" aria-selected="true">Datos del Estudiante</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="introduccion-tab" data-bs-toggle="tab" data-bs-target="#introduccion" type="button" role="tab" aria-controls="introduccion" aria-selected="false">Introducción</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="descripcion-institucion-tab" data-bs-toggle="tab" data-bs-target="#descripcion-institucion" type="button" role="tab" aria-controls="descripcion-institucion" aria-selected="false">Descripción de la Institución</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="labores-tab" data-bs-toggle="tab" data-bs-target="#labores" type="button" role="tab" aria-controls="labores" aria-selected="false">Labores</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="conclusiones-tab" data-bs-toggle="tab" data-bs-target="#conclusiones" type="button" role="tab" aria-controls="conclusiones" aria-selected="false">Conclusiones</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="bibliografia-tab" data-bs-toggle="tab" data-bs-target="#bibliografia" type="button" role="tab" aria-controls="bibliografia" aria-selected="false">Bibliografía</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="recomendaciones-tab" data-bs-toggle="tab" data-bs-target="#recomendaciones" type="button" role="tab" aria-controls="recomendaciones" aria-selected="false">Recomendaciones</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="anexos-tab" data-bs-toggle="tab" data-bs-target="#anexos" type="button" role="tab" aria-controls="anexos" aria-selected="false">Anexos</button>
-                </li>
-            </ul>
+            <fieldset>   
+                <div class="row">      
+                    <div class="col-4">
+                        <label for="estudiante" class="form-label">Estudiante:</label>
+                        <div class="d-flex align-items-end">
+                            <div class="flex-grow-1 me-2">
+                                <div class="custom-combo">
+                                    <input type="text" id="estudiante" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
+                                    <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
+                                </div>
+                            </div>
+                            <button id="btnBuscarE" type="submit" class="btn btn-secondary">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>   
+                    <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                    <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
+                </div>   
+            </fieldset>
+            
+            <div class="informe-tabs">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="introduccion-tab" data-bs-toggle="tab" data-bs-target="#introduccion" type="button" role="tab" aria-controls="introduccion" aria-selected="true">Introducción</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="descripcion-institucion-tab" data-bs-toggle="tab" data-bs-target="#descripcion-institucion" type="button" role="tab" aria-controls="descripcion-institucion" aria-selected="false">Descripción de la institución</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="labores-tab" data-bs-toggle="tab" data-bs-target="#labores" type="button" role="tab" aria-controls="labores" aria-selected="false">Labores desarrolladas</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="conclusiones-tab" data-bs-toggle="tab" data-bs-target="#conclusiones" type="button" role="tab" aria-controls="conclusiones" aria-selected="false">Conclusiones y Recomendaciones</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="bibliografia-tab" data-bs-toggle="tab" data-bs-target="#bibliografia" type="button" role="tab" aria-controls="bibliografia" aria-selected="false">Bibliografía y Anexos</button>
+                    </li>
+                </ul>
 
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <!-- Datos del Estudiante -->
-                <div class="tab-pane fade show active" id="datos-estudiante" role="tabpanel" aria-labelledby="datos-estudiante-tab">
-                    <fieldset>
-                        <legend>Datos del Estudiante</legend>
-                        <div class="row">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Introducción -->
+                    <div class="tab-pane fade show active" id="introduccion" role="tabpanel" aria-labelledby="introduccion-tab">
+                        <div class="row mb-3">
                             <div class="col-md-3">
                                 <label for="nombre_estudiante" class="form-label">Nombres del Estudiante:</label>
-                                <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required>
+                                <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required readonly>
                             </div>
                             <div class="col-md-3">
                                 <label for="apellido_estudiante" class="form-label">Apellidos del Estudiante:</label>
-                                <input type="text" class="form-control" id="apellido_estudiante" name="apellido_estudiante" required>
+                                <input type="text" class="form-control" id="apellido_estudiante" name="apellido_estudiante" required readonly>
                             </div>
                             <div class="col-md-3">
-                                <label for="nombre_institucion" class="form-label">Nombre de la Institución:</label>
-                                <input type="text" class="form-control" id="nombre_institucion" name="nombre_institucion" required>
+                                <label for="escuelap" class="form-label">Escuela:</label>
+                                <input type="text" class="form-control" id="escuelap" name="escuelap" required readonly>
                             </div>
                             <div class="col-md-3">
                                 <label for="fecha_entrega" class="form-label">Fecha de Entrega del Informe:</label>
-                                <input type="date" class="form-control" id="fecha_entrega" name="fecha_entrega" required>
+                                <input type="date" class="form-control" id="fecha_entrega" name="fecha_entrega" required readonly>
                             </div>
                         </div>
-                    </fieldset>
-                </div>
-
-                <!-- Introducción -->
-                <div class="tab-pane fade" id="introduccion" role="tabpanel" aria-labelledby="introduccion-tab">
-                    <fieldset>
-                        <legend>Introducción</legend>
                         <div class="mb-3">
-                            <label for="introduccion" class="form-label">Introducción:</label>
-                            <textarea class="form-control" id="introduccion" name="introduccion" rows="4" required></textarea>
+                            <label for="intro" class="form-label">Introducción:</label>
+                            <textarea class="form-control" id="intro" name="intro" rows="4" required></textarea>
                         </div>
-                    </fieldset>
-                </div>
+                    </div>
 
-                <!-- Descripción de la Institución -->
-                <div class="tab-pane fade" id="descripcion-institucion" role="tabpanel" aria-labelledby="descripcion-institucion-tab">
-                    <fieldset>
-                        <legend>Descripción de la Institución</legend>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="razon_social" class="form-label">Razón Social de la Institución:</label>
-                                <input type="text" class="form-control" id="razon_social" name="razon_social" required>
+                    <!-- Descripción de la Institución -->
+                    <div class="tab-pane fade" id="descripcion-institucion" role="tabpanel" aria-labelledby="descripcion-institucion-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="razon_social" class="form-label">Razón Social:</label>
+                                <input type="text" class="form-control" id="razon_social" name="razon_social" required readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="direccion" class="form-label">Dirección:</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion" required>
+                                <input type="text" class="form-control" id="direccion" name="direccion" required readonly>
                             </div>
-                            <div class="col-md-4">
-                                <label for="giro_institucion" class="form-label">Giro de la Institución:</label>
-                                <input type="text" class="form-control" id="giro_institucion" name="giro_institucion" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="representante" class="form-label">Representante Legal:</label>
-                                <input type="text" class="form-control" id="representante" name="representante" required>
+                            <div class="col-md-2">
+                                <label for="giro_institucion" class="form-label">Giro:</label>
+                                <input type="text" class="form-control" id="giro_institucion" name="giro_institucion" required readonly>
                             </div>
                             <div class="col-md-3">
-                                <label for="mision" class="form-label">Misión:</label>
-                                <input type="text" class="form-control" id="mision" name="mision" required>
+                                <label for="jefe" class="form-label">Representante Legal:</label>
+                                <input type="text" class="form-control" id="jefe" name="jefe" required readonly>
                             </div>
-                            <div class="col-md-3">
-                                <label for="vision" class="form-label">Visión:</label>
-                                <input type="text" class="form-control" id="vision" name="vision" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="cantidad_trabajadores" class="form-label">Cantidad de Trabajadores:</label>
+                            <div class="col-md-1">
+                                <label for="cantidad_trabajadores" class="form-label">Trabajadores:</label>
                                 <input type="number" class="form-control" id="cantidad_trabajadores" name="cantidad_trabajadores" required>
                             </div>
+                        </div>
+                        <div class="row mb-3">      
+                            <div class="col-md-6">
+                                <label for="mision" class="form-label">Misión:</label>
+                                <textarea class="form-control" id="mision" name="mision" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="vision" class="form-label">Visión:</label>
+                                <textarea class="form-control" id="vision" name="vision" rows="3" required></textarea>
+                            </div>
+                            
                         </div>
                         <div class="mb-3">
                             <label for="infraestructura_fisica" class="form-label">Infraestructura Física:</label>
@@ -156,203 +148,471 @@
                         </div>
                         <div class="mb-3">
                             <label for="organigrama" class="form-label">Organigrama:</label>
-                            <textarea class="form-control" id="organigrama" name="organigrama" rows="3" required></textarea>
+                            <input type="file" class="form-control" id="organigrama" name="organigrama" accept="image/*" required>
                         </div>
-                    </fieldset>
-                </div>
+                    </div>
 
-                <!-- Labores Desarrolladas por el Estudiante -->
-                <div class="tab-pane fade" id="labores" role="tabpanel" aria-labelledby="labores-tab">
-                    <fieldset>
-                        <legend>Labores Desarrolladas por el Estudiante</legend>
+                    <!-- Labores Desarrolladas por el Estudiante -->
+                    <div class="tab-pane fade" id="labores" role="tabpanel" aria-labelledby="labores-tab">
                         <div class="mb-3">
-                            <label for="area_trabajo" class="form-label">Descripción del Área de Trabajo y Relaciones Laborales:</label>
+                            <label for="area_trabajo" class="form-label">Descripción del área de trabajo y relaciones laborales:</label>
                             <textarea class="form-control" id="area_trabajo" name="area_trabajo" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="labores_realizadas" class="form-label">Descripción de las Labores Realizadas:</label>
+                            <label for="labores_realizadas" class="form-label">Descripción de las labores realizadas:</label>
                             <textarea class="form-control" id="labores_realizadas" name="labores_realizadas" rows="3" required></textarea>
                         </div>
-                    </fieldset>
-                </div>
+                    </div>
 
-                <!-- Conclusiones -->
-                <div class="tab-pane fade" id="conclusiones" role="tabpanel" aria-labelledby="conclusiones-tab">
-                    <fieldset>
-                        <legend>
-                            Conclusiones
-                            <button type="button" class="btn btn-primary btn-sm" id="agregarConclusion">+</button>
-                        </legend>
-                        <table class="table table-bordered" id="tabla-conclusiones">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:center">Descripción de la conclusión</th>
-                                    <th style="text-align:center">Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><textarea class="form-control" name="conclusiones[]" rows="2" placeholder="Conclusión"></textarea></td>
-                                    <td style="text-align:center">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFilaConclusion(this)">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </fieldset>
-                </div>
-
-                <!-- Bibliografía -->
-                <div class="tab-pane fade" id="bibliografia" role="tabpanel" aria-labelledby="bibliografia-tab">
-                    <fieldset>
-                        <legend>Bibliografía</legend>
-                        <div class="mb-3">
-                            <label for="bibliografia" class="form-label">Bibliografía (Estilo IEEE):</label>
-                            <textarea class="form-control" id="bibliografia" name="bibliografia" rows="8" required></textarea>
+                    <!-- Conclusiones y Recomendaciones -->
+                    <div class="tab-pane fade" id="conclusiones" role="tabpanel" aria-labelledby="conclusiones-tab">
+                        <div class="row">
+                            <!-- Fieldset para Conclusiones -->
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <label for="tabla-conclusion" class="form-label" style="margin-top: 0px; margin-bottom: 0px; margin-right: 15px;">Conclusiones:</label>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnAgregarC"><i class="fas fa-plus"></i> Agregar</button>
+                                    <button type="button" class="btn btn-danger btn-sm ms-2" id="btnBorrarC"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                                </div>                        
+                                <table class="table table-bordered" id="tabla-conclusion">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">N°</th>
+                                            <th>Conclusión</th>
+                                            <th style="width: 10%;">Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" min="0" class="form-control text-center" name="numC[]" value=1 readonly></td>
+                                            <td><textarea type="text" id="conclusion" class="form-control" name="conclusion[]" required></textarea>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-conclusion"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                    
+                            <!-- Fieldset para Recomendaciones -->
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <label for="tabla-recomendacion" class="form-label" style="margin-top: 0px; margin-bottom: 0px; margin-right: 15px;">Recomendaciones:</label>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnAgregarR"><i class="fas fa-plus"></i> Agregar</button>
+                                    <button type="button" class="btn btn-danger btn-sm ms-2" id="btnBorrarR"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                                </div>                        
+                                <table class="table table-bordered" id="tabla-recomendacion">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 10%;">N°</th>
+                                            <th>Recomendación</th>
+                                            <th style="width: 10%;">Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="number" min="0" class="form-control text-center" name="numR[]" value=1 required readonly></td>
+                                            <td><textarea type="text" id="conclusion" class="form-control" name="recomendacion[]" required></textarea>
+                                            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-recomendacion"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </fieldset>
+                    </div>
+                    
+                    <!-- Bibliografía -->
+                    <div class="tab-pane fade" id="bibliografia" role="tabpanel" aria-labelledby="bibliografia-tab">
+                            <div class="mb-3">
+                                <label for="bibliografia" class="form-label">Bibliografía (Estilo IEEE):</label>
+                                <textarea class="form-control" id="bibliografia" name="bibliografia" rows="8" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="anexos" class="form-label">Anexos:</label>
+                                <input type="file" class="form-control" id="anexos" name="anexos" accept="image/*" required>
+                            </div>
+                    </div>
                 </div>
-
-                <!-- Recomendaciones -->
-                <div class="tab-pane fade" id="recomendaciones" role="tabpanel" aria-labelledby="recomendaciones-tab">
-                    <fieldset>
-                        <legend>
-                            Recomendaciones
-                            <button type="button" class="btn btn-primary btn-sm" id="agregarRecomendacion">+</button>
-                        </legend>
-                        <table class="table table-bordered" id="tabla-recomendaciones">
-                            <thead>
-                                <tr>
-                                    <th style="text-align:center">Descripción de la recomendación</th>
-                                    <th style="text-align:center">Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><textarea class="form-control" name="recomendaciones[]" rows="2" placeholder="Recomendación"></textarea></td>
-                                    <td style="text-align:center">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFilaRecomendacion(this)">Eliminar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </fieldset>
-                </div>
-
-                <!-- Anexos -->
-                <div class="tab-pane fade" id="anexos" role="tabpanel" aria-labelledby="anexos-tab">
-                    <fieldset>
-                        <legend>Anexos</legend>
-                        <div class="mb-3">
-                            <label for="anexos" class="form-label">Anexos:</label>
-                            <textarea class="form-control" id="anexos" name="anexos" rows="3"></textarea>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary mt-3" style="margin-top: 15px;">Guardar Informe</button>
-            </div>  
+                <div class="text-end">
+                    <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
+                    <button id="btnGuardar" type="submit" class="btn btn-primary mt-3" style="margin-top: 15px;">Guardar Informe</button>
+                </div> 
+            </div>      
         </div>
     </div>
 </div>
 
-<!-- Scripts de Bootstrap y JQuery -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Script para manejar el agregado dinámico de conclusiones y recomendaciones -->
+
 <script>
-    document.getElementById('agregarConclusion').addEventListener('click', function() {
-        var nuevaFila = `
-            <tr>
-                <td><textarea class="form-control" name="conclusiones[]" rows="2" placeholder="Conclusión"></textarea></td>
-                <td style="text-align:center">
-                    <button class="btn btn-danger btn-sm" onclick="eliminarFilaConclusion(this)">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        document.querySelector('#tabla-conclusiones tbody').insertAdjacentHTML('beforeend', nuevaFila);
+    // Evento para cuando cargas la página
+    document.addEventListener('DOMContentLoaded', function() {
+        limpiarControles();
+    });
+    
+    // Evento para Cancelar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        limpiarControles();
     });
 
-    function eliminarFilaConclusion(btn) {
-        var fila = btn.closest('tr');
-        fila.remove();
-    }
-
-    document.getElementById('agregarRecomendacion').addEventListener('click', function() {
-        var nuevaFila = `
-            <tr>
-                <td><textarea class="form-control" name="recomendaciones[]" rows="2" placeholder="Recomendación"></textarea></td>
-                <td style="text-align:center">
-                    <button class="btn btn-danger btn-sm" onclick="eliminarFilaRecomendacion(this)">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        document.querySelector('#tabla-recomendaciones tbody').insertAdjacentHTML('beforeend', nuevaFila);
-    });
-
-    function eliminarFilaRecomendacion(btn) {
-        var fila = btn.closest('tr');
-        fila.remove();
-    }
-
-     // Función para agregar conclusiones dinámicamente
-     $('#agregarConclusion').on('click', function() {
-        const nuevaConclusion = `
-            <div class="mb-3">
-                <textarea class="form-control" name="conclusiones[]" rows="2" placeholder="Conclusión"></textarea>
-            </div>
-        `;
-        $('#conclusiones-container').append(nuevaConclusion);
-    });
-
-    // Función para agregar recomendaciones dinámicamente
-    $('#agregarRecomendacion').on('click', function() {
-        const nuevaRecomendacion = `
-            <div class="mb-3">
-                <textarea class="form-control" name="recomendaciones[]" rows="2" placeholder="Recomendación"></textarea>
-            </div>
-        `;
-        $('#recomendaciones-container').append(nuevaRecomendacion);
-    });
-
-    // Enviar el formulario con AJAX
-    $('#form-informe-final').on('submit', function(event) {
-        event.preventDefault();
-        const formData = $(this).serialize();
-
-        $.ajax({
-            url: "{{ url_for('router_informe.agregar_informe_final') }}",
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: response.message,
-                        confirmButtonText: 'Aceptar'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.error || 'No se pudo guardar el informe.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al enviar el formulario.',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
+    // Función para convertir un archivo a Base64
+    function convertirABase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]); // Solo la parte Base64
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
         });
+    }
+
+    // Función para formatear la fecha
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+        
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+            Swal.fire({
+                icon: tipo,
+                title: titulo,
+                html: mensaje,
+                showConfirmButton: true,
+                timer: 5000
+            });
+        }
+
+    // Función para deshabilitar los tabs
+    function disableTabs() {
+        const tabs = document.querySelectorAll('.´p-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.p-tabs .tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.add('disabled');
+            tab.setAttribute('aria-disabled', 'true');
+            tab.setAttribute('tabindex', '-1');
+        });
+        tabContents.forEach(content => {
+            content.classList.add('disabled');
+        });
+        $('#btnFinalizar').hide();
+    }
+
+    // Función para habilitar los tabs
+    function enableTabs() {
+        const tabs = document.querySelectorAll('.informe-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.informe-tabs .tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.remove('disabled');
+            tab.removeAttribute('aria-disabled');
+            tab.removeAttribute('tabindex');
+        });
+        tabContents.forEach(content => {
+            content.classList.remove('disabled');
+        });
+        $('#btnFinalizar').show();
+    }
+
+    function limpiarControles() {     
+        document.getElementById('nombre_estudiante').value = '';
+        document.getElementById('apellido_estudiante').value = '';
+        document.getElementById('escuelap').value = '';
+        document.getElementById('fecha_entrega').value = '';
+        document.getElementById('intro').value = '';
+        document.getElementById('razon_social').value = '';
+        document.getElementById('direccion').value = '';
+        document.getElementById('giro_institucion').value = '';
+        document.getElementById('jefe').value = '';
+        document.getElementById('cantidad_trabajadores').value = '';
+        document.getElementById('mision').value = '';
+        document.getElementById('vision').value = '';
+        document.getElementById('infraestructura_fisica').value = '';
+        document.getElementById('infraestructura_tecnologica').value = '';
+        document.getElementById('organigrama').value = '';
+        document.getElementById('estudiante').value = '';
+        document.getElementById('estudiante').disabled = false;
+        document.getElementById('dropdown-estudiantes').disabled = false;
+        document.getElementById('id').value = '';
+        document.getElementById('id').disabled = false;
+        document.getElementById('idPersonaMod').value = '';
+        document.getElementById('idPersonaMod').disabled = false;
+
+        document.getElementById('area_trabajo').value = '';
+        document.getElementById('labores_realizadas').value = '';
+
+        document.getElementById('bibliografia').value = '';
+        document.getElementById('anexos').value = '';
+           
+        idPersona = '';
+
+        disableTabs();
+    }
+    
+    // Función para cargar datos de la institución
+    function obtenerDatosInstitucion(numDocInstitucion) {
+        const razonSocialInput = document.getElementById('razon_social');
+        const jefeInput = document.getElementById('jefe');
+        const giroInput = document.getElementById('giro_institucion');
+        const direccionInput = document.getElementById('direccion');
+        jefeInput.value = '';
+        giroInput.value = '';
+        fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos de la institución');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.length > 0) {
+                    razonSocialInput.value = data[0].razonSocial || 'Razón social no disponible';
+                    jefeInput.value = `${data[0].apellidos} ${data[0].nombre}` || 'Jefe no disponible';
+                    giroInput.value = data[0].giro || 'Giro no disponible';
+                    direccionInput.value = data[0].direccion || 'Direccion no disponible';   
+                } else {
+                    razonSocialInput.value = 'Razón social no disponible';
+                    jefeInput.value = 'No se encontró jefe.';
+                    giroInput.value = 'Giro no disponible';
+                    direccionInput.value = 'Direccion no disponible';
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos de la institución:', error);
+                razonSocialInput.value = 'Razón social no disponible';
+                jefeInput.value = 'No se encontró jefe.';
+                giroInput.value = 'Giro no disponible';
+                direccionInput.value = 'Direccion no disponible';
+            });
+    }
+
+    // Función para cargar datos de la práctica
+    function cargarDatosPractica(data) {
+        document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
+        document.getElementById('idPersonaMod').value = data.idPersona || '';
+        if (data.numDocInstitucion) {
+            obtenerDatosInstitucion(data.numDocInstitucion);
+        }
+    }
+
+    // Función para cargar datos del estudiante
+    function cargarDatosEstudiante(idEstudiante) {
+        if (!idEstudiante) {
+            console.error("ID de estudiante no proporcionado.");
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido.");
+            return;
+        }
+        fetch(`/obtener_estudiante_por_id/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos del estudiante');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('nombre_estudiante').value = data.nombre || 'Sin nombre';
+                    document.getElementById('apellido_estudiante').value = data.apellidos || 'Sin apellidos';
+                    document.getElementById('escuelap').value = data.escuela || 'Sin escuela';
+                } else {
+                    mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar el estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
+            });
+    }
+
+    // Evento para agregar nueva conclusión
+    $('#btnAgregarC').on('click', function() {
+        const tablaBody = $('#tabla-conclusion tbody');
+        let nuevoNumero = 1;
+        const numerosExistentes = tablaBody.find('input[name="numC[]"]').map(function() {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+
+        if (numerosExistentes.length > 0) {
+            nuevoNumero = Math.max(...numerosExistentes) + 1;
+        }
+        const nuevaFila = `<tr>
+            <td><input type="number" min="0" class="form-control text-center" name="numC[]" value="${nuevoNumero}" required readonly></td>
+            <td><textarea type="text" id="conclusion" class="form-control" name="conclusion[]" required></textarea>
+            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-conclusion"></td>
+        </tr>`;
+        tablaBody.append(nuevaFila);
     });
+
+    // Evento para eliminar una conclusión
+    $('#btnBorrarC').on('click', function() {
+        $('.seleccionar-conclusion:checked').closest('tr').remove();
+    });
+
+    // Evento para agregar nueva recomendación
+    $('#btnAgregarR').on('click', function() {
+        const tablaBody = $('#tabla-recomendacion tbody');
+        let nuevoNumero = 1;
+        const numerosExistentes = tablaBody.find('input[name="numR[]"]').map(function() {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+
+        if (numerosExistentes.length > 0) {
+            nuevoNumero = Math.max(...numerosExistentes) + 1;
+        }
+        const nuevaFila = `<tr>
+            <td><input type="number" min="0" class="form-control text-center" name="numR[]" value="${nuevoNumero}" required readonly></td>
+            <td><textarea type="text" id="recomendacion" class="form-control" name="recomendacion[]" required></textarea>
+            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-recomendacion"></td>
+        </tr>`;
+        tablaBody.append(nuevaFila);
+    });
+
+    // Evento para eliminar una recomendación
+    $('#btnBorrarR').on('click', function() {
+        $('.seleccionar-recomendacion:checked').closest('tr').remove();
+    });
+
+    // Función para mostrar y recuperar estudiantes en el dropdown-search
+    const inputEstudiante = document.getElementById('estudiante');
+    const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
+    let idPersona = 0;
+    inputEstudiante.addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_estudiantes')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEstudiantes.innerHTML = '';
+                const resultados = data.filter(estudiante => 
+                    `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(estudiante => {
+                        const li = document.createElement('li');
+                        li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
+                        li.dataset.id = estudiante.idPersona;
+                        li.addEventListener('click', () => {
+                            inputEstudiante.value = li.textContent;
+                            idPersona = estudiante.idPersona;
+                            document.getElementById('idPersonaMod').value = estudiante.idPersona;
+                            dropdownEstudiantes.classList.remove('show');
+                        });
+                        dropdownEstudiantes.appendChild(li);
+                    });
+                    dropdownEstudiantes.classList.add('show');
+                } else {
+                    dropdownEstudiantes.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error al cargar los estudiantes:', error));
+    });
+
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault();
+        const idEstudiante = idPersona;
+        const fechaActualFormateada = formatFechaParaInput(new Date());
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
+            return;
+        }
+        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+            .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener datos del estudiante');
+                    }
+                    return response.json();
+                })
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                    limpiarControles();
+                } else if (data.mensaje) {
+                    mostrarAlerta("info", "Información", data.mensaje);
+                    limpiarControles();
+                } else {
+                    const idInput = document.getElementById('id');
+                    if (idInput) {
+                        idInput.value = data.idPractica || '';
+                        idInput.disabled = true;
+                    }
+                    cargarDatosPractica(data);
+                    cargarDatosEstudiante(idEstudiante);
+                    document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar la práctica del estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+            });
+    });
+
+    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const idPractica = document.getElementById('id').value;
+        const fecha_entrega = document.getElementById('fecha_entrega').value;
+        const introduccion = document.getElementById('intro').value;
+        const cantidad_trabajadores = document.getElementById('cantidad_trabajadores').value;
+        const mision = document.getElementById('mision').value;
+        const vision = document.getElementById('vision').value;
+        const infraestructura_fisica = document.getElementById('infraestructura_fisica').value;
+        const infraestructura_tecnologica = document.getElementById('infraestructura_tecnologica').value;
+        const area_trabajo = document.getElementById('area_trabajo').value;
+        const labores_realizadas = document.getElementById('labores_realizadas').value;
+        const bibliografia = document.getElementById('bibliografia').value;
+        const organigramaInput = document.getElementById('organigrama');
+        const anexosInput = document.getElementById('anexos');
+        const organigramaBase64 = organigramaInput.files[0] ? await convertirABase64(organigramaInput.files[0]) : null;
+        const anexosBase64 = anexosInput.files[0] ? await convertirABase64(anexosInput.files[0]) : null;
+        const conclusiones = Array.from(document.querySelectorAll('#tabla-conclusion textarea[name="conclusion[]"]'))
+            .map(textarea => textarea.value.trim())
+            .filter(value => value !== '');
+        const recomendaciones = Array.from(document.querySelectorAll('#tabla-recomendacion textarea[name="recomendacion[]"]'))
+            .map(textarea => textarea.value.trim())
+            .filter(value => value !== '');
+        if (!idPractica || !fecha_entrega || !introduccion || !cantidad_trabajadores || !mision || !vision || !infraestructura_fisica || !infraestructura_tecnologica || !area_trabajo || !labores_realizadas) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, complete todos los campos requeridos.");
+            return;
+        }
+        const data = {
+            idPractica,
+            fecha_entrega,
+            introduccion,
+            cantidad_trabajadores,
+            mision,
+            vision,
+            infraestructura_fisica,
+            infraestructura_tecnologica,
+            organigrama: organigramaBase64,
+            area_trabajo,
+            labores_realizadas,
+            conclusiones,
+            recomendaciones,
+            bibliografia,
+            anexos: anexosBase64,
+        };
+        fetch('/agregar_informe_final_estudiante', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                } else {
+                    mostrarAlerta("success", "Éxito", data.mensaje);
+                    limpiarControles();
+                }
+            })
+            .catch(error => {
+                console.error('Error al guardar el informe:', error);
+                mostrarAlerta("error", "Error", "Hubo un error al guardar el informe.");
+            });
+    });
+
 </script>
 {% endblock %}

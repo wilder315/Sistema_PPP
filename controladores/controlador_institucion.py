@@ -70,7 +70,7 @@ def obtener_jefe(ruc):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT p.apellidos, p.nombre, i.giro, p.cargo 
+                SELECT p.apellidos, p.nombre, i.giro, p.cargo, i.direccion , i.razonSocial
                 FROM persona p 
                 INNER JOIN institucion i ON p.idPersona = i.idPersona 
                 WHERE i.numdoc = %s

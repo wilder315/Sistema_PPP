@@ -86,43 +86,34 @@ def agregar_informe_empresa():
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
-    
-@router_informe.route('/agregar_informe_final_estudiante', methods=['POST'])
-def agregar_informe_final():
-    try:
-        idPractica = request.form.get('idPractica')
-        nombre_estudiante = request.form.get('nombre_estudiante')
-        apellido_estudiante = request.form.get('apellido_estudiante')
-        nombre_institucion = request.form.get('nombre_institucion')
-        fecha_entrega = request.form.get('fecha_entrega')
-        introduccion = request.form.get('introduccion')
-        razon_social = request.form.get('razon_social')
-        direccion = request.form.get('direccion')
-        giro_institucion = request.form.get('giro_institucion')
-        representante = request.form.get('representante')
-        mision = request.form.get('mision')
-        vision = request.form.get('vision')
-        cantidad_trabajadores = request.form.get('cantidad_trabajadores')
-        infraestructura_fisica = request.form.get('infraestructura_fisica')
-        infraestructura_tecnologica = request.form.get('infraestructura_tecnologica')
-        organigrama = request.form.get('organigrama')
-        area_trabajo = request.form.get('area_trabajo')
-        labores_realizadas = request.form.get('labores_realizadas')
-        conclusiones = request.form.getlist('conclusiones[]')
-        bibliografia = request.form.get('bibliografia')
-        recomendaciones = request.form.getlist('recomendaciones[]')
-        anexos = request.form.get('anexos')
 
-        resultado = agregar_informe_final_estudiante(
-            idPractica, nombre_estudiante, apellido_estudiante, nombre_institucion, fecha_entrega, introduccion,
-            razon_social, direccion, giro_institucion, representante, mision, vision, cantidad_trabajadores,
-            infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo, labores_realizadas,
-            conclusiones, bibliografia, recomendaciones, anexos
-        )
-        return jsonify(resultado)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+@router_informe.route("/agregar_informe_final_estudiante", methods=["POST"])
+def agregar_informe_final_estudiante_route():
+    data = request.json
+    idPractica = data.get("idPractica")
+    fecha_entrega = data.get("fecha_entrega")
+    introduccion = data.get("introduccion")
+    cantidad_trabajadores = data.get("cantidad_trabajadores")
+    mision = data.get("mision")
+    vision = data.get("vision")
+    infraestructura_fisica = data.get("infraestructura_fisica")
+    infraestructura_tecnologica = data.get("infraestructura_tecnologica")
+    organigrama = data.get("organigrama")
+    area_trabajo = data.get("area_trabajo")
+    labores_realizadas = data.get("labores_realizadas")
+    conclusiones = data.get("conclusiones", [])
+    recomendaciones = data.get("recomendaciones", [])
+    bibliografia = data.get("bibliografia")
+    anexos = data.get("anexos")
 
+    resultado = agregar_informe_final_estudiante(
+        idPractica, fecha_entrega, introduccion, cantidad_trabajadores, 
+        mision, vision, infraestructura_fisica, infraestructura_tecnologica, 
+        organigrama, area_trabajo, labores_realizadas, conclusiones, 
+        recomendaciones, bibliografia, anexos
+    )
+
+    return jsonify(resultado)
 
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
