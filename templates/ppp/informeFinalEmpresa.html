@@ -9,90 +9,119 @@
     </ol>
 </nav>
 
-<div class="container-fluid my-4 scrollable">
+<div class="container-fluid my-4">
     <div class="card w-100">
         <div class="card-header bg-red-usat text-white">
             Informe Final de Prácticas Pre Profesionales (Elaborado por la Empresa)
         </div>
         <div class="card-body">
             <form id="form-informe-final-empresa" action="{{ url_for('router_informe.agregar_informe_final_empresa') }}" method="post">
-                <!-- Datos de la Empresa/Institución -->
-                <fieldset>
-                    <legend>Datos de la Empresa/Institución</legend>
-                    <div class="mb-3">
-                        <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
-                        <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="responsable" class="form-label">Nombre del Responsable:</label>
-                        <input type="text" class="form-control" id="responsable" name="responsable" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="grado_responsable" class="form-label">Grado del Responsable:</label>
-                        <input type="text" class="form-control" id="grado_responsable" name="grado_responsable">
-                    </div>
-                    <div class="mb-3">
-                        <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
-                        <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required>
-                    </div>
-                </fieldset>
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="tabs-informe" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="tab-datos-generales" data-bs-toggle="tab" href="#panel-datos-generales" role="tab" aria-controls="panel-datos-generales" aria-selected="true">Datos Generales</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-valoracion" data-bs-toggle="tab" href="#panel-valoracion" role="tab" aria-controls="panel-valoracion" aria-selected="false">Valoración del Estudiante</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-firma" data-bs-toggle="tab" href="#panel-firma" role="tab" aria-controls="panel-firma" aria-selected="false">Fecha y Firma</a>
+                    </li>
+                </ul>
 
-                <!-- Datos del Estudiante -->
-                <fieldset>
-                    <legend>Datos del Estudiante</legend>
-                    <div class="mb-3">
-                        <label for="nombre_estudiante" class="form-label">Nombres y Apellidos del Estudiante:</label>
-                        <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required>
+                <div class="tab-content mt-4" id="tabs-informe-content">
+                    <!-- Datos Generales -->
+                    <div class="tab-pane fade show active" id="panel-datos-generales" role="tabpanel" aria-labelledby="tab-datos-generales">
+                        <fieldset>
+                            <legend>Datos de la Empresa/Institución</legend>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
+                                    <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="responsable" class="form-label">Nombre del Responsable:</label>
+                                    <input type="text" class="form-control" id="responsable" name="responsable" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="grado_responsable" class="form-label">Grado del Responsable:</label>
+                                    <input type="text" class="form-control" id="grado_responsable" name="grado_responsable">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
+                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Datos del Estudiante</legend>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="nombre_estudiante" class="form-label">Nombres y Apellidos del Estudiante:</label>
+                                    <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="fecha_fin" class="form-label">Fecha de Término:</label>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
-                    <div class="mb-3">
-                        <label for="fecha_inicio" class="form-label">Fecha de Inicio de la Práctica:</label>
-                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha_fin" class="form-label">Fecha de Término de la Práctica:</label>
-                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
-                    </div>
-                </fieldset>
 
-                <!-- Valoración sobre el Trabajo del Estudiante -->
-                <fieldset>
-                    <legend>Valoración sobre el Trabajo del Estudiante</legend>
-                    <div class="mb-3">
-                        <label for="cumplimiento_objetivos" class="form-label">Cumplimiento de los Objetivos:</label>
-                        <textarea class="form-control" id="cumplimiento_objetivos" name="cumplimiento_objetivos" rows="3" required></textarea>
+                    <!-- Valoración del Estudiante -->
+                    <div class="tab-pane fade" id="panel-valoracion" role="tabpanel" aria-labelledby="tab-valoracion">
+                        <fieldset>
+                            <legend>Valoración sobre el Trabajo del Estudiante</legend>
+                            <div class="mb-3">
+                                <label for="cumplimiento_objetivos" class="form-label">Cumplimiento de los Objetivos:</label>
+                                <textarea class="form-control" id="cumplimiento_objetivos" name="cumplimiento_objetivos" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cumplimiento_horas" class="form-label">Cumplimiento del Total de Horas Planificadas:</label>
+                                <textarea class="form-control" id="cumplimiento_horas" name="cumplimiento_horas" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="responsabilidad" class="form-label">Responsabilidad (Disciplina, Puntualidad, Relaciones Humanas, etc.):</label>
+                                <textarea class="form-control" id="responsabilidad" name="responsabilidad" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="otros_aspectos" class="form-label">Otros Aspectos de Interés:</label>
+                                <textarea class="form-control" id="otros_aspectos" name="otros_aspectos" rows="3"></textarea>
+                            </div>
+                        </fieldset>
                     </div>
-                    <div class="mb-3">
-                        <label for="cumplimiento_horas" class="form-label">Cumplimiento del Total de Horas Planificadas:</label>
-                        <textarea class="form-control" id="cumplimiento_horas" name="cumplimiento_horas" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="responsabilidad" class="form-label">Responsabilidad (Disciplina, Puntualidad, Relaciones Humanas, etc.):</label>
-                        <textarea class="form-control" id="responsabilidad" name="responsabilidad" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="otros_aspectos" class="form-label">Otros Aspectos de Interés:</label>
-                        <textarea class="form-control" id="otros_aspectos" name="otros_aspectos" rows="3"></textarea>
-                    </div>
-                </fieldset>
 
-                <!-- Fecha y Firma -->
-                <fieldset>
-                    <legend>Fecha y Firma</legend>
-                    <div class="mb-3">
-                        <label for="fecha_firma" class="form-label">Fecha de la Firma:</label>
-                        <input type="date" class="form-control" id="fecha_firma" name="fecha_firma" required>
+                    <!-- Fecha y Firma -->
+                    <div class="tab-pane fade" id="panel-firma" role="tabpanel" aria-labelledby="tab-firma">
+                        <fieldset>
+                            <legend>Fecha y Firma</legend>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="fecha_firma" class="form-label">Fecha de la Firma:</label>
+                                    <input type="date" class="form-control" id="fecha_firma" name="fecha_firma" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="firma_responsable" class="form-label">Nombre del Responsable:</label>
+                                    <input type="text" class="form-control" id="firma_responsable" name="firma_responsable" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="cargo_firma" class="form-label">Cargo del Responsable:</label>
+                                    <input type="text" class="form-control" id="cargo_firma" name="cargo_firma" required>
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
-                    <div class="mb-3">
-                        <label for="firma_responsable" class="form-label">Nombre del Responsable:</label>
-                        <input type="text" class="form-control" id="firma_responsable" name="firma_responsable" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="cargo_firma" class="form-label">Cargo del Responsable:</label>
-                        <input type="text" class="form-control" id="cargo_firma" name="cargo_firma" required>
-                    </div>
-                </fieldset>
+                </div>
 
-                <button type="submit" class="btn btn-primary">Guardar Informe</button>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
+                </div>
             </form>
         </div>
     </div>
@@ -100,7 +129,6 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // Enviar el formulario con AJAX
     $('#form-informe-final-empresa').on('submit', function(event) {
         event.preventDefault();
         const formData = $(this).serialize();
@@ -112,28 +140,13 @@
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: response.message,
-                        confirmButtonText: 'Aceptar'
-                    });
+                    Swal.fire('¡Éxito!', 'El informe ha sido guardado correctamente.', 'success');
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.error || 'No se pudo guardar el informe.',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    Swal.fire('Error', response.error || 'No se pudo guardar el informe.', 'error');
                 }
             },
             error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al enviar el formulario.',
-                    confirmButtonText: 'Aceptar'
-                });
+                Swal.fire('Error', 'Hubo un error al enviar el formulario.', 'error');
             }
         });
     });

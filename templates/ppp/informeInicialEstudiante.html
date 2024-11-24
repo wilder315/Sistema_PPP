@@ -66,6 +66,9 @@
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link" id="empresa-tab" data-bs-toggle="tab" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">Datos de la Institución</a>
                                 </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="firmas-tab" data-bs-toggle="tab" href="#firmas" role="tab" aria-controls="firmas" aria-selected="false">Firmas</a>
+                                </li>
                             </ul>
 
                             <div class="tab-content" id="datosTabContent">
@@ -115,6 +118,22 @@
                                         <div class="col-md-6">
                                             <label for="cargo_responsable" class="form-label">Cargo:</label>
                                             <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="firmas" role="tabpanel" aria-labelledby="firmas-tab">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="firma_estudiante" class="form-label">Firma del Estudiante:</label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="firma_responsable" class="form-label">Firma del Responsable:</label>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -306,6 +325,41 @@
                 });
             }
         });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Realizar una solicitud a la API
+        fetch('/datos_ultimos_semestres_activos')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error en la respuesta del servidor");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Verifica si hay un error en los datos retornados
+                if (data.error) {
+                    console.error(data.error);
+                    document.getElementById('semestre').value = "Error al cargar datos";
+                    alert("Error: " + data.error);
+                    return;
+                }
+
+                // Verifica si hay datos disponibles
+                if (data.length > 0) {
+                    // Suponiendo que deseas usar el primer semestre activo
+                    document.getElementById('semestre').value = data[0].nombre || "Semestre no definido";
+                } else {
+                    // Muestra un mensaje si no hay semestres activos
+                    document.getElementById('semestre').value = "No hay semestres activos";
+                    alert("No hay ningún semestre activo disponible.");
+                }
+            })
+            .catch(error => {
+                // Manejo de errores generales
+                console.error('Error al obtener los datos de semestres:', error);
+                document.getElementById('semestre').value = "Error al cargar datos";
+                alert("Hubo un error al cargar los semestres. Por favor, inténtelo nuevamente.");
+            });
     });
 
     // Evento al seleccionar una institución

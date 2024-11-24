@@ -18,6 +18,11 @@ def datos_ultimos_semestres():
     semestres = controlador_semestre.obtener_ultimos_semestres()
     return jsonify(semestres)
 
+@router_semestre.route("/datos_ultimos_semestres_activos", methods=["GET"])
+def datos_ultimos_semestres_activos():
+    semestres = controlador_semestre.obtener_ultimos_semestres_activo()
+    return jsonify(semestres)
+
 @router_semestre.route("/obtener_semestre_por_id/<int:idSemestre>", methods=["GET"])
 def obtener_semestre_por_id(idSemestre):
     semestres = controlador_semestre.obtener_semestre_por_id(idSemestre)
