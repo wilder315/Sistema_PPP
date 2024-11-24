@@ -164,3 +164,30 @@ def dar_de_baja_jefe(idJefe):
         return {"error": str(e)}
     finally: 
         conexion.close()
+
+def obtener_jefe_por_doc(numDoc): 
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.idPersona, p.numDoc, p.nombre, p.apellidos, p.tel1, p.cargo, 
+                    p.correoP, p.estado, p.idGenero, p.idTipoDoc, ins.razonSocial,
+                        p.idEscuela, u.username
+                FROM persona p 
+					LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+					LEFT JOIN institucion ins ON ins.idPersona = p.idPersona
+                WHERE  u.idTipoUsuario = 4 AND ins.numDoc = %s;
+            """, (numDoc,))
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            for row in rows:
+                jefe_dict = dict(zip(column_names, row))
+                return jefe_dict
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()

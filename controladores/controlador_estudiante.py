@@ -380,3 +380,31 @@ def obtener_ultima_practica_por_alumno(idPersona):
         return {"error": str(e)}
     finally:
         conexion.close()
+        
+def obtener_estudiante_por_doc(doc_estudiante): 
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.idPersona, p.numDoc, p.nombre, p.apellidos, p.codUniversitario, p.tel1, p.tel2, 
+                    p.correoP, p.correoUSAT, p.estado, p.idGenero, p.idTipoDoc, pp.fechaInicio, pp.fechaFin, pp.numeroHorasPPP,
+                        p.idEscuela, u.username
+                FROM persona p 
+				LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+				LEFT JOIN practicas_preprofesionales pp ON pp.idPersona = p.idPersona
+                WHERE p.numDoc = %s and u.idTipoUsuario = 3
+            """, (doc_estudiante,))
+            row = cursor.fetchone()
+            if row:
+                columnas = [desc[0] for desc in cursor.description]
+                estudiante_dict = dict(zip(columnas, row))
+                return estudiante_dict
+            else:
+                return {"error": "Estudiante no encontrado"}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()

@@ -67,3 +67,8 @@ def dar_de_baja_jefe():
     idJefe = request.json.get('idJefe')
     resultado = controlador_jefe.dar_de_baja_jefe(idJefe)
     return jsonify(resultado)
+
+@router_jefe.route("/obtener_jefe_por_docc/<string:numDoc>", methods=["GET"])
+def obtener_jefe_por_docc(numDoc):
+    jefe = controlador_jefe.obtener_jefe_por_doc(numDoc)   
+    return jsonify(jefe)

@@ -99,3 +99,8 @@ def reporte_estudiantes_semestre():
 def datos_estudiantes_semestre():
     datos = controlador_estudiante.obtener_estudiantes_por_semestre()
     return jsonify(datos)
+
+@router_estudiante.route("/obtener_estudiante_por_doc/<string:doc_estudiante>", methods=["GET"])
+def obtener_estudiante_por_doc(doc_estudiante):
+    estudiante = controlador_estudiante.obtener_estudiante_por_doc(doc_estudiante)
+    return jsonify(estudiante)
