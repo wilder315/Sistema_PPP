@@ -41,8 +41,9 @@ def obtener_estudiante_por_id(idEstudiante):
             cursor.execute("""
                 SELECT p.idPersona, p.numDoc, p.nombre, p.apellidos, p.codUniversitario, p.tel1, p.tel2, 
                        p.correoP, p.correoUSAT, p.estado, p.idGenero, p.idTipoDoc, 
-                        p.idEscuela, u.username
+                        p.idEscuela, u.username, e.nombre as escuela
                 FROM persona p LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
                 WHERE p.idPersona = %s
             """, (idEstudiante,))
             row = cursor.fetchone()

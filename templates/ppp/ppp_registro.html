@@ -2,7 +2,7 @@
 {% block titulo %} Gestionar Prácticas {% endblock %}
 {% block contenido %}
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
-    <ol class="breadcrumb"  style="padding-bottom: 0px; margin-bottom: -10px;">
+    <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
         <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
         <li class="breadcrumb-item active"><a href="{{ url_for('router_main.ppp') }}">Prácticas Pre Profesionales</a></li>
@@ -561,6 +561,22 @@
             .catch(error => console.error('Error:', error));
     });
 
+    // Evento para cargar los estados dinámicamente
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/datos_estados')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('estadopractica');
+                data.forEach(estado => {
+                    const option = document.createElement('option');
+                    option.value = estado.idEstado;
+                    option.textContent = estado.nombre;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
     // Evento para cargar las instituciones dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
         fetch('/datos_instituciones')
@@ -583,34 +599,6 @@
         if (numDocInstitucion) {
             obtenerDatosInstitucion(numDocInstitucion);
         }
-    });
-
-    // Evento para agregar nueva supervisión
-    $('#btnAgregar').on('click', function() {
-        const tablaBody = $('#tabla-supervision tbody');
-        let nuevoNumero = 1;
-        const numerosExistentes = tablaBody.find('input[name="num[]"]').map(function() {
-            return parseInt($(this).val(), 10) || 0;
-        }).get();
-
-        if (numerosExistentes.length > 0) {
-            nuevoNumero = Math.max(...numerosExistentes) + 1;
-        }
-        const nuevaFila = `<tr>
-            <td><input type="number" min="0" class="form-control" name="num[]" value="${nuevoNumero}" required readonly></td>
-            <td>
-                <input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required>
-            </td>
-            <td><textarea type="text" id="funciones" class="form-control" name="funciones[]" required></textarea></td>
-            <td><textarea type="text" id="observacion" class="form-control" name="observacion[]" required></textarea></td>
-            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-supervision"></td>
-        </tr>`;
-        tablaBody.append(nuevaFila);
-    });
-
-    // Evento para eliminar una supervisión
-    $('#btnBorrar').on('click', function() {
-        $('.seleccionar-supervision:checked').closest('tr').remove();
     });
 
     // Función para cargar datos de la institución
@@ -642,20 +630,30 @@
             });
     }
 
-    // Evento para cargar los estados dinámicamente
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_estados')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('estadopractica');
-                data.forEach(estado => {
-                    const option = document.createElement('option');
-                    option.value = estado.idEstado;
-                    option.textContent = estado.nombre;
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error:', error));
+    // Evento para agregar nueva supervisión
+    $('#btnAgregar').on('click', function() {
+        const tablaBody = $('#tabla-supervision tbody');
+        let nuevoNumero = 1;
+        const numerosExistentes = tablaBody.find('input[name="num[]"]').map(function() {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+
+        if (numerosExistentes.length > 0) {
+            nuevoNumero = Math.max(...numerosExistentes) + 1;
+        }
+        const nuevaFila = `<tr>
+            <td><input type="number" min="0" class="form-control" name="num[]" value="${nuevoNumero}" required readonly></td>
+            <td><input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required></td>
+            <td><textarea type="text" id="funciones" class="form-control" name="funciones[]" required></textarea></td>
+            <td><textarea type="text" id="observacion" class="form-control" name="observacion[]" required></textarea></td>
+            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-supervision"></td>
+        </tr>`;
+        tablaBody.append(nuevaFila);
+    });
+
+    // Evento para eliminar una supervisión
+    $('#btnBorrar').on('click', function() {
+        $('.seleccionar-supervision:checked').closest('tr').remove();
     });
 
     // Función para mostrar y recuperar estudiantes en el dropdown-search
@@ -681,7 +679,6 @@
                             idPersona = li.dataset.id;
                             $('#idPersonaMod').val(response.idPersona);
                             dropdownEstudiantes.classList.remove('show');
-                            handleEstudianteChange();
                             calcularHorasPendientes();
                         });
                         dropdownEstudiantes.appendChild(li);
@@ -692,13 +689,6 @@
                 }
             })
             .catch(error => console.error('Error:', error));
-    });
-
-    // Evento para el click en estudiantes
-    document.addEventListener('click', function(event) {
-        if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
-            dropdownEstudiantes.classList.remove('show');
-        }
     });
 
     // Función para calcular horas pendientes

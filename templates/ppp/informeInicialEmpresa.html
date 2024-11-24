@@ -8,6 +8,22 @@
         <li class="breadcrumb-item active">Informe Inicial (Empresa)</li>
     </ol>
 </nav>
+<style>
+    body {
+        overflow: hidden;
+    }
+    .scrollable {
+        height: 42%;
+        overflow-y: auto;
+    }
+    fieldset {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    .form-label {
+        margin-bottom: 5px;
+    }
+</style>
 
 <div class="container-fluid my-4">
     <div class="card w-100">
@@ -16,61 +32,116 @@
         </div>
         <div class="card-body">
             <form id="form-informe-empresa">
-                <!-- Selección de práctica -->
-                <div class="mb-3">
-                    <label for="idPractica" class="form-label">Seleccionar Práctica:</label>
-                    <select class="form-control" id="idPractica" name="idPractica" required>
-                        <option value="" selected disabled>Seleccione una práctica</option>
-                    </select>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="tabs-informe" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="tab-generales" data-bs-toggle="tab" href="#panel-generales" role="tab" aria-controls="panel-generales" aria-selected="true">Datos Generales</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-compromiso-labores" data-bs-toggle="tab" href="#panel-compromiso-labores" role="tab" aria-controls="panel-compromiso-labores" aria-selected="false">Compromiso y Labores</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-firmas" data-bs-toggle="tab" href="#panel-firmas" role="tab" aria-controls="panel-firmas" aria-selected="false">Firmas</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-4" id="tabs-informe-content">
+                    <!-- Datos Generales -->
+                    <div class="tab-pane fade show active" id="panel-generales" role="tabpanel" aria-labelledby="tab-generales">
+                        <fieldset>
+                            <legend>Datos del Estudiante</legend>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="apellidos_estudiante" class="form-label">Apellidos:</label>
+                                    <select class="form-control" id="apellidos_estudiante" name="apellidos_estudiante">
+                                        <option value="" disabled selected>Seleccione un estudiante</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="fecha_fin" class="form-label">Fecha de Final:</label>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Datos de la Institución</legend>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="nombre_empresa" class="form-label">Razón Social de la Institución:</label>
+                                    <select class="form-control" id="nombre_empresa" name="nombre_empresa">
+                                        <option value="" disabled selected>Seleccione una institución</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="responsable" class="form-label">Nombre del Responsable:</label>
+                                    <input type="text" class="form-control" id="responsable" name="responsable" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
+                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Compromiso y Labores -->
+                    <div class="tab-pane fade" id="panel-compromiso-labores" role="tabpanel" aria-labelledby="tab-compromiso-labores">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <fieldset>
+                                    <legend>Aceptación y Compromiso</legend>
+                                    <div class="mb-3">
+                                        <label for="aceptacion" class="form-label">Aceptación y compromiso de la empresa:</label>
+                                        <textarea class="form-control" id="aceptacion" name="aceptacion" rows="7" required></textarea>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-md-6">
+                                <fieldset>
+                                    <legend>Labores del Practicante</legend>
+                                    <button type="button" class="btn btn-primary btn-sm mb-2" id="agregarLabor">
+                                        <i class="fas fa-plus"></i> Agregar Labor
+                                    </button>
+                                    <table class="table table-bordered" id="tabla-labores">
+                                        <thead>
+                                            <tr>
+                                                <th>Descripción de la labor</th>
+                                                <th>Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input type="text" class="form-control" name="labores[]" placeholder="Descripción de la labor" required></td>
+                                                <td><button class="btn btn-danger btn-sm" onclick="eliminarFilaLabor(this)">Eliminar</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Firmas -->
+                    <div class="tab-pane fade" id="panel-firmas" role="tabpanel" aria-labelledby="tab-firmas">
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="firma_responsable" class="form-label">Firma del Responsable:</label>
+                                    <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="firma_estudiante" class="form-label">Firma del Estudiante:</label>
+                                    <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
-
-                <!-- Datos Generales -->
-                <fieldset>
-                    <legend>Datos de la Empresa/Institución</legend>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
-                            <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="responsable" class="form-label">Nombre del Responsable:</label>
-                            <input type="text" class="form-control" id="responsable" name="responsable" readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
-                            <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <!-- Aceptación y Compromiso -->
-                <fieldset>
-                    <legend>Aceptación y Compromiso</legend>
-                    <div class="mb-3">
-                        <label for="aceptacion" class="form-label">Aceptación y compromiso de la empresa:</label>
-                        <textarea class="form-control" id="aceptacion" name="aceptacion" rows="3" required></textarea>
-                    </div>
-                </fieldset>
-
-                <!-- Labores del Practicante -->
-                <fieldset>
-                    <legend>Labores del Practicante</legend>
-                    <button type="button" class="btn btn-primary btn-sm" id="agregarLabor"><i class="fas fa-plus"></i> Agregar Labor</button>
-                    <table class="table table-bordered" id="tabla-labores">
-                        <thead>
-                            <tr>
-                                <th>Descripción de la labor</th>
-                                <th>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="text" class="form-control" name="labores[]" placeholder="Descripción de la labor" required></td>
-                                <td><button class="btn btn-danger btn-sm" onclick="eliminarFilaLabor(this)">Eliminar</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </fieldset>
 
                 <div class="text-end">
                     <button type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
@@ -84,134 +155,90 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Cargar prácticas dinámicamente
-    function cargarPracticas() {
-        $.ajax({
-            url: '/obtener_practicas_informe_inicial',
-            type: 'GET',
-            contentType: 'application/json',
-            success: function (response) {
-                const practicaSelect = $('#idPractica');
-                practicaSelect.empty();
-                practicaSelect.append('<option value="" disabled selected>Seleccione una práctica</option>');
-
-                if (response.success === false) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.error,
-                        confirmButtonText: 'Aceptar'
-                    });
-                    return;
-                }
-
-                response.forEach(function (practica) {
-                    const { idPractica, estudiante, institucion, fechaInicio, fechaFin } = practica;
-                    const textoOpcion = `ID: ${idPractica} - Estudiante: ${estudiante} - Institución: ${institucion}`;
-                    practicaSelect.append(`<option value="${idPractica}">${textoOpcion}</option>`);
+    // Cargar estudiantes
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/datos_estudiantes')
+            .then(response => response.json())
+            .then(data => {
+                const selectEstudiantes = document.getElementById('apellidos_estudiante');
+                data.forEach(estudiante => {
+                    const option = document.createElement('option');
+                    option.value = estudiante.idPersona;
+                    option.textContent = `${estudiante.apellidos}, ${estudiante.nombre}`;
+                    selectEstudiantes.appendChild(option);
                 });
-            },
-            error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al cargar las prácticas. Intente nuevamente.',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-        });
-    }
+            })
+            .catch(error => console.error('Error al cargar estudiantes:', error));
+    });
 
-    // Al seleccionar una práctica, cargar datos de la empresa
-    $('#idPractica').on('change', function () {
-        const idPractica = $(this).val();
-        if (idPractica) {
-            $.ajax({
-                url: `/get_institucion_responsable/${idPractica}`,
-                type: 'GET',
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        $('#nombre_empresa').val(response.razonSocial);
-                        $('#responsable').val(response.nombre_responsable);
-                        $('#cargo_responsable').val(response.cargo_responsable);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message || 'No se encontraron datos para la práctica seleccionada.',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un error al obtener los datos del responsable.',
-                        confirmButtonText: 'Aceptar'
-                    });
+    // Actualizar nombres del estudiante según el seleccionado
+    document.getElementById('apellidos_estudiante').addEventListener('change', function () {
+        const selectedId = this.value;
+        fetch(`/datos_estudiantes`)
+            .then(response => response.json())
+            .then(data => {
+                const estudiante = data.find(e => e.idPersona == selectedId);
+                if (estudiante) {
+                    document.getElementById('nombres_estudiante').value = estudiante.nombre;
                 }
             });
-        }
     });
 
-    // Agregar una nueva fila de labor
-    $('#agregarLabor').on('click', function () {
-        const nuevaFila = `
-            <tr>
-                <td><input type="text" class="form-control" name="labores[]" placeholder="Descripción de la labor" required></td>
-                <td><button class="btn btn-danger btn-sm" onclick="eliminarFilaLabor(this)">Eliminar</button></td>
-            </tr>`;
-        $('#tabla-labores tbody').append(nuevaFila);
+    // Cargar instituciones
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/datos_instituciones')
+            .then(response => response.json())
+            .then(data => {
+                const selectInstituciones = document.getElementById('nombre_empresa');
+                data.forEach(institucion => {
+                    const option = document.createElement('option');
+                    option.value = institucion.numDoc;
+                    option.textContent = institucion.razonSocial;
+                    selectInstituciones.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error al cargar instituciones:', error));
     });
 
-    // Eliminar una fila de labor
+    // Actualizar datos del responsable según la institución seleccionada
+    document.getElementById('nombre_empresa').addEventListener('change', function () {
+        const selectedNumDoc = this.value;
+        fetch(`/jefe_institucion?ruc=${selectedNumDoc}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    document.getElementById('responsable').value = data[0].nombre || 'N/A';
+                    document.getElementById('cargo_responsable').value = data[0].cargo || 'N/A';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar datos del responsable:', error);
+            });
+    });
+
+    // Eliminar fila de labor
     function eliminarFilaLabor(btn) {
         $(btn).closest('tr').remove();
     }
 
-    // Enviar el formulario con AJAX
-    $('#form-informe-empresa').on('submit', function(event) {
-    event.preventDefault();
-    const formData = $(this).serialize();
+    // Enviar formulario
+    $('#form-informe-empresa').on('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
 
-    $.ajax({
-        url: "{{ url_for('router_informe.agregar_informe_empresa') }}",
-        type: 'POST',
-        data: formData,
-        dataType: 'json',
-        success: function(response) {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: response.message,
-                    confirmButtonText: 'Aceptar'
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: response.error || 'No se pudo guardar el informe.',
-                    confirmButtonText: 'Aceptar'
-                });
+        $.ajax({
+            url: "{{ url_for('router_informe.agregar_informe_empresa') }}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                Swal.fire('¡Éxito!', 'El informe ha sido guardado correctamente.', 'success');
+            },
+            error: function () {
+                Swal.fire('Error', 'No se pudo guardar el informe.', 'error');
             }
-        },
-        error: function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al enviar el formulario.',
-                confirmButtonText: 'Aceptar'
-            });
-        }
-    });
-});
-
-    // Inicializar funciones al cargar la página
-    $(document).ready(function () {
-        cargarPracticas();
+        });
     });
 </script>
 {% endblock %}
