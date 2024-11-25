@@ -145,8 +145,11 @@
                             
                         </div>
                         <div class="col-lg-4 mb-3"> 
-                            <label for="firma_imagen" class="form-label">Subir Firma:</label>
-                            <input type="file" class="form-control" id="firma_imagen" name="firma_imagen" accept="image/*">
+                            <label for="firma_imagen" class="form-label">Firma del Responsable:</label>
+                            <input type="file" class="form-control" id="firma_imagen" name="firma_imagen" accept="image/*" required>
+                            <div class="mt-2">
+                                <img id="firma_imagen-preview" src="#" alt="Vista previa de la firma_imagen" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                            </div>
                         </div> 
                     </div>
                     
@@ -221,6 +224,23 @@
             }); 
         });
     
+        // Evento para vista previa de la firma_imagen
+        document.getElementById('firma_imagen').addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById('firma_imagen-preview');
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.src = '#';
+                    preview.style.display = 'none';
+                }
+            });
+
         // Acción al buscar estudiante
         $('#buscar_estudiante').on('click', function() {
             var doc_estudiante = $('#doc_estudiante').val(); // Obtener el doc_estudiante
