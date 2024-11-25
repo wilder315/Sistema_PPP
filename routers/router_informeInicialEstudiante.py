@@ -51,15 +51,11 @@ def agregar_informe():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
     
-
-
-    
 @router_informe.route('/obtener_practicas_informe_inicial', methods=['GET'])
 def obtener_practicas_ajax():
         # Llama a la función del controlador y obtiene los datos
         practicas_informe_inicial = controlador_informeInicialEstudiante.obtener_practicas_informe_inicial()
         return jsonify(practicas_informe_inicial)
-
 
 @router_informe.route('/agregar_informe_inicial_empresa', methods=['POST'])
 def agregar_informe_empresa():
@@ -118,11 +114,15 @@ def agregar_informe_final_estudiante_route():
     except Exception as e:
         print(f"Error en la ruta: {e}")
         return jsonify({"error": str(e)})
+    
+@router_informe.route("/obtener_informe_final_estudiante/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
+def obtener_informe_final_estudiante(idEstudiante, idPractica):
+    resultado = controlador_informeInicialEstudiante.obtener_informe_final_estudiante(idEstudiante, idPractica)
+    return jsonify(resultado)
 
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
     try:
-        # Obtener datos del formulario
         nombre_empresa = request.form.get('nombre_empresa')
         responsable = request.form.get('responsable')
         grado_responsable = request.form.get('grado_responsable')
@@ -138,7 +138,6 @@ def agregar_informe_final_empresa():
         firma_responsable = request.form.get('firma_responsable')
         cargo_firma = request.form.get('cargo_firma')
 
-        # Llamar al controlador para agregar el informe
         resultado = agregar_informe_final_empresa(
             nombre_empresa, responsable, grado_responsable, cargo_responsable,
             nombre_estudiante, fecha_inicio, fecha_fin, cumplimiento_objetivos,
@@ -149,3 +148,8 @@ def agregar_informe_final_empresa():
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+@router_informe.route("/estado_informe_final/<int:idEstudiante>", methods=["GET"])
+def estado_informe_final(idEstudiante):
+    resultado = controlador_informeInicialEstudiante.obtener_estado_informe_final_estudiante(idEstudiante)
+    return jsonify(resultado)

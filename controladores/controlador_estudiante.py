@@ -32,6 +32,38 @@ def obtener_estudiantes():
         conexion.close()
     return estudiantes
 
+def obtener_estudiantes_buscar():
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    estudiantes = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT p.idPersona, p.numDoc, p.nombre, p.apellidos, p.codUniversitario, p.tel1, p.tel2, 
+                                p.correoP, p.correoUSAT, p.estado, g.nombre as genero, td.nombre as tipoDocumento, 
+                                e.nombre as escuela, u.username as usuario
+                FROM persona p
+                LEFT JOIN genero g ON p.idGenero = g.idGenero
+                LEFT JOIN tipo_documento td ON p.idTipoDoc = td.idTipoDoc
+                LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
+                LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                INNER JOIN practicas_preprofesionales pp ON p.idPersona = pp.idPersona
+                WHERE u.idTipoUsuario = 3
+                  AND pp.estadoVigencia = 'P'
+                ORDER BY p.apellidos ASC, p.nombre ASC
+            """)
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            for row in rows:
+                estudiante_dict = dict(zip(column_names, row))
+                estudiantes.append(estudiante_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return estudiantes
+
 def obtener_estudiante_por_id(idEstudiante):
     conexion = obtener_conexion()
     if not conexion:
@@ -168,7 +200,7 @@ def dar_de_baja_estudiante(idEstudiante):
         return {"error": str(e)}  
     finally:
         conexion.close()
-   
+
 #------------------------ CARLOS DELGADO
 def obtener_estudiantes_por_fecha(): 
     conexion = obtener_conexion()

@@ -35,7 +35,7 @@
         </div>
         <div class="card-body">
             <fieldset>   
-                <div class="row">      
+                <div class="row align-items-end">      
                     <div class="col-4">
                         <label for="estudiante" class="form-label">Estudiante:</label>
                         <div class="d-flex align-items-end">
@@ -49,11 +49,16 @@
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
-                    </div>   
+                    </div>
+                    <div class="col-4 d-flex justify-content-left">
+                        <button id="btnCancelar" type="button" class="btn btn-danger me-2">Cancelar</button>
+                        <button id="btnGuardar" type="submit" class="btn btn-primary">Guardar Informe</button>
+                    </div> 
                     <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
                     <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
                 </div>   
             </fieldset>
+            
             
             <div class="informe-tabs">
                 <!-- Nav tabs -->
@@ -260,10 +265,6 @@
                         </div>    
                     </div>
                 </div>
-                <div class="text-end">
-                    <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
-                    <button id="btnGuardar" type="submit" class="btn btn-primary mt-3" style="margin-top: 15px;">Guardar Informe</button>
-                </div> 
             </div>      
         </div>
     </div>
@@ -499,6 +500,69 @@
             });
     }
 
+    // Función para cargar datos del informe
+    function cargarDatosInforme(informe) {
+        if (!informe || informe.error) {
+            mostrarAlerta("warning", "Advertencia", informe ? informe.error : "No se encontraron datos del informe.");
+            return;
+        }
+        document.getElementById('fecha_entrega').value = informe.fecha || '';
+        document.getElementById('intro').value = informe.introduccion || '';
+        document.getElementById('cantidad_trabajadores').value = informe.trabajadores || '';
+        document.getElementById('mision').value = informe.mision || '';
+        document.getElementById('vision').value = informe.vision || '';
+        document.getElementById('infraestructura_fisica').value = informe.infFisica || '';
+        document.getElementById('infraestructura_tecnologica').value = informe.infTecnologica || '';
+        document.getElementById('area_trabajo').value = informe.area || '';
+        document.getElementById('labores_realizadas').value = informe.labores || '';
+        document.getElementById('bibliografiai').value = informe.bibliografia || '';
+        const organigramaPreview = document.getElementById('organigrama-preview');
+        if (informe.organigrama) {
+            organigramaPreview.src = `data:image/png;base64,${informe.organigrama}`;
+            organigramaPreview.style.display = 'block';
+        } else {
+            organigramaPreview.src = '#';
+            organigramaPreview.style.display = 'none';
+        }
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        const anexosPreview = document.getElementById('anexos-preview');
+        if (informe.anexos) {
+            anexosPreview.src = `data:application/pdf;base64,${informe.anexos}`;
+            anexosPreviewContainer.style.display = 'block';
+        } else {
+            anexosPreview.src = '';
+            anexosPreviewContainer.style.display = 'none';
+        }
+        const conclusionesTableBody = document.querySelector('#tabla-conclusion tbody');
+        conclusionesTableBody.innerHTML = '';
+        if (informe.conclusiones && informe.conclusiones.length > 0) {
+            informe.conclusiones.forEach((conclusion, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="number" class="form-control text-center" name="numC[]" value="${index + 1}" readonly></td>
+                        <td><textarea class="form-control" name="conclusion[]" required>${conclusion}</textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-conclusion"></td>
+                    </tr>
+                `;
+                conclusionesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+        const recomendacionesTableBody = document.querySelector('#tabla-recomendacion tbody');
+        recomendacionesTableBody.innerHTML = '';
+        if (informe.recomendaciones && informe.recomendaciones.length > 0) {
+            informe.recomendaciones.forEach((recomendacion, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="number" class="form-control text-center" name="numR[]" value="${index + 1}" readonly></td>
+                        <td><textarea class="form-control" name="recomendacion[]" required>${recomendacion}</textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-recomendacion"></td>
+                    </tr>
+                `;
+                recomendacionesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+    }
+
     // Evento para agregar nueva conclusión
     $('#btnAgregarC').on('click', function() {
         const tablaBody = $('#tabla-conclusion tbody');
@@ -622,7 +686,7 @@
     let idPersona = 0;
     inputEstudiante.addEventListener('input', function () {
         const searchText = this.value.toLowerCase();
-        fetch('/datos_estudiantes')
+        fetch('/datos_estudiantes_buscar')
             .then(response => response.json())
             .then(data => {
                 dropdownEstudiantes.innerHTML = '';
@@ -659,36 +723,102 @@
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
-        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+        fetch(`/estado_informe_final/${idEstudiante}`)
             .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error al obtener datos del estudiante');
-                    }
-                    return response.json();
-                })
-            .then(data => {
-                if (data.error) {
-                    mostrarAlerta("error", "Error", data.error);
-                    limpiarControles();
-                } else if (data.mensaje) {
-                    mostrarAlerta("info", "Información", data.mensaje);
-                    limpiarControles();
-                } else {
-                    const idInput = document.getElementById('id');
-                    if (idInput) {
-                        idInput.value = data.idPractica || '';
-                        idInput.disabled = true;
-                    }
-                    cargarDatosPractica(data);
-                    cargarDatosEstudiante(idEstudiante);
-                    enableTabs();
-                    document.getElementById('estudiante').disabled = true;
-                    document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                if (!response.ok) {
+                    throw new Error('Error al obtener el estado del informe final');
                 }
+                return response.json();
+            })
+            .then(estadoData => {
+                const estado = estadoData.estado;
+                if (estado === 3) {
+                    mostrarAlerta("info", "Información", "El estudiante ya tiene un informe final aprobado.");
+                    limpiarControles();
+                    return;
+                } else if (estado === 2) {
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe final del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        enableTabs();
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe final:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else if (estado === 1) {
+                    mostrarAlerta("warning", "Advertencia", "El estudiante tiene un informe final rechazado.");
+                    limpiarControles();
+                    return;
+                }
+                fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener datos del estudiante');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            mostrarAlerta("error", "Error", data.error);
+                            limpiarControles();
+                        } else if (data.mensaje) {
+                            mostrarAlerta("info", "Información", data.mensaje);
+                            limpiarControles();
+                        } else {
+                            const idInput = document.getElementById('id');
+                            if (idInput) {
+                                idInput.value = data.idPractica || '';
+                                idInput.disabled = true;
+                            }
+                            cargarDatosPractica(data);
+                            cargarDatosEstudiante(idEstudiante);
+                            enableTabs();
+                            document.getElementById('estudiante').disabled = true;
+                            document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar la práctica del estudiante:", error);
+                        mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                    });
             })
             .catch(error => {
-                console.error("Error al buscar la práctica del estudiante:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                console.error("Error al obtener el estado del informe final:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar el estado del informe final.");
             });
     });
 

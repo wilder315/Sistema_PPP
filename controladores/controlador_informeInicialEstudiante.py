@@ -180,7 +180,7 @@ def agregar_informe_final_estudiante(
     ):
     
     conexion = obtener_conexion()
-    tipoInforme = 4
+    tipoInforme = 3
     estado = 'P'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -223,6 +223,45 @@ def agregar_informe_final_estudiante(
     finally:
         conexion.close()
 
+def obtener_informe_final_estudiante(idEstudiante, idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    i.estado, i.fecha, i.introduccion, i.trabajadores, i.mision, i.vision, 
+                    i.infFisica, i.infTecnologica, i.organigrama, i.area, i.labores, 
+                    i.anexos, i.bibliografia, i.idInforme
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s AND pp.idPractica = %s AND i.idTipoInforme = 3
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante, idPractica))
+            informe = cursor.fetchone()
+            if not informe:
+                return {"error": "No se encontró un informe final asociado a esta práctica."}         
+            column_names = [desc[0] for desc in cursor.description]
+            informe_dict = dict(zip(column_names, informe))
+            cursor.execute("""
+                SELECT tipo, descripcion
+                FROM adicionales
+                WHERE idInforme = %s
+            """, (informe_dict['idInforme'],))
+            adicionales = cursor.fetchall()
+            conclusiones = [adicional[1] for adicional in adicionales if adicional[0] == 'C']
+            recomendaciones = [adicional[1] for adicional in adicionales if adicional[0] == 'R']
+            informe_dict['conclusiones'] = conclusiones
+            informe_dict['recomendaciones'] = recomendaciones
+            return informe_dict
+    except Exception as e:
+        return {"error": f"Error al obtener el informe: {str(e)}"}
+    finally:
+        conexion.close()
+
 def agregar_informe_final_empresa(nombre_empresa, responsable, grado_responsable, cargo_responsable,
                                   nombre_estudiante, fecha_inicio, fecha_fin, cumplimiento_objetivos,
                                   cumplimiento_horas, responsabilidad, otros_aspectos, fecha_firma,
@@ -262,5 +301,39 @@ def agregar_informe_final_empresa(nombre_empresa, responsable, grado_responsable
     except Exception as e:
         conexion.rollback()
         return {"success": False, "error": str(e)}
+    finally:
+        conexion.close()
+
+   
+def obtener_estado_informe_final_estudiante(idEstudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT i.estado
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s
+                  AND i.idTipoInforme = 3
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante,))
+            
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                estado = resultado[0]
+                if estado == 'A':  # Aprobado
+                    return {"estado": 3}
+                elif estado == 'P':  # Pendiente
+                    return {"estado": 2}
+                elif estado == 'R':  # Rechazado
+                    return {"estado": 1}
+            return {"estado": 0}  # No tiene informe de tipo 3
+    except Exception as e:
+        return {"error": str(e)}
     finally:
         conexion.close()
