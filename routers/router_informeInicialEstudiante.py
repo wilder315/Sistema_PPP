@@ -28,25 +28,19 @@ def agregar_informe_inicial_estudiante_route():
         # Extraer datos del JSON recibido
         idInforme = data.get("idInforme")  # Puede ser None si es un nuevo informe
         idPractica = data.get("idPractica")
-        fecha_inicio = data.get("fecha_inicio")
-        fecha_fin = data.get("fecha_fin")
+        fecha = data.get('fecha')
         objetivos = data.get("objetivos", [])
-        plan_trabajo = data.get("plan_trabajo", {})
+        plan_trabajos = data.get("plan_trabajos", [])
         firma1 = data.get("firma1")  # Firma del estudiante
         firma2 = data.get("firma2")  # Firma del responsable
-
-        # Validaciones básicas
-        if not idPractica or not fecha_inicio or not fecha_fin or not firma1 or not firma2:
-            return jsonify({"error": "Faltan campos obligatorios."}), 400
 
         # Llamar a la función de controlador
         resultado = agregar_informe_inicial_estudiante(
             idInforme=idInforme,
             idPractica=idPractica,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
+            fecha=fecha,
             objetivos=objetivos,
-            plan_trabajo=plan_trabajo,
+            plan_trabajos=plan_trabajos,
             firma1=firma1,
             firma2=firma2
         )

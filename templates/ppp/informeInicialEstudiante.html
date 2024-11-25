@@ -52,7 +52,8 @@
                         </div>                                     
                         <div class="col"></div>  
                         <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
-                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
+                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">  
+                        <input type="hidden" id="idInformeMod" name="idInformeMod">                                                                                       
                     </div>   
                 </fieldset>
                 <div class="row">    
@@ -136,6 +137,10 @@
                                             <div class="mt-2">
                                                 <img id="firma_responsable-preview" src="#" alt="Vista previa de la firma_responsable" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
                                             </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="fecha_entrega" class="form-label">Fecha de Entrega del Informe:</label>
+                                            <input type="date" class="form-control" id="fecha_entrega" name="fecha_entrega" required readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -292,18 +297,24 @@
 
     // Enviar el formulario con AJAX y mostrar alerta de éxito
     // Función para guardar el informe
+// Función para guardar el informe inicial
 document.getElementById('btnGuardar').addEventListener('click', async function (event) {
     event.preventDefault(); // Evita el envío automático del formulario
 
     // Obtener los valores de los campos
     const idPractica = document.getElementById('id').value;
-    const fechaInicio = document.getElementById('fecha_inicio').value;
-    const fechaFin = document.getElementById('fecha_fin').value;
+    const idInforme = document.getElementById('idInformeMod').value;
+    const fecha_entrega = document.getElementById('fecha_entrega').value;
+
     // Procesar archivos para las firmas en formato Base64
     const firmaEstudianteInput = document.getElementById('firma_estudiante');
     const firmaResponsableInput = document.getElementById('firma_responsable');
-    const firmaEstudianteBase64 = firmaEstudianteInput.files[0] ? await convertirABase64(firmaEstudianteInput.files[0]) : null;
-    const firmaResponsableBase64 = firmaResponsableInput.files[0] ? await convertirABase64(firmaResponsableInput.files[0]) : null;
+    const firmaEstudianteBase64 = firmaEstudianteInput.files[0] 
+        ? await convertirABase64(firmaEstudianteInput.files[0]) 
+        : null;
+    const firmaResponsableBase64 = firmaResponsableInput.files[0] 
+        ? await convertirABase64(firmaResponsableInput.files[0]) 
+        : null;
 
     // Recopilar los objetivos
     const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos input[name="objetivo[]"]'))
@@ -319,16 +330,25 @@ document.getElementById('btnGuardar').addEventListener('click', async function (
         horas: row.querySelector('input[name="horas[]"]').value,
     }));
 
-   
+    // Validar los campos obligatorios
+    if (!idPractica || !firmaEstudianteBase64 || !firmaResponsableBase64) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'Por favor, complete todos los campos requeridos.',
+        });
+        return;
+    }
+
     // Preparar datos para enviar
     const data = {
+        idInforme,
         idPractica,
-        fecha_inicio: fechaInicio,
-        fecha_fin: fechaFin,
+        fecha_entrega,
         firma_estudiante: firmaEstudianteBase64,
         firma_responsable: firmaResponsableBase64,
         objetivos,
-        plan_trabajo: planTrabajo,
+        plan_trabajo,
     };
 
     // Enviar los datos al servidor
@@ -365,6 +385,16 @@ document.getElementById('btnGuardar').addEventListener('click', async function (
             });
         });
 });
+
+// Función para convertir archivos a Base64
+async function convertirABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
 
 // Variables globales para almacenar las firmas previas
 let firma_estudianteBase64Previo = null;
@@ -547,11 +577,20 @@ async function convertirABase64(file) {
             dropdownEstudiantes.classList.remove('show');
         }
     });
+    // Función para formatear la fecha
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 
     // Función para buscar por Estudiante
     document.getElementById('btnBuscarE').addEventListener('click', function (event) {
         event.preventDefault();
         const idEstudiante = idPersona;
+        const fechaActualFormateada = formatFechaParaInput(new Date());
         if (!idEstudiante) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
@@ -575,6 +614,8 @@ async function convertirABase64(file) {
                         idInput.disabled = true;
                     }
                     cargarDatosEstudiante(idEstudiante);
+                    document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                    
                 }
             })
             .catch(error => {

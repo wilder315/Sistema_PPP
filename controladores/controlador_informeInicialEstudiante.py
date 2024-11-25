@@ -47,7 +47,7 @@ def obtener_responsable_institucion(numDoc):
         conexion.close()
 
 def agregar_informe_inicial_estudiante(
-        idInforme, idPractica, fecha_inicio, fecha_fin, objetivos, plan_trabajo, firma1, firma2
+        idInforme, idPractica, fecha, objetivos, plan_trabajos, firma1, firma2
     ):
     conexion = obtener_conexion()
     tipoInforme = 1  # Asumiendo que 1 corresponde a "Informe Inicial"
@@ -60,10 +60,10 @@ def agregar_informe_inicial_estudiante(
                 # Actualización del informe inicial existente
                 cursor.execute("""
                     UPDATE informe
-                    SET estado = %s, fecha = %s, labor = %s, extras = %s, firma1 = %s, firma2 = %s
+                    SET estado = %s, fecha = %s, firma1 = %s, firma2 = %s
                     WHERE idInforme = %s
                 """, (
-                    estado, fecha_inicio, f"Inicio: {fecha_inicio}, Fin: {fecha_fin}", None, firma1, firma2, idInforme
+                    estado, fecha, firma1, firma2, idInforme
                 ))
                 # Eliminar objetivos y plan de trabajo antiguos asociados al informe
                 cursor.execute("DELETE FROM objetivos WHERE idInforme = %s", (idInforme,))
@@ -74,23 +74,22 @@ def agregar_informe_inicial_estudiante(
                         INSERT INTO objetivos (descripcion, idInforme)
                         VALUES (%s, %s)
                     """, (objetivo, idInforme))
-                # Insertar nuevo plan de trabajo
-                for semana, detalles in plan_trabajo.items():
+                # Insertar plan de trabajo
+                for plan_trabajo in plan_trabajos:
                     cursor.execute("""
                         INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
                         VALUES (%s, %s, %s, %s, %s, %s)
-                    """, (semana, detalles['fechaInicio'], detalles['fechaFin'], detalles['actividades'], detalles['horas'], idInforme))
-                conexion.commit()
+                    """, (plan_trabajo, idInforme))
                 return {"mensaje": "Informe inicial de estudiante actualizado correctamente."}
             else:
                 # Registro de un nuevo informe inicial
                 cursor.execute("""
                     INSERT INTO informe (
-                        estado, fecha, labor, extras, firma1, firma2, idTipoInforme
+                        estado, fecha, firma1, firma2, idTipoInforme
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s)
                 """, (
-                    estado, fecha_inicio, f"Inicio: {fecha_inicio}, Fin: {fecha_fin}", None, firma1, firma2, tipoInforme
+                    estado, fecha, firma1, firma2, tipoInforme
                 ))
                 idInforme = cursor.lastrowid
                 # Insertar objetivos
@@ -100,11 +99,11 @@ def agregar_informe_inicial_estudiante(
                         VALUES (%s, %s)
                     """, (objetivo, idInforme))
                 # Insertar plan de trabajo
-                for semana, detalles in plan_trabajo.items():
+                for plan_trabajo in plan_trabajos:
                     cursor.execute("""
                         INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
                         VALUES (%s, %s, %s, %s, %s, %s)
-                    """, (semana, detalles['fechaInicio'], detalles['fechaFin'], detalles['actividades'], detalles['horas'], idInforme))
+                    """, (plan_trabajo, idInforme))
                 # Asociar el informe con la práctica preprofesional
                 cursor.execute("""
                     INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
