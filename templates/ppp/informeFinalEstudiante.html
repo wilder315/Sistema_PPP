@@ -26,6 +26,11 @@
     td {
         padding: 0 !important;
     }
+    .badge {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
 </style>
 
 <div class="container-fluid my-4 scrollable">
@@ -35,7 +40,7 @@
         </div>
         <div class="card-body">
             <fieldset>   
-                <div class="row">      
+                <div class="row align-items-end">      
                     <div class="col-4">
                         <label for="estudiante" class="form-label">Estudiante:</label>
                         <div class="d-flex align-items-end">
@@ -49,11 +54,18 @@
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
-                    </div>   
+                    </div>
+                    <div class="col-4 offset-4 d-flex justify-content-end align-items-center">
+                        <span id="estado-indicador" class="badge d-none me-3"></span>
+                        <button id="btnCancelar" type="button" class="btn btn-danger me-2">Cancelar</button>
+                        <button id="btnGuardar" type="submit" class="btn btn-primary">Guardar Informe</button>     
+                    </div> 
                     <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
-                    <input type="hidden" id="idPersonaMod" name="idPersonaMod">                                                                                     
+                    <input type="hidden" id="idPersonaMod" name="idPersonaMod">
+                    <input type="hidden" id="idInformeMod" name="idInformeMod">                                                                                                
                 </div>   
             </fieldset>
+            
             
             <div class="informe-tabs">
                 <!-- Nav tabs -->
@@ -260,10 +272,6 @@
                         </div>    
                     </div>
                 </div>
-                <div class="text-end">
-                    <button id="btnCancelar" type="button" class="btn btn-danger" style="margin-top: 15px;">Cancelar</button>
-                    <button id="btnGuardar" type="submit" class="btn btn-primary mt-3" style="margin-top: 15px;">Guardar Informe</button>
-                </div> 
             </div>      
         </div>
     </div>
@@ -371,6 +379,7 @@
         document.getElementById('dropdown-estudiantes').disabled = false;
         document.getElementById('id').value = '';
         document.getElementById('id').disabled = false;
+        document.getElementById('idInformeMod').value = '';
         document.getElementById('idPersonaMod').value = '';
         document.getElementById('idPersonaMod').disabled = false;
         document.getElementById('area_trabajo').value = '';
@@ -396,6 +405,10 @@
             firma2Preview.style.display = 'none';
         }
         idPersona = '';
+        organigramaBase64Previo = null;
+        anexosBase64Previo = null;
+        firma1Base64Previo = null;
+        firma2Base64Previo = null;
         const tablaConclusion = document.getElementById('tabla-conclusion');
         const tbodyC = tablaConclusion.querySelector('tbody');
         tbodyC.innerHTML = '';
@@ -421,6 +434,12 @@
         const introduccionTab = document.getElementById('introduccion-tab');
         const bootstrapTab = new bootstrap.Tab(introduccionTab);
         bootstrapTab.show();
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (estadoIndicador) {
+            estadoIndicador.textContent = '';
+            estadoIndicador.classList.add('d-none');
+            estadoIndicador.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+        }
         disableTabs();
     }
     
@@ -497,6 +516,121 @@
                 console.error("Error al buscar el estudiante:", error);
                 mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
             });
+    }
+
+    // Variables globales para almacenar los archivos previos
+    let organigramaBase64Previo = null;
+    let anexosBase64Previo = null;
+    let firma1Base64Previo = null;
+    let firma2Base64Previo = null;
+
+    // Función para cargar datos del informe
+    function cargarDatosInforme(informe) {
+        if (!informe || informe.error) {
+            mostrarAlerta("warning", "Advertencia", informe ? informe.error : "No se encontraron datos del informe.");
+            return;
+        }
+        document.getElementById('idInformeMod').value = informe.idInforme || '';
+        document.getElementById('fecha_entrega').value = informe.fecha || '';
+        document.getElementById('intro').value = informe.introduccion || '';
+        document.getElementById('cantidad_trabajadores').value = informe.trabajadores || '';
+        document.getElementById('mision').value = informe.mision || '';
+        document.getElementById('vision').value = informe.vision || '';
+        document.getElementById('infraestructura_fisica').value = informe.infFisica || '';
+        document.getElementById('infraestructura_tecnologica').value = informe.infTecnologica || '';
+        document.getElementById('area_trabajo').value = informe.area || '';
+        document.getElementById('labores_realizadas').value = informe.labores || '';
+        document.getElementById('bibliografiai').value = informe.bibliografia || '';
+        const organigramaPreview = document.getElementById('organigrama-preview');
+        if (informe.organigrama) {
+            organigramaBase64Previo = informe.organigrama;
+            organigramaPreview.src = `data:image/png;base64,${informe.organigrama}`;
+            organigramaPreview.style.display = 'block';
+        } else {
+            organigramaBase64Previo = null;
+            organigramaPreview.src = '#';
+            organigramaPreview.style.display = 'none';
+        }
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        const anexosPreview = document.getElementById('anexos-preview');
+        if (informe.anexos) {
+            anexosBase64Previo = informe.anexos;
+            anexosPreview.src = `data:application/pdf;base64,${informe.anexos}`;
+            anexosPreviewContainer.style.display = 'block';
+        } else {
+            anexosBase64Previo = null;
+            anexosPreview.src = '';
+            anexosPreviewContainer.style.display = 'none';
+        }
+        const firma1Preview = document.getElementById('firma1-preview');
+        if (informe.firma1) {
+            firma1Base64Previo = informe.firma1;
+            firma1Preview.src = `data:image/png;base64,${informe.firma1}`;
+            firma1Preview.style.display = 'block';
+        } else {
+            firma1Base64Previo = null;
+            firma1Preview.src = '#';
+            firma1Preview.style.display = 'none';
+        }
+        const firma2Preview = document.getElementById('firma2-preview');
+        if (informe.firma2) {
+            firma2Base64Previo = informe.firma2;
+            firma2Preview.src = `data:image/png;base64,${informe.firma2}`;
+            firma2Preview.style.display = 'block';
+        } else {
+            firma2Base64Previo = null;
+            firma2Preview.src = '#';
+            firma2Preview.style.display = 'none';
+        }
+        const conclusionesTableBody = document.querySelector('#tabla-conclusion tbody');
+        conclusionesTableBody.innerHTML = '';
+        if (informe.conclusiones && informe.conclusiones.length > 0) {
+            informe.conclusiones.forEach((conclusion, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="number" class="form-control text-center" name="numC[]" value="${index + 1}" readonly></td>
+                        <td><textarea class="form-control" name="conclusion[]" required>${conclusion}</textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-conclusion"></td>
+                    </tr>
+                `;
+                conclusionesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+        const recomendacionesTableBody = document.querySelector('#tabla-recomendacion tbody');
+        recomendacionesTableBody.innerHTML = '';
+        if (informe.recomendaciones && informe.recomendaciones.length > 0) {
+            informe.recomendaciones.forEach((recomendacion, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="number" class="form-control text-center" name="numR[]" value="${index + 1}" readonly></td>
+                        <td><textarea class="form-control" name="recomendacion[]" required>${recomendacion}</textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-recomendacion"></td>
+                    </tr>
+                `;
+                recomendacionesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+    }
+
+
+    // Función para mostrar el estado del informe
+    function actualizarEstadoIndicador(estado) {
+        const estadoIndicador = document.getElementById('estado-indicador');
+        estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+
+        if (estado === 3) {
+            estadoIndicador.textContent = 'Aprobado';
+            estadoIndicador.classList.add('bg-success');
+        } else if (estado === 2) {
+            estadoIndicador.textContent = 'Pendiente de aprobación';
+            estadoIndicador.classList.add('bg-warning');
+        } else if (estado === 1) {
+            estadoIndicador.textContent = 'Rechazado';
+            estadoIndicador.classList.add('bg-danger');
+        } else {
+            estadoIndicador.textContent = '';
+            estadoIndicador.classList.add('d-none');
+        }
     }
 
     // Evento para agregar nueva conclusión
@@ -622,7 +756,7 @@
     let idPersona = 0;
     inputEstudiante.addEventListener('input', function () {
         const searchText = this.value.toLowerCase();
-        fetch('/datos_estudiantes')
+        fetch('/datos_estudiantes_buscar')
             .then(response => response.json())
             .then(data => {
                 dropdownEstudiantes.innerHTML = '';
@@ -655,47 +789,195 @@
         event.preventDefault();
         const idEstudiante = idPersona;
         const fechaActualFormateada = formatFechaParaInput(new Date());
+        const estadoIndicador = document.getElementById('estado-indicador');
         if (!idEstudiante) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
-        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+        fetch(`/estado_informe_final/${idEstudiante}`)
             .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error al obtener datos del estudiante');
-                    }
-                    return response.json();
-                })
-            .then(data => {
-                if (data.error) {
-                    mostrarAlerta("error", "Error", data.error);
-                    limpiarControles();
-                } else if (data.mensaje) {
-                    mostrarAlerta("info", "Información", data.mensaje);
-                    limpiarControles();
-                } else {
-                    const idInput = document.getElementById('id');
-                    if (idInput) {
-                        idInput.value = data.idPractica || '';
-                        idInput.disabled = true;
-                    }
-                    cargarDatosPractica(data);
-                    cargarDatosEstudiante(idEstudiante);
-                    enableTabs();
-                    document.getElementById('estudiante').disabled = true;
-                    document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                if (!response.ok) {
+                    throw new Error('Error al obtener el estado del informe final');
                 }
+                return response.json();
+            })
+            .then(estadoData => {
+                const estado = estadoData.estado;
+                estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+
+                if (estado === 3) { // Estado aprobado
+                    estadoIndicador.textContent = 'Aprobado';
+                    estadoIndicador.classList.add('bg-success');
+
+                    // Cargar práctica e informe en modo solo lectura
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe final del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        // Cargar datos del informe
+                                        cargarDatosInforme(informeData);
+
+                                        // Cargar datos de la práctica y estudiante
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+
+                                        // Habilitar solo lectura (sin deshabilitar tabs)
+                                        setFormularioSoloLectura(true, false);
+
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe final:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else if (estado === 2 || estado === 1) { // Pendiente o Rechazado
+                    if (estado === 1) {
+                        estadoIndicador.textContent = 'Rechazado';
+                        estadoIndicador.classList.add('bg-danger');
+                        mostrarAlerta("warning", "Advertencia", "El estudiante tiene un informe final rechazado.");
+                    } else {
+                        estadoIndicador.textContent = 'Pendiente de aprobación';
+                        estadoIndicador.classList.add('bg-warning');
+                    }
+
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe final del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        enableTabs();
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe final:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else {
+                    estadoIndicador.textContent = '';
+                    estadoIndicador.classList.add('d-none');
+                }
+                fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener datos del estudiante');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            mostrarAlerta("error", "Error", data.error);
+                            limpiarControles();
+                        } else if (data.mensaje) {
+                            mostrarAlerta("info", "Información", data.mensaje);
+                            limpiarControles();
+                        } else {
+                            const idInput = document.getElementById('id');
+                            if (idInput) {
+                                idInput.value = data.idPractica || '';
+                                idInput.disabled = true;
+                            }
+                            cargarDatosPractica(data);
+                            cargarDatosEstudiante(idEstudiante);
+                            enableTabs();
+                            document.getElementById('estudiante').disabled = true;
+                            document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar la práctica del estudiante:", error);
+                        mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                    });
             })
             .catch(error => {
-                console.error("Error al buscar la práctica del estudiante:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                console.error("Error al obtener el estado del informe final:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar el estado del informe final.");
             });
     });
+
+    // Función para habilitar/deshabilitar controles
+    function setFormularioSoloLectura(soloLectura) {
+        enableTabs();
+        const inputs = document.querySelectorAll('.tab-content input, .tab-content textarea, .tab-content select, .tab-content button:not(.nav-link)');
+        inputs.forEach(input => {
+            if (soloLectura) {
+                input.setAttribute('disabled', 'true');
+            } else {
+                input.removeAttribute('disabled');
+            }
+        });
+        const guardarBtn = document.getElementById('btnGuardar');
+        const cancelarBtn = document.getElementById('btnCancelar');
+        if (guardarBtn) {
+            guardarBtn.style.display = soloLectura ? 'none' : '';
+        }
+        if (cancelarBtn) {
+            cancelarBtn.style.display = '';
+        }
+    }
 
     // Función para guardar el informe
     document.getElementById('btnGuardar').addEventListener('click', async function (event) {
         event.preventDefault();
         const idPractica = document.getElementById('id').value;
+        const idInforme = document.getElementById('idInformeMod').value;
         const fecha_entrega = document.getElementById('fecha_entrega').value;
         const introduccion = document.getElementById('intro').value;
         const cantidad_trabajadores = document.getElementById('cantidad_trabajadores').value;
@@ -708,19 +990,48 @@
         const bibliografia = document.getElementById('bibliografiai').value;
         const organigramaInput = document.getElementById('organigrama');
         const anexosInput = document.getElementById('anexos');
-        const organigramaBase64 = organigramaInput.files[0] ? await convertirABase64(organigramaInput.files[0]) : null;
-        const anexosBase64 = anexosInput.files[0] ? await convertirABase64(anexosInput.files[0]) : null;
-        const conclusiones = Array.from(document.querySelectorAll('#tabla-conclusion textarea[name="conclusion[]"]'))
-            .map(textarea => textarea.value.trim())
-            .filter(value => value !== '');
-        const recomendaciones = Array.from(document.querySelectorAll('#tabla-recomendacion textarea[name="recomendacion[]"]'))
-            .map(textarea => textarea.value.trim())
-            .filter(value => value !== '');        
-        if (!idPractica || !fecha_entrega || !introduccion || !cantidad_trabajadores || !mision || !vision || !infraestructura_fisica || !infraestructura_tecnologica || !area_trabajo || !labores_realizadas) {
+        const firma1Input = document.getElementById('firma1');
+        const firma2Input = document.getElementById('firma2');
+        const organigramaBase64 = organigramaInput.files[0]
+            ? await convertirABase64(organigramaInput.files[0])
+            : organigramaBase64Previo;
+        const anexosBase64 = anexosInput.files[0]
+            ? await convertirABase64(anexosInput.files[0])
+            : anexosBase64Previo;
+        const firma1Base64 = firma1Input.files[0]
+            ? await convertirABase64(firma1Input.files[0])
+            : firma1Base64Previo;
+        const firma2Base64 = firma2Input.files[0]
+            ? await convertirABase64(firma2Input.files[0])
+            : firma2Base64Previo;
+        const conclusiones = Array.from(
+            document.querySelectorAll('#tabla-conclusion textarea[name="conclusion[]"]')
+        )
+            .map((textarea) => textarea.value.trim())
+            .filter((value) => value !== '');
+        const recomendaciones = Array.from(
+            document.querySelectorAll('#tabla-recomendacion textarea[name="recomendacion[]"]')
+        )
+            .map((textarea) => textarea.value.trim())
+            .filter((value) => value !== '');
+        if (
+            !idInforme ||
+            !idPractica ||
+            !fecha_entrega ||
+            !introduccion ||
+            !cantidad_trabajadores ||
+            !mision ||
+            !vision ||
+            !infraestructura_fisica ||
+            !infraestructura_tecnologica ||
+            !area_trabajo ||
+            !labores_realizadas
+        ) {
             mostrarAlerta("warning", "Advertencia", "Por favor, complete todos los campos requeridos.");
             return;
         }
         const data = {
+            idInforme,
             idPractica,
             fecha_entrega,
             introduccion,
@@ -736,6 +1047,8 @@
             recomendaciones,
             bibliografia,
             anexos: anexosBase64,
+            firma1: firma1Base64,
+            firma2: firma2Base64,
         };
         fetch('/agregar_informe_final_estudiante', {
             method: 'POST',
@@ -744,8 +1057,8 @@
             },
             body: JSON.stringify(data),
         })
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 if (data.error) {
                     mostrarAlerta("error", "Error", data.error);
                 } else {
@@ -753,7 +1066,7 @@
                     limpiarControles();
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error al guardar el informe:', error);
                 mostrarAlerta("error", "Error", "Hubo un error al guardar el informe.");
             });

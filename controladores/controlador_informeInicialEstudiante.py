@@ -176,52 +176,117 @@ def agregar_informe_inicial_empresa(idPractica, nombre_empresa, responsable, car
         conexion.close()
 
 def agregar_informe_final_estudiante(
-        idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+        idInforme, idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
         infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
-        labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos
+        labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos, firma1, firma2
     ):
-    
     conexion = obtener_conexion()
-    tipoInforme = 4
+    tipoInforme = 3
     estado = 'P'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-
     try:
         with conexion.cursor() as cursor:
-            # Insertar en la tabla `informe`
-            cursor.execute("""
-                INSERT INTO informe (
-                    estado, fecha, introduccion, trabajadores, mision, vision, 
-                    infFisica, infTecnologica, organigrama, area, labores, anexos, 
-                    bibliografia, idTipoInforme
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
-                infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
-                labores_realizadas, anexos, bibliografia, tipoInforme
-            ))
-            idInforme = cursor.lastrowid
-            for conclusion in conclusiones:
+            if idInforme:
                 cursor.execute("""
-                    INSERT INTO adicionales (tipo, descripcion, idInforme)
-                    VALUES (%s, %s, %s)
-                """, ('C', conclusion, idInforme))
-            for recomendacion in recomendaciones:
+                    UPDATE informe
+                    SET estado = %s, fecha = %s, introduccion = %s, trabajadores = %s,
+                        mision = %s, vision = %s, infFisica = %s, infTecnologica = %s,
+                        organigrama = %s, area = %s, labores = %s, anexos = %s,
+                        bibliografia = %s, firma1 = %s, firma2 = %s
+                    WHERE idInforme = %s
+                """, (
+                    'P', fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                    infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+                    labores_realizadas, anexos, bibliografia, firma1, firma2, idInforme
+                ))
                 cursor.execute("""
-                    INSERT INTO adicionales (tipo, descripcion, idInforme)
-                    VALUES (%s, %s, %s)
-                """, ('R', recomendacion, idInforme))
-            cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
-                VALUES (%s, %s)
-            """, (idPractica, idInforme))
-            conexion.commit()
-            return {"mensaje": "Informe final de estudiante registrado correctamente."}
+                    DELETE FROM adicionales WHERE idInforme = %s
+                """, (idInforme,))
+                for conclusion in conclusiones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('C', conclusion, idInforme))
+                for recomendacion in recomendaciones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('R', recomendacion, idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe final de estudiante actualizado correctamente."}
+            else:
+                cursor.execute("""
+                    INSERT INTO informe (
+                        'P', fecha, introduccion, trabajadores, mision, vision, 
+                        infFisica, infTecnologica, organigrama, area, labores, anexos, 
+                        bibliografia, idTipoInforme, firma1, firma2
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                    infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+                    labores_realizadas, anexos, bibliografia, tipoInforme, firma1, firma2
+                ))
+                idInforme = cursor.lastrowid
+                for conclusion in conclusiones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('C', conclusion, idInforme))
+                for recomendacion in recomendaciones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('R', recomendacion, idInforme))
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                """, (idPractica, idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe final de estudiante registrado correctamente."}
     except Exception as e:
         conexion.rollback()
-        return {"error": f"Error al registrar el informe: {str(e)}"}
+        return {"error": f"Error al registrar o modificar el informe: {str(e)}"}
+    finally:
+        conexion.close()
+
+def obtener_informe_final_estudiante(idEstudiante, idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    i.estado, i.fecha, i.introduccion, i.trabajadores, i.mision, i.vision, 
+                    i.infFisica, i.infTecnologica, i.organigrama, i.area, i.labores, 
+                    i.anexos, i.bibliografia, i.idInforme, i.firma1, i.firma2
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s AND pp.idPractica = %s AND i.idTipoInforme = 3
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante, idPractica))
+            informe = cursor.fetchone()
+            if not informe:
+                return {"error": "No se encontró un informe final asociado a esta práctica."}         
+            column_names = [desc[0] for desc in cursor.description]
+            informe_dict = dict(zip(column_names, informe))
+            cursor.execute("""
+                SELECT tipo, descripcion
+                FROM adicionales
+                WHERE idInforme = %s
+            """, (informe_dict['idInforme'],))
+            adicionales = cursor.fetchall()
+            conclusiones = [adicional[1] for adicional in adicionales if adicional[0] == 'C']
+            recomendaciones = [adicional[1] for adicional in adicionales if adicional[0] == 'R']
+            informe_dict['conclusiones'] = conclusiones
+            informe_dict['recomendaciones'] = recomendaciones
+            return informe_dict
+    except Exception as e:
+        return {"error": f"Error al obtener el informe: {str(e)}"}
     finally:
         conexion.close()
 
@@ -264,5 +329,39 @@ def agregar_informe_final_empresa(nombre_empresa, responsable, grado_responsable
     except Exception as e:
         conexion.rollback()
         return {"success": False, "error": str(e)}
+    finally:
+        conexion.close()
+
+   
+def obtener_estado_informe_final_estudiante(idEstudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT i.estado
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s
+                  AND i.idTipoInforme = 3
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante,))
+            
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                estado = resultado[0]
+                if estado == 'A':  # Aprobado
+                    return {"estado": 3}
+                elif estado == 'P':  # Pendiente
+                    return {"estado": 2}
+                elif estado == 'R':  # Rechazado
+                    return {"estado": 1}
+            return {"estado": 0}  # No tiene informe de tipo 3
+    except Exception as e:
+        return {"error": str(e)}
     finally:
         conexion.close()
