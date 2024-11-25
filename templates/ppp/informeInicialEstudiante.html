@@ -295,95 +295,96 @@
         $('.seleccionar-plan:checked').closest('tr').remove();
     });
 
-    // Enviar el formulario con AJAX y mostrar alerta de éxito
-    // Función para guardar el informe
-// Función para guardar el informe inicial
-document.getElementById('btnGuardar').addEventListener('click', async function (event) {
-    event.preventDefault(); // Evita el envío automático del formulario
+    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+    event.preventDefault(); // Evitar el envío automático del formulario
 
-    // Obtener los valores de los campos
-    const idPractica = document.getElementById('id').value;
-    const idInforme = document.getElementById('idInformeMod').value;
-    const fecha_entrega = document.getElementById('fecha_entrega').value;
+    try {
+        // Obtener valores del formulario
+        const idInforme = document.getElementById('idInformeMod').value || null;
+        const idPractica = document.getElementById('id').value;
+        const fechaEntrega = document.getElementById('fecha_entrega').value;
 
-    // Procesar archivos para las firmas en formato Base64
-    const firmaEstudianteInput = document.getElementById('firma_estudiante');
-    const firmaResponsableInput = document.getElementById('firma_responsable');
-    const firmaEstudianteBase64 = firmaEstudianteInput.files[0] 
-        ? await convertirABase64(firmaEstudianteInput.files[0]) 
-        : null;
-    const firmaResponsableBase64 = firmaResponsableInput.files[0] 
-        ? await convertirABase64(firmaResponsableInput.files[0]) 
-        : null;
+        // Procesar archivos de firmas en Base64
+        const firmaEstudianteInput = document.getElementById('firma_estudiante');
+        const firmaResponsableInput = document.getElementById('firma_responsable');
 
-    // Recopilar los objetivos
-    const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos input[name="objetivo[]"]'))
-        .map(input => input.value.trim())
-        .filter(value => value !== '');
+        const firmaEstudiante = firmaEstudianteInput.files[0]
+            ? await convertirABase64(firmaEstudianteInput.files[0])
+            : null;
 
-    // Recopilar el plan de trabajo
-    const planTrabajo = Array.from(document.querySelectorAll('#tabla-plan-trabajo tbody tr')).map(row => ({
-        semana: row.querySelector('input[name="semana[]"]').value,
-        fecha_inicio: row.querySelector('input[name="fecha_inicio[]"]').value,
-        fecha_fin: row.querySelector('input[name="fecha_fin[]"]').value,
-        actividad: row.querySelector('input[name="actividad[]"]').value,
-        horas: row.querySelector('input[name="horas[]"]').value,
-    }));
+        const firmaResponsable = firmaResponsableInput.files[0]
+            ? await convertirABase64(firmaResponsableInput.files[0])
+            : null;
 
-    // Validar los campos obligatorios
-    if (!idPractica || !firmaEstudianteBase64 || !firmaResponsableBase64) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Advertencia',
-            text: 'Por favor, complete todos los campos requeridos.',
+        // Recopilar los objetivos
+        const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos input[name="objetivo[]"]'))
+            .map(input => input.value.trim())
+            .filter(value => value !== '');
+
+        // Recopilar el plan de trabajo
+        const planTrabajo = Array.from(document.querySelectorAll('#tabla-plan-trabajo tbody tr')).map(row => ({
+            semana: row.querySelector('input[name="semana[]"]').value.trim(),
+            fechaInicio: row.querySelector('input[name="fecha_inicio[]"]').value,
+            fechaFin: row.querySelector('input[name="fecha_fin[]"]').value,
+            actividades: row.querySelector('input[name="actividad[]"]').value.trim(),
+            horas: parseInt(row.querySelector('input[name="horas[]"]').value, 10)
+        }));
+
+        // Validar campos obligatorios
+        if (!idPractica || !fechaEntrega || !firmaEstudiante || !firmaResponsable) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                text: 'Por favor, complete todos los campos obligatorios.',
+            });
+            return;
+        }
+
+        // Crear el objeto de datos para enviar
+        const data = {
+            idInforme,
+            idPractica,
+            fecha: fechaEntrega,
+            objetivos,
+            plan_trabajos: planTrabajo,
+            firma1: firmaEstudiante,
+            firma2: firmaResponsable,
+        };
+
+        // Realizar la solicitud al backend
+        const response = await fetch('/agregar_informe_inicial_estudiante', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
         });
-        return;
-    }
 
-    // Preparar datos para enviar
-    const data = {
-        idInforme,
-        idPractica,
-        fecha_entrega,
-        firma_estudiante: firmaEstudianteBase64,
-        firma_responsable: firmaResponsableBase64,
-        objetivos,
-        plan_trabajo,
-    };
+        const result = await response.json();
 
-    // Enviar los datos al servidor
-    fetch('/agregar_informe_inicial_estudiante', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-        .then(response => response.json())
-        .then(response => {
-            if (response.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: response.message || 'El informe inicial ha sido guardado correctamente.',
-                });
-                document.getElementById('form-informe').reset(); // Resetear el formulario
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: response.error || 'No se pudo guardar el informe.',
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error al guardar el informe:', error);
+        // Manejar la respuesta del servidor
+        if (response.ok && result.mensaje) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Informe guardado',
+                text: result.mensaje,
+            });
+            // Limpiar el formulario o redirigir si es necesario
+        } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Hubo un error al procesar la solicitud. Verifique su conexión e intente de nuevo.',
+                title: 'Error al guardar',
+                text: result.error || 'No se pudo guardar el informe.',
             });
+        }
+    } catch (error) {
+        console.error('Error al procesar la solicitud:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al procesar la solicitud. Verifique su conexión e intente de nuevo.',
         });
+    }
 });
 
 // Función para convertir archivos a Base64

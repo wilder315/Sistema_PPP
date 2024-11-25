@@ -44,6 +44,7 @@ def agregar_informe_inicial_estudiante_route():
             firma1=firma1,
             firma2=firma2
         )
+        
 
         # Devolver resultado al cliente
         return jsonify(resultado)

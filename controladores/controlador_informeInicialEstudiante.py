@@ -54,6 +54,11 @@ def agregar_informe_inicial_estudiante(
     estado = 'P'  # Estado inicial del informe
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
+    
+    # Validar datos obligatorios
+    if not idPractica or not fecha or not firma1 or not firma2:
+        return {"error": "Faltan datos obligatorios para registrar el informe inicial."}
+
     try:
         with conexion.cursor() as cursor:
             if idInforme:
@@ -68,19 +73,6 @@ def agregar_informe_inicial_estudiante(
                 # Eliminar objetivos y plan de trabajo antiguos asociados al informe
                 cursor.execute("DELETE FROM objetivos WHERE idInforme = %s", (idInforme,))
                 cursor.execute("DELETE FROM plan_trabajo WHERE idInforme = %s", (idInforme,))
-                # Insertar nuevos objetivos
-                for objetivo in objetivos:
-                    cursor.execute("""
-                        INSERT INTO objetivos (descripcion, idInforme)
-                        VALUES (%s, %s)
-                    """, (objetivo, idInforme))
-                # Insertar plan de trabajo
-                for plan_trabajo in plan_trabajos:
-                    cursor.execute("""
-                        INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """, (plan_trabajo, idInforme))
-                return {"mensaje": "Informe inicial de estudiante actualizado correctamente."}
             else:
                 # Registro de un nuevo informe inicial
                 cursor.execute("""
@@ -92,30 +84,46 @@ def agregar_informe_inicial_estudiante(
                     estado, fecha, firma1, firma2, tipoInforme
                 ))
                 idInforme = cursor.lastrowid
-                # Insertar objetivos
-                for objetivo in objetivos:
-                    cursor.execute("""
-                        INSERT INTO objetivos (descripcion, idInforme)
-                        VALUES (%s, %s)
-                    """, (objetivo, idInforme))
-                # Insertar plan de trabajo
-                for plan_trabajo in plan_trabajos:
-                    cursor.execute("""
-                        INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """, (plan_trabajo, idInforme))
-                # Asociar el informe con la práctica preprofesional
+
+            # Insertar objetivos
+            for objetivo in objetivos:
                 cursor.execute("""
-                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    INSERT INTO objetivos (descripcion, idInforme)
                     VALUES (%s, %s)
-                """, (idPractica, idInforme))
-                conexion.commit()
-                return {"mensaje": "Informe inicial de estudiante registrado correctamente."}
+                """, (objetivo, idInforme))
+
+            # Insertar plan de trabajo
+            for plan_trabajo in plan_trabajos:
+                if not all(key in plan_trabajo for key in ['semana', 'fechaInicio', 'fechaFin', 'actividades', 'horas']):
+                    return {"error": "El plan de trabajo no tiene todos los campos requeridos."}
+                cursor.execute("""
+                    INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (
+                    plan_trabajo['semana'],
+                    plan_trabajo['fechaInicio'],
+                    plan_trabajo['fechaFin'],
+                    plan_trabajo['actividades'],
+                    plan_trabajo['horas'],
+                    idInforme
+                ))
+
+            # Asociar el informe con la práctica preprofesional
+            cursor.execute("""
+                INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                VALUES (%s, %s)
+            """, (idPractica, idInforme))
+
+            conexion.commit()
+            return {"mensaje": "Informe inicial de estudiante registrado correctamente."}
+
     except Exception as e:
+        print(f"Error al registrar o modificar el informe inicial: {str(e)}")
         conexion.rollback()
         return {"error": f"Error al registrar o modificar el informe inicial: {str(e)}"}
     finally:
         conexion.close()
+
 
 def obtener_practicas_informe_inicial():
     conexion = obtener_conexion()
