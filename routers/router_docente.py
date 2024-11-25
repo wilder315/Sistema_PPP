@@ -57,10 +57,9 @@ def modificar_docente():
     estado = data.get('estado')
     idGenero = data.get('idGenero')
     idTipoDoc = data.get('idTipoDoc')
-    idUsuario = data.get('idUsuario')
     idEscuela = data.get('idEscuela')
 
-    resultado = controlador_docente.modificar_docente(idDocente, numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idUsuario, idEscuela)
+    resultado = controlador_docente.modificar_docente(idDocente, numDoc, nombre, apellidos, tel1, tel2, correoP, correoUSAT, cargo, estado, idGenero, idTipoDoc, idEscuela)
     return jsonify(resultado)
 
 @router_docente.route("/dar_de_baja_docente", methods=["POST"])
