@@ -87,6 +87,7 @@ def agregar_informe_empresa():
 def agregar_informe_final_estudiante_route():
     try:
         data = request.get_json()
+        idInforme = data.get("idInforme")
         idPractica = data.get("idPractica")
         fecha_entrega = data.get("fecha_entrega")
         introduccion = data.get("introduccion")
@@ -102,18 +103,21 @@ def agregar_informe_final_estudiante_route():
         anexos = data.get("anexos")
         conclusiones = data.get("conclusiones", [])
         recomendaciones = data.get("recomendaciones", [])
+        firma1 = data.get("firma1")
+        firma2 = data.get("firma2")
 
         resultado = agregar_informe_final_estudiante(
-            idPractica, fecha_entrega, introduccion, cantidad_trabajadores,
+            idInforme, idPractica, fecha_entrega, introduccion, cantidad_trabajadores,
             mision, vision, infraestructura_fisica, infraestructura_tecnologica,
             organigrama, area_trabajo, labores_realizadas, conclusiones,
-            recomendaciones, bibliografia, anexos
+            recomendaciones, bibliografia, anexos, firma1, firma2
         )
 
         return jsonify(resultado)
     except Exception as e:
         print(f"Error en la ruta: {e}")
         return jsonify({"error": str(e)})
+
     
 @router_informe.route("/obtener_informe_final_estudiante/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
 def obtener_informe_final_estudiante(idEstudiante, idPractica):

@@ -174,52 +174,78 @@ def agregar_informe_inicial_empresa(idPractica, nombre_empresa, responsable, car
         conexion.close()
 
 def agregar_informe_final_estudiante(
-        idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+        idInforme, idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
         infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
-        labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos
+        labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos, firma1, firma2
     ):
-    
     conexion = obtener_conexion()
     tipoInforme = 3
     estado = 'P'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-
     try:
         with conexion.cursor() as cursor:
-            # Insertar en la tabla `informe`
-            cursor.execute("""
-                INSERT INTO informe (
-                    estado, fecha, introduccion, trabajadores, mision, vision, 
-                    infFisica, infTecnologica, organigrama, area, labores, anexos, 
-                    bibliografia, idTipoInforme
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
-                infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
-                labores_realizadas, anexos, bibliografia, tipoInforme
-            ))
-            idInforme = cursor.lastrowid
-            for conclusion in conclusiones:
+            if idInforme:
                 cursor.execute("""
-                    INSERT INTO adicionales (tipo, descripcion, idInforme)
-                    VALUES (%s, %s, %s)
-                """, ('C', conclusion, idInforme))
-            for recomendacion in recomendaciones:
+                    UPDATE informe
+                    SET estado = %s, fecha = %s, introduccion = %s, trabajadores = %s,
+                        mision = %s, vision = %s, infFisica = %s, infTecnologica = %s,
+                        organigrama = %s, area = %s, labores = %s, anexos = %s,
+                        bibliografia = %s, firma1 = %s, firma2 = %s
+                    WHERE idInforme = %s
+                """, (
+                    'P', fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                    infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+                    labores_realizadas, anexos, bibliografia, firma1, firma2, idInforme
+                ))
                 cursor.execute("""
-                    INSERT INTO adicionales (tipo, descripcion, idInforme)
-                    VALUES (%s, %s, %s)
-                """, ('R', recomendacion, idInforme))
-            cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
-                VALUES (%s, %s)
-            """, (idPractica, idInforme))
-            conexion.commit()
-            return {"mensaje": "Informe final de estudiante registrado correctamente."}
+                    DELETE FROM adicionales WHERE idInforme = %s
+                """, (idInforme,))
+                for conclusion in conclusiones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('C', conclusion, idInforme))
+                for recomendacion in recomendaciones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('R', recomendacion, idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe final de estudiante actualizado correctamente."}
+            else:
+                cursor.execute("""
+                    INSERT INTO informe (
+                        'P', fecha, introduccion, trabajadores, mision, vision, 
+                        infFisica, infTecnologica, organigrama, area, labores, anexos, 
+                        bibliografia, idTipoInforme, firma1, firma2
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                    infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+                    labores_realizadas, anexos, bibliografia, tipoInforme, firma1, firma2
+                ))
+                idInforme = cursor.lastrowid
+                for conclusion in conclusiones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('C', conclusion, idInforme))
+                for recomendacion in recomendaciones:
+                    cursor.execute("""
+                        INSERT INTO adicionales (tipo, descripcion, idInforme)
+                        VALUES (%s, %s, %s)
+                    """, ('R', recomendacion, idInforme))
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                """, (idPractica, idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe final de estudiante registrado correctamente."}
     except Exception as e:
         conexion.rollback()
-        return {"error": f"Error al registrar el informe: {str(e)}"}
+        return {"error": f"Error al registrar o modificar el informe: {str(e)}"}
     finally:
         conexion.close()
 
@@ -233,7 +259,7 @@ def obtener_informe_final_estudiante(idEstudiante, idPractica):
                 SELECT 
                     i.estado, i.fecha, i.introduccion, i.trabajadores, i.mision, i.vision, 
                     i.infFisica, i.infTecnologica, i.organigrama, i.area, i.labores, 
-                    i.anexos, i.bibliografia, i.idInforme
+                    i.anexos, i.bibliografia, i.idInforme, i.firma1, i.firma2
                 FROM informe i
                 INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
