@@ -14,7 +14,7 @@ def guardar_informeFinalEmpresa(numDoc, area_desarrollo, texto_responsabilidad, 
                 SELECT idPractica 
                 FROM practicas_preprofesionales pp
                 INNER JOIN persona pe ON pp.idPersona = pe.idPersona
-                WHERE pe.numDoc = %s""", (numDoc))
+                WHERE pe.idPersona = %s""", (numDoc))
             practica = cursor.fetchone()
             
             if not practica: 
@@ -26,7 +26,7 @@ def guardar_informeFinalEmpresa(numDoc, area_desarrollo, texto_responsabilidad, 
             cursor.execute("""
                 INSERT INTO informe (aceptacion, estado, labor, cumplehoras, responsabilidad, extras, idTipoInforme, fecha, firma1)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,('ACEPTADO', 'P', area_desarrollo, 'S',texto_responsabilidad, texto_otros_aspectos, 4, fecha, file_path))
+                """,('ACEPTADO', 'P', area_desarrollo, 'S', texto_responsabilidad, texto_otros_aspectos, 4, fecha, file_path))
             
             print("se ejecuto el insert en informe")
             

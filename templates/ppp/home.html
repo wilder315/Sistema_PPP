@@ -180,6 +180,12 @@
                             <div class="collapse" id="informes">
                                 <ul class="sidebar-nav">
                                     <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ url_for('router_main.InformesAlumno') }}" id="informesAlumno">
+                                            <i class="fas fa-chart-line fa-lg"></i>
+                                            <span class="align-middle">Informes por Alumno</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
                                         <a class="sidebar-link" href="{{ url_for('router_main.informeInicialEstudiante') }}" id="informeInicialEstudiante">
                                             <i class="far fa-file fa-lg"></i>
                                             <span class="align-middle">Informe Inicial Estudiante</span>
@@ -213,13 +219,6 @@
                             </a>
                             <div class="collapse" id="reportes">
                                 <ul class="sidebar-nav">
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="{{ url_for('router_main.InformesAlumno') }}" id="informesAlumno">
-                                            <i class="fas fa-chart-line fa-lg"></i>
-                                            <span class="align-middle">Informes por Alumno</span>
-                                        </a>
-                                    </li>
-                                    
                                     <li class="sidebar-item">
                                         <a class="sidebar-link" href="{{ url_for('router_main.horas_practica') }}" id="horasPractica">
                                             <i class="fas fa-chart-area fa-lg"></i>

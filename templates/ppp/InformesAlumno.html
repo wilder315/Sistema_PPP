@@ -8,7 +8,16 @@
         <li class="breadcrumb-item active" aria-current="page">Informes por Alumno</li>
     </ol>
 </nav>
-
+<style>
+    .modal .list-group-item {
+    padding: 10px 15px;
+    border: none;
+    }
+    .modal .list-group-item strong {
+        font-weight: 600;
+        margin-right: 10px;
+    }
+</style>
 <div class="container-fluid my-4">
     <div class="card w-100" id="card_estudiantes">
         <div class="card-header bg-red-usat text-white" id="headingOne" data-bs-toggle="collapse"
@@ -24,14 +33,57 @@
                             <th style="text-align:center">Nombres</th>                 
                             <th style="text-align:center">Semestre Académico</th>
                             <th style="text-align:center">ID Práctica</th>
-                            <th style="text-align:center">Informe Inicial</th>
-                            <th style="text-align:center">Informe Final</th>
+                            <th style="text-align:center">I. Estudiante</th>
+                            <th style="text-align:center">I. Empresa</th>
+                            <th style="text-align:center">F. Estudiante</th>
+                            <th style="text-align:center">F. Empresa</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Los datos se cargarán dinámicamente con DataTables -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para visualizar informe -->
+<div class="modal fade" id="modalVisualizarInforme" tabindex="-1" aria-labelledby="modalVisualizarInformeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalVisualizarInformeLabel">Detalles del Informe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <input type="hidden" id="idInforme" name="idInforme">
+            <div class="modal-body">
+                <!-- Columna única para todos los datos -->
+                <div class="mb-3">
+                    <label for="detalleInforme" class="form-label">Detalles:</label>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>Tipo de Informe:</strong> <span id="tipoInforme"></span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Fecha del Informe:</strong> <span id="fechaInforme"></span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Estado:</strong> <span id="estadoInforme"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnRevisarInforme" type="button" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Revisar
+                </button>
+                <button id="btnAprobarInforme" type="button" class="btn btn-success">
+                    <i class="fas fa-check"></i> Aprobar
+                </button>
+                <button id="btnRechazarInforme" type="button" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Rechazar
+                </button>
             </div>
         </div>
     </div>
@@ -46,45 +98,66 @@
         }
         $('#tabla-informes-estudiantes').DataTable({
             paging: true,
-            info: false,
+            pageLength: 8,
+            lengthMenu: [8, 16, 24, 32],
+            info: true,
             responsive: true,
             autoWidth: true,
             searching: true,
             order: [],
+            dom: '<"top-controls d-flex justify-content-between"fB>rt<"bottom-controls"ip>',
             ajax: {
                 url: "/datos_informesAlumnos",
                 type: "GET",
                 dataSrc: ""
             },
-            columns: [         
-                { data: "Apellidos_Alumno"},
-                { data: "Nombre_Alumno"},
+            columns: [
+                { data: "Apellidos_Alumno" },
+                { data: "Nombre_Alumno" },
                 { data: "Semestre_Academico", className: 'text-center' },
                 { data: "ID_Practica", className: 'text-center' },
                 {
-                    data: "Informe_Inicial",
+                    data: "Informe_Inicial_Existe",
                     className: 'text-center',
                     render: function (data, type, row) {
-                        if (data === "Por subir" || data === null) {
-                            return '<button class="btn btn-secondary" disabled><i class="fas fa-eye"></i></button> ' +
-                                   '<button class="btn btn-secondary" disabled><i class="fas fa-download"></i></button>';
-                        } else {
-                            return '<button class="btn btn-primary"><i class="fas fa-eye"></i></button> ' +
-                                   '<button class="btn btn-primary"><i class="fas fa-download"></i></button>';
-                        }
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Inicial_ID : ''}" data-tipo="Inicial (Estudiante)">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
                     }
                 },
                 {
-                    data: "Informe_Final",
+                    data: "Informe_Final_Existe",
                     className: 'text-center',
                     render: function (data, type, row) {
-                        if (data === "Por subir" || data === null) {
-                            return '<button class="btn btn-secondary" disabled><i class="fas fa-eye"></i></button> ' +
-                                   '<button class="btn btn-secondary" disabled><i class="fas fa-download"></i></button>';
-                        } else {
-                            return '<button class="btn btn-primary"><i class="fas fa-eye"></i></button> ' +
-                                   '<button class="btn btn-primary"><i class="fas fa-download"></i></button>';
-                        }
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Final_ID : ''}" data-tipo="Inicial (Empresa)">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
+                    }
+                },
+                {
+                    data: "Informe_Tipo3_Existe",
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Tipo3_ID : ''}" data-tipo="Final (Estudiante)">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
+                    }
+                },
+                {
+                    data: "Informe_Tipo4_Existe",
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Tipo4_ID : ''}" data-tipo="Final (Empresa)">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
                     }
                 }
             ],
@@ -93,6 +166,117 @@
             }
         });
     });
+
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
+
+    // Función para formatear la fecha a dd/mm/yyyy
+    function formatFechaParaMostrar(fecha) {
+        const date = new Date(fecha);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    $(document).on('click', '.btnVerInforme', function () {
+        const idInforme = $(this).data('id'); // Obtener el ID del informe desde el botón
+        const tipoInforme = $(this).data('tipo'); // Obtener el tipo de informe desde el botón
+
+        // Mapeo para los títulos según el tipo de informe
+        const tituloMap = {
+            1: "Informe Inicial (Estudiante)",
+            2: "Informe Inicial (Empresa)",
+            3: "Informe Final (Estudiante)",
+            4: "Informe Final (Empresa)"
+        };
+
+        // Configurar el título del modal
+        $('#modalVisualizarInformeLabel').text(tituloMap[tipoInforme] || "Detalles del Informe");
+
+        // Fetch para obtener los datos del informe
+        fetch(`/obtener_detalle_informe/${idInforme}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                } else {
+                    // Mostrar los datos en el modal
+                    $('#tipoInforme').text(tituloMap[data.tipoInforme] || "Sin tipo");
+                    $('#fechaInforme').text(data.fecha ? formatFechaParaMostrar(data.fecha) : "Sin fecha");
+                    $('#estadoInforme').text(data.estado || "Sin estado");
+                    $('#idInforme').text(data.idInforme || "Sin id"); // Mostrar el ID del informe
+                }
+            })
+            .catch(error => {
+                console.error("Error al cargar el informe:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al cargar el informe.");
+            });
+
+        // Mostrar el modal
+        $('#modalVisualizarInforme').modal('show');
+    });
+
+    // Evento para el botón "Revisar Informe"
+    document.getElementById('btnRevisarInforme').addEventListener('click', function () {
+        const idInforme = document.getElementById('idInforme').textContent.trim(); // Recuperar el ID del control en el modal
+        console.log('Revisar informe con ID:', idInforme);
+        // Implementar funcionalidad para revisar el informe
+    });
+
+    // Evento para el botón "Aprobar Informe"
+    document.getElementById('btnAprobarInforme').addEventListener('click', function () {
+        event.preventDefault();
+        const idInforme = document.getElementById('idInforme').textContent.trim(); // Recuperar el ID del control en el modal
+        fetch(`/aprobar_informe/${idInforme}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta('error', 'Error', data.error);
+                } else {
+                    mostrarAlerta('success', 'Éxito', data.mensaje);
+                    $('#modalVisualizarInforme').modal('hide');
+                    $('#tabla-informes-estudiantes').DataTable().ajax.reload(); // Recargar tabla
+                }
+            })
+            .catch(error => {
+                console.error('Error al aprobar el informe:', error);
+                mostrarAlerta('error', 'Error', 'Hubo un problema al aprobar el informe.');
+            });
+    });
+
+    // Evento para el botón "Rechazar Informe"
+    document.getElementById('btnRechazarInforme').addEventListener('click', function () {
+        event.preventDefault();
+        const idInforme = document.getElementById('idInforme').textContent.trim(); // Recuperar el ID del control en el modal
+        
+        fetch(`/rechazar_informe/${idInforme}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarAlerta('error', 'Error', data.error);
+                } else {
+                    mostrarAlerta('success', 'Éxito', data.mensaje);
+                    $('#modalVisualizarInforme').modal('hide');
+                    $('#tabla-informes-estudiantes').DataTable().ajax.reload(); // Recargar tabla
+                }
+            })
+            .catch(error => {
+                console.error('Error al rechazar el informe:', error);
+                mostrarAlerta('error', 'Error', 'Hubo un problema al rechazar el informe.');
+            });
+    });
+
+
+
 </script>
 {% endblock %}
 {% endblock %}

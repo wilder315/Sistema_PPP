@@ -424,11 +424,11 @@ def obtener_estudiante_por_doc(doc_estudiante):
                 SELECT 
                     p.idPersona, p.numDoc, p.nombre, p.apellidos, p.codUniversitario, p.tel1, p.tel2, 
                     p.correoP, p.correoUSAT, p.estado, p.idGenero, p.idTipoDoc, pp.fechaInicio, pp.fechaFin, pp.numeroHorasPPP,
-                        p.idEscuela, u.username
+                    pp.area, p.idEscuela, u.username
                 FROM persona p 
 				LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
 				LEFT JOIN practicas_preprofesionales pp ON pp.idPersona = p.idPersona
-                WHERE p.numDoc = %s and u.idTipoUsuario = 3
+                WHERE p.idPersona = %s and u.idTipoUsuario = 3
             """, (doc_estudiante,))
             row = cursor.fetchone()
             if row:

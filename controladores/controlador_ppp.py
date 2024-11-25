@@ -250,8 +250,8 @@ def obtener_supervisiones(idPractica):
     finally:
         conexion.close()
 
-def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona, supervisiones):
-    if not fechaInicio or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
+def agregar_practica(idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona, supervisiones):
+    if not fechaInicio or not fechaFin or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
         return {"error": "Todos los campos son requeridos."}
     conexion = obtener_conexion()
     if not conexion:
@@ -263,20 +263,20 @@ def agregar_practica(idPractica, fechaInicio, horario, modalidad, area, numeroHo
             if practica_existente:
                 cursor.execute("""
                     UPDATE practicas_preprofesionales
-                    SET horario = %s, modalidad = %s, area = %s,
+                    SET fechaFin = %s, horario = %s, modalidad = %s, area = %s,
                         numeroHorasPPP = %s, numeroHorasPendientes = %s, numeroHorasRealizadas = %s,
                         idLinea = %s, numDocInstitucion = %s, idTipoPractica = %s, estadoVigencia = %s, idEstado = %s
                     WHERE idPractica = %s
-                """, (horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
+                """, (fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
                       idLinea, numDocInstitucion, idTipoPractica, 'P', 1, idPractica))
             else:
                 cursor.execute("""
-                    INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, horario, modalidad, area,
+                    INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, fechaFin, horario, modalidad, area,
                                                             numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
                                                             estadoVigencia, idSemestre, idLinea, numDocInstitucion, idEstado,
                                                             idTipoPractica, idPersona)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes,
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes,
                       numeroHorasRealizadas, 'P', idSemestre, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
             for supervision in supervisiones:
                 idSupervision = supervision.get('idSupervision')
