@@ -73,6 +73,9 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="bibliografia-tab" data-bs-toggle="tab" data-bs-target="#bibliografia" type="button" role="tab" aria-controls="bibliografia" aria-selected="false">Bibliografía y Anexos</button>
                     </li>
+                    <li class="nav-item" role="firmas">
+                        <button class="nav-link" id="firmas-tab" data-bs-toggle="tab" data-bs-target="#firmas" type="button" role="tab" aria-controls="biblifirmasografia" aria-selected="false">Firmas</button>
+                    </li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -149,6 +152,9 @@
                         <div class="mb-3">
                             <label for="organigrama" class="form-label">Organigrama:</label>
                             <input type="file" class="form-control" id="organigrama" name="organigrama" accept="image/*" required>
+                            <div class="mt-2">
+                                <img id="organigrama-preview" src="#" alt="Vista previa del organigrama" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                            </div>
                         </div>
                     </div>
 
@@ -222,13 +228,36 @@
                     <!-- Bibliografía -->
                     <div class="tab-pane fade" id="bibliografia" role="tabpanel" aria-labelledby="bibliografia-tab">
                             <div class="mb-3">
-                                <label for="bibliografia" class="form-label">Bibliografía (Estilo IEEE):</label>
-                                <textarea class="form-control" id="bibliografia" name="bibliografia" rows="8" required></textarea>
+                                <label for="bibliografiai" class="form-label">Bibliografía (Estilo IEEE):</label>
+                                <textarea class="form-control" id="bibliografiai" name="bibliografiai" rows="8" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="anexos" class="form-label">Anexos:</label>
-                                <input type="file" class="form-control" id="anexos" name="anexos" accept="image/*" required>
+                                <input type="file" class="form-control" id="anexos" name="anexos" accept="application/pdf" required>
+                                <div class="mt-2" id="anexos-preview-container" style="display: none;">
+                                    <iframe id="anexos-preview" style="width: 100%; height: 400px; border: 1px solid #ccc;"></iframe>
+                                </div>
+                            </div>  
+                    </div>
+
+                    <!-- Firmas -->
+                    <div class="tab-pane fade" id="firmas" role="tabpanel" aria-labelledby="labores-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="firma1" class="form-label">Firma 1:</label>
+                                <input type="file" class="form-control" id="firma1" name="firma1" accept="image/*" required>
+                                <div class="mt-2">
+                                    <img id="firma1-preview" src="#" alt="Vista previa de la firma 1" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                                </div>
                             </div>
+                            <div class="col-md-6">
+                                <label for="firma2" class="form-label">Firma 2:</label>
+                                <input type="file" class="form-control" id="firma2" name="firma2" accept="image/*" required>
+                                <div class="mt-2">
+                                    <img id="firma2-preview" src="#" alt="Vista previa de la firma 2" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                                </div>
+                            </div>
+                        </div>    
                     </div>
                 </div>
                 <div class="text-end">
@@ -288,8 +317,8 @@
 
     // Función para deshabilitar los tabs
     function disableTabs() {
-        const tabs = document.querySelectorAll('.´p-tabs .nav-link');
-        const tabContents = document.querySelectorAll('.p-tabs .tab-pane');
+        const tabs = document.querySelectorAll('.informe-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.informe-tabs .tab-pane');
         tabs.forEach(tab => {
             tab.classList.add('disabled');
             tab.setAttribute('aria-disabled', 'true');
@@ -332,6 +361,11 @@
         document.getElementById('infraestructura_fisica').value = '';
         document.getElementById('infraestructura_tecnologica').value = '';
         document.getElementById('organigrama').value = '';
+        const organigramaPreview = document.getElementById('organigrama-preview');
+        if (organigramaPreview) {
+            organigramaPreview.src = '#';
+            organigramaPreview.style.display = 'none';
+        }
         document.getElementById('estudiante').value = '';
         document.getElementById('estudiante').disabled = false;
         document.getElementById('dropdown-estudiantes').disabled = false;
@@ -339,15 +373,54 @@
         document.getElementById('id').disabled = false;
         document.getElementById('idPersonaMod').value = '';
         document.getElementById('idPersonaMod').disabled = false;
-
         document.getElementById('area_trabajo').value = '';
         document.getElementById('labores_realizadas').value = '';
-
-        document.getElementById('bibliografia').value = '';
+        document.getElementById('bibliografiai').value = '';
         document.getElementById('anexos').value = '';
-           
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        const anexosPreview = document.getElementById('anexos-preview');
+        if (anexosPreviewContainer && anexosPreview) {
+            anexosPreview.src = '';
+            anexosPreviewContainer.style.display = 'none';
+        }
+        document.getElementById('firma1').value = '';
+        const firma1Preview = document.getElementById('firma1-preview');
+        if (firma1Preview) {
+            firma1Preview.src = '#';
+            firma1Preview.style.display = 'none';
+        }
+        document.getElementById('firma2').value = '';
+        const firma2Preview = document.getElementById('firma2-preview');
+        if (firma2Preview) {
+            firma2Preview.src = '#';
+            firma2Preview.style.display = 'none';
+        }
         idPersona = '';
-
+        const tablaConclusion = document.getElementById('tabla-conclusion');
+        const tbodyC = tablaConclusion.querySelector('tbody');
+        tbodyC.innerHTML = '';
+        const filaVaciaC = `
+            <tr>
+                <td><input type="number" min="0" class="form-control text-center" name="numC[]" value=1 required readonly></td>
+                <td><textarea type="text" id="conclusion" class="form-control" name="conclusion[]" required></textarea>
+                <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-conclusion"></td>
+            </tr>
+        `;
+        tbodyC.innerHTML = filaVaciaC;
+        const tablaRecnomendacion = document.getElementById('tabla-recomendacion');
+        const tbodyR = tablaRecnomendacion.querySelector('tbody');
+        tbodyR.innerHTML = '';
+        const filaVaciaR = `
+            <tr>
+                <td><input type="number" min="0" class="form-control text-center" name="numR[]" value=1 required readonly></td>
+                <td><textarea type="text" id="recomendacion" class="form-control" name="recomendacion[]" required></textarea>
+                <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-recomendacion"></td>
+            </tr>
+        `;
+        tbodyR.innerHTML = filaVaciaR;
+        const introduccionTab = document.getElementById('introduccion-tab');
+        const bootstrapTab = new bootstrap.Tab(introduccionTab);
+        bootstrapTab.show();
         disableTabs();
     }
     
@@ -474,6 +547,75 @@
         $('.seleccionar-recomendacion:checked').closest('tr').remove();
     });
 
+    // Evento para vista previa del organigrama
+    document.getElementById('organigrama').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('organigrama-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    });
+
+    // Evento para vista previa de los anexos
+    document.getElementById('anexos').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const previewContainer = document.getElementById('anexos-preview-container');
+        const preview = document.getElementById('anexos-preview');
+        if (file && file.type === 'application/pdf') {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '';
+            previewContainer.style.display = 'none';
+        }
+    });
+
+    // Evento para vista previa de la firma 1
+    document.getElementById('firma1').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('firma1-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    });
+
+    // Evento para vista previa de la firma 2
+    document.getElementById('firma2').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('firma2-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    });
+
     // Función para mostrar y recuperar estudiantes en el dropdown-search
     const inputEstudiante = document.getElementById('estudiante');
     const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
@@ -539,6 +681,8 @@
                     }
                     cargarDatosPractica(data);
                     cargarDatosEstudiante(idEstudiante);
+                    enableTabs();
+                    document.getElementById('estudiante').disabled = true;
                     document.getElementById('fecha_entrega').value = fechaActualFormateada;
                 }
             })
@@ -548,6 +692,7 @@
             });
     });
 
+    // Función para guardar el informe
     document.getElementById('btnGuardar').addEventListener('click', async function (event) {
         event.preventDefault();
         const idPractica = document.getElementById('id').value;
@@ -560,7 +705,7 @@
         const infraestructura_tecnologica = document.getElementById('infraestructura_tecnologica').value;
         const area_trabajo = document.getElementById('area_trabajo').value;
         const labores_realizadas = document.getElementById('labores_realizadas').value;
-        const bibliografia = document.getElementById('bibliografia').value;
+        const bibliografia = document.getElementById('bibliografiai').value;
         const organigramaInput = document.getElementById('organigrama');
         const anexosInput = document.getElementById('anexos');
         const organigramaBase64 = organigramaInput.files[0] ? await convertirABase64(organigramaInput.files[0]) : null;
@@ -570,7 +715,7 @@
             .filter(value => value !== '');
         const recomendaciones = Array.from(document.querySelectorAll('#tabla-recomendacion textarea[name="recomendacion[]"]'))
             .map(textarea => textarea.value.trim())
-            .filter(value => value !== '');
+            .filter(value => value !== '');        
         if (!idPractica || !fecha_entrega || !introduccion || !cantidad_trabajadores || !mision || !vision || !infraestructura_fisica || !infraestructura_tecnologica || !area_trabajo || !labores_realizadas) {
             mostrarAlerta("warning", "Advertencia", "Por favor, complete todos los campos requeridos.");
             return;

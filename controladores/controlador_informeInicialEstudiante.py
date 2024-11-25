@@ -173,44 +173,48 @@ def agregar_informe_inicial_empresa(idPractica, nombre_empresa, responsable, car
     finally:
         conexion.close()
 
-def agregar_informe_final_estudiante(idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision, infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo, labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos):
-    if not idPractica or not fecha_entrega or not introduccion or not cantidad_trabajadores:
-        return {"error": "Los campos principales son obligatorios."}
+def agregar_informe_final_estudiante(
+        idPractica, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+        infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+        labores_realizadas, conclusiones, recomendaciones, bibliografia, anexos
+    ):
+    
     conexion = obtener_conexion()
+    tipoInforme = 4
+    estado = 'P'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
+
     try:
         with conexion.cursor() as cursor:
             # Insertar en la tabla `informe`
             cursor.execute("""
-                INSERT INTO informe (fecha, introduccion, trabajadores, mision, vision, infFisica, infTecnologica, organigrama, area, labores, anexos, bibliografia)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (fecha_entrega, introduccion, cantidad_trabajadores, mision, vision, infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo, labores_realizadas, anexos, bibliografia))
-            
-            # Obtener el ID del informe recién creado
+                INSERT INTO informe (
+                    estado, fecha, introduccion, trabajadores, mision, vision, 
+                    infFisica, infTecnologica, organigrama, area, labores, anexos, 
+                    bibliografia, idTipoInforme
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
+                labores_realizadas, anexos, bibliografia, tipoInforme
+            ))
             idInforme = cursor.lastrowid
-            
-            # Insertar las conclusiones en la tabla `adicionales`
             for conclusion in conclusiones:
                 cursor.execute("""
                     INSERT INTO adicionales (tipo, descripcion, idInforme)
                     VALUES (%s, %s, %s)
                 """, ('C', conclusion, idInforme))
-            
-            # Insertar las recomendaciones en la tabla `adicionales`
             for recomendacion in recomendaciones:
                 cursor.execute("""
                     INSERT INTO adicionales (tipo, descripcion, idInforme)
                     VALUES (%s, %s, %s)
                 """, ('R', recomendacion, idInforme))
-            
-            # Relacionar el informe con la práctica en `informes_practicas_preprofesionales`
             cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (idPractica, idInforme)
+                INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
                 VALUES (%s, %s)
             """, (idPractica, idInforme))
-
-            # Confirmar los cambios
             conexion.commit()
             return {"mensaje": "Informe final de estudiante registrado correctamente."}
     except Exception as e:

@@ -89,31 +89,35 @@ def agregar_informe_empresa():
 
 @router_informe.route("/agregar_informe_final_estudiante", methods=["POST"])
 def agregar_informe_final_estudiante_route():
-    data = request.json
-    idPractica = data.get("idPractica")
-    fecha_entrega = data.get("fecha_entrega")
-    introduccion = data.get("introduccion")
-    cantidad_trabajadores = data.get("cantidad_trabajadores")
-    mision = data.get("mision")
-    vision = data.get("vision")
-    infraestructura_fisica = data.get("infraestructura_fisica")
-    infraestructura_tecnologica = data.get("infraestructura_tecnologica")
-    organigrama = data.get("organigrama")
-    area_trabajo = data.get("area_trabajo")
-    labores_realizadas = data.get("labores_realizadas")
-    conclusiones = data.get("conclusiones", [])
-    recomendaciones = data.get("recomendaciones", [])
-    bibliografia = data.get("bibliografia")
-    anexos = data.get("anexos")
+    try:
+        data = request.get_json()
+        idPractica = data.get("idPractica")
+        fecha_entrega = data.get("fecha_entrega")
+        introduccion = data.get("introduccion")
+        cantidad_trabajadores = data.get("cantidad_trabajadores")
+        mision = data.get("mision")
+        vision = data.get("vision")
+        infraestructura_fisica = data.get("infraestructura_fisica")
+        infraestructura_tecnologica = data.get("infraestructura_tecnologica")
+        area_trabajo = data.get("area_trabajo")
+        labores_realizadas = data.get("labores_realizadas")
+        bibliografia = data.get("bibliografia")
+        organigrama = data.get("organigrama")
+        anexos = data.get("anexos")
+        conclusiones = data.get("conclusiones", [])
+        recomendaciones = data.get("recomendaciones", [])
 
-    resultado = agregar_informe_final_estudiante(
-        idPractica, fecha_entrega, introduccion, cantidad_trabajadores, 
-        mision, vision, infraestructura_fisica, infraestructura_tecnologica, 
-        organigrama, area_trabajo, labores_realizadas, conclusiones, 
-        recomendaciones, bibliografia, anexos
-    )
+        resultado = agregar_informe_final_estudiante(
+            idPractica, fecha_entrega, introduccion, cantidad_trabajadores,
+            mision, vision, infraestructura_fisica, infraestructura_tecnologica,
+            organigrama, area_trabajo, labores_realizadas, conclusiones,
+            recomendaciones, bibliografia, anexos
+        )
 
-    return jsonify(resultado)
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error en la ruta: {e}")
+        return jsonify({"error": str(e)})
 
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
