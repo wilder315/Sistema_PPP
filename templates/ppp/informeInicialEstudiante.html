@@ -321,16 +321,16 @@ document.getElementById('btnGuardar').addEventListener('click', async function (
     // Preparar datos para enviar
     const data = {
         idPractica,
-        fecha_inicio,
-        fecha_fin,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
         firma_estudiante: firmaEstudianteBase64,
         firma_responsable: firmaResponsableBase64,
         objetivos,
-        plan_trabajo,
+        plan_trabajo: planTrabajo,
     };
 
     // Enviar los datos al servidor
-    fetch('/agregar_informe', {
+    fetch('/agregar_informe_inicial_estudiante', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

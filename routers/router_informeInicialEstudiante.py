@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, session
-from controladores.controlador_informeInicialEstudiante import obtener_instituciones, agregar_informe_final_estudiante, agregar_informe_inicial, agregar_informe_inicial_empresa, agregar_informe_final_empresa
+from controladores.controlador_informeInicialEstudiante import obtener_instituciones, agregar_informe_final_estudiante, agregar_informe_inicial_estudiante, agregar_informe_inicial_empresa, agregar_informe_final_empresa
 from controladores import controlador_ppp as controlador_ppp
 from controladores import controlador_informeInicialEstudiante as controlador_informeInicialEstudiante
 
@@ -20,46 +20,43 @@ def get_institucion_responsable(numDoc):
     return jsonify(datos)
 
 # Ruta para agregar el informe inicial
-@router_informe.route('/agregar_informe', methods=['POST'])
-def agregar_informe():
+@router_informe.route("/agregar_informe_inicial_estudiante", methods=["POST"])
+def agregar_informe_inicial_estudiante_route():
     try:
         data = request.get_json()
+        
+        # Extraer datos del JSON recibido
+        idInforme = data.get("idInforme")  # Puede ser None si es un nuevo informe
+        idPractica = data.get("idPractica")
+        fecha_inicio = data.get("fecha_inicio")
+        fecha_fin = data.get("fecha_fin")
+        objetivos = data.get("objetivos", [])
+        plan_trabajo = data.get("plan_trabajo", {})
+        firma1 = data.get("firma1")  # Firma del estudiante
+        firma2 = data.get("firma2")  # Firma del responsable
 
-        # Verificar campos obligatorios
-        idPractica = data.get('idPractica')
-        fechaInicio = data.get('fechaInicio')
-        fechaFin = data.get('fechaFin')
-        institucion = data.get('institucion')
-        nombreResponsable = data.get('nombreResponsable')
-        apellidoResponsable = data.get('apellidoResponsable')
-        cargoResponsable = data.get('cargoResponsable')
-        firmaEstudiante = data.get('firmaEstudiante')  # Base64
-        firmaResponsable = data.get('firmaResponsable')  # Base64
-        objetivos = data.get('objetivos', [])
-        plan_trabajo = data.get('planTrabajo', [])
+        # Validaciones básicas
+        if not idPractica or not fecha_inicio or not fecha_fin or not firma1 or not firma2:
+            return jsonify({"error": "Faltan campos obligatorios."}), 400
 
-        # Validar datos
-        if not idPractica or not fechaInicio or not fechaFin or not institucion or not nombreResponsable or not apellidoResponsable or not cargoResponsable:
-            return jsonify({"success": False, "error": "Faltan campos obligatorios."})
-
-        # Preparar datos para guardar en la base de datos
-        resultado = agregar_informe_inicial(
+        # Llamar a la función de controlador
+        resultado = agregar_informe_inicial_estudiante(
+            idInforme=idInforme,
             idPractica=idPractica,
-            fechaInicio=fechaInicio,
-            fechaFin=fechaFin,
-            institucion=institucion,
-            nombreResponsable=nombreResponsable,
-            apellidoResponsable=apellidoResponsable,
-            cargoResponsable=cargoResponsable,
-            firmaEstudiante=firmaEstudiante,
-            firmaResponsable=firmaResponsable,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
             objetivos=objetivos,
-            plan_trabajo=plan_trabajo
+            plan_trabajo=plan_trabajo,
+            firma1=firma1,
+            firma2=firma2
         )
 
+        # Devolver resultado al cliente
         return jsonify(resultado)
+
     except Exception as e:
-        return jsonify({"success": False, "error": f"Error al procesar la solicitud: {str(e)}"})
+        print(f"Error en la ruta: {e}")
+        return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
     
 @router_informe.route('/obtener_practicas_informe_inicial', methods=['GET'])
 def obtener_practicas_ajax():

@@ -46,56 +46,75 @@ def obtener_responsable_institucion(numDoc):
     finally:
         conexion.close()
 
-def agregar_informe_inicial(data):
+def agregar_informe_inicial_estudiante(
+        idInforme, idPractica, fecha_inicio, fecha_fin, objetivos, plan_trabajo, firma1, firma2
+    ):
     conexion = obtener_conexion()
+    tipoInforme = 1  # Asumiendo que 1 corresponde a "Informe Inicial"
+    estado = 'P'  # Estado inicial del informe
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
-            # Usar 'P' para Pendiente y 'A' para Aprobado
-            estado = 'P'  # El informe inicial empieza como Pendiente
-
-            # Insertar el informe en la tabla 'informe'
-            cursor.execute("""
-                INSERT INTO informe (estado, idTipoInforme, fecha, area)
-                VALUES (%s, %s, %s, %s)
-            """, (estado, 1, data['fecha_creacion'], data['area']))
-
-            # Obtener el ID del informe recién insertado
-            idInforme = cursor.lastrowid
-
-            # Insertar la relación en la tabla 'informes_practicas_preprofesionales'
-            cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (IidInforme, idPractica)
-                VALUES (%s, %s)
-            """, (idInforme, data['id_practica']))
-
-            # Insertar los datos de las firmas en la tabla 'informe'
-            cursor.execute("""
-                UPDATE informe
-                SET 
-                    extras = %s  -- Puede usarse este campo para guardar info adicional
-                WHERE idInforme = %s
-            """, (data['firmas'], idInforme))
-
-            # Insertar los objetivos en la tabla 'objetivos'
-            for objetivo in data['objetivos']:
+            if idInforme:
+                # Actualización del informe inicial existente
                 cursor.execute("""
-                    INSERT INTO objetivos (descripcion, idInforme)
+                    UPDATE informe
+                    SET estado = %s, fecha = %s, labor = %s, extras = %s, firma1 = %s, firma2 = %s
+                    WHERE idInforme = %s
+                """, (
+                    estado, fecha_inicio, f"Inicio: {fecha_inicio}, Fin: {fecha_fin}", None, firma1, firma2, idInforme
+                ))
+                # Eliminar objetivos y plan de trabajo antiguos asociados al informe
+                cursor.execute("DELETE FROM objetivos WHERE idInforme = %s", (idInforme,))
+                cursor.execute("DELETE FROM plan_trabajo WHERE idInforme = %s", (idInforme,))
+                # Insertar nuevos objetivos
+                for objetivo in objetivos:
+                    cursor.execute("""
+                        INSERT INTO objetivos (descripcion, idInforme)
+                        VALUES (%s, %s)
+                    """, (objetivo, idInforme))
+                # Insertar nuevo plan de trabajo
+                for semana, detalles in plan_trabajo.items():
+                    cursor.execute("""
+                        INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (semana, detalles['fechaInicio'], detalles['fechaFin'], detalles['actividades'], detalles['horas'], idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe inicial de estudiante actualizado correctamente."}
+            else:
+                # Registro de un nuevo informe inicial
+                cursor.execute("""
+                    INSERT INTO informe (
+                        estado, fecha, labor, extras, firma1, firma2, idTipoInforme
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    estado, fecha_inicio, f"Inicio: {fecha_inicio}, Fin: {fecha_fin}", None, firma1, firma2, tipoInforme
+                ))
+                idInforme = cursor.lastrowid
+                # Insertar objetivos
+                for objetivo in objetivos:
+                    cursor.execute("""
+                        INSERT INTO objetivos (descripcion, idInforme)
+                        VALUES (%s, %s)
+                    """, (objetivo, idInforme))
+                # Insertar plan de trabajo
+                for semana, detalles in plan_trabajo.items():
+                    cursor.execute("""
+                        INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (semana, detalles['fechaInicio'], detalles['fechaFin'], detalles['actividades'], detalles['horas'], idInforme))
+                # Asociar el informe con la práctica preprofesional
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
                     VALUES (%s, %s)
-                """, (objetivo, idInforme))
-
-            # Insertar el plan de trabajo en la tabla 'plan_trabajo'
-            for plan in data['plan_trabajo']:
-                cursor.execute("""
-                    INSERT INTO plan_trabajo (semana, fechaInicio, fechaFin, actividades, horas, idInforme)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                """, (plan['semana'], plan['fecha_inicio'], plan['fecha_fin'], plan['actividad'], plan['horas'], idInforme))
-
-            # Confirmar los cambios
-            conexion.commit()
-            return {"success": True, "message": "Informe inicial guardado correctamente."}
+                """, (idPractica, idInforme))
+                conexion.commit()
+                return {"mensaje": "Informe inicial de estudiante registrado correctamente."}
     except Exception as e:
         conexion.rollback()
-        return {"success": False, "error": str(e)}
+        return {"error": f"Error al registrar o modificar el informe inicial: {str(e)}"}
     finally:
         conexion.close()
 
