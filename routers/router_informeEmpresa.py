@@ -5,7 +5,7 @@ import os
 import base64
 import uuid
 from io import BytesIO
-from PIL import Image
+
 
 router_informeEmpresa = Blueprint('router_informeEmpresa', __name__)
 

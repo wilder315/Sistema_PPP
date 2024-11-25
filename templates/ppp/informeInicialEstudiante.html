@@ -237,7 +237,7 @@
                     </div>
                 </div>
                 <div class="text-end">
-                    <button type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
+                    <button id="btnGuardar" type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
                 </div>
             </form>
         </div>
@@ -289,43 +289,91 @@
     });
 
     // Enviar el formulario con AJAX y mostrar alerta de éxito
-    $('#form-informe').on('submit', function(event) {
-        event.preventDefault(); // Evita el envío automático del formulario
+    // Función para guardar el informe
+document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+    event.preventDefault(); // Evita el envío automático del formulario
 
-        const formData = $(this).serialize();
+    // Obtener los valores de los campos
+    const idPractica = document.getElementById('id').value;
+    const fechaInicio = document.getElementById('fecha_inicio').value;
+    const fechaFin = document.getElementById('fecha_fin').value;
+    // Procesar archivos para las firmas en formato Base64
+    const firmaEstudianteInput = document.getElementById('firma_estudiante');
+    const firmaResponsableInput = document.getElementById('firma_responsable');
+    const firmaEstudianteBase64 = firmaEstudianteInput.files[0] ? await convertirABase64(firmaEstudianteInput.files[0]) : null;
+    const firmaResponsableBase64 = firmaResponsableInput.files[0] ? await convertirABase64(firmaResponsableInput.files[0]) : null;
 
-        $.ajax({
-            url: "{{ url_for('router_informe.agregar_informe') }}",
-            type: 'POST',
-            data: formData,
-            dataType: 'json', // Indicamos que esperamos una respuesta JSON
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: response.message || 'El informe inicial ha sido guardado correctamente.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'No se pudo guardar el informe.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
+    // Recopilar los objetivos
+    const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos input[name="objetivo[]"]'))
+        .map(input => input.value.trim())
+        .filter(value => value !== '');
+
+    // Recopilar el plan de trabajo
+    const planTrabajo = Array.from(document.querySelectorAll('#tabla-plan-trabajo tbody tr')).map(row => ({
+        semana: row.querySelector('input[name="semana[]"]').value,
+        fecha_inicio: row.querySelector('input[name="fecha_inicio[]"]').value,
+        fecha_fin: row.querySelector('input[name="fecha_fin[]"]').value,
+        actividad: row.querySelector('input[name="actividad[]"]').value,
+        horas: row.querySelector('input[name="horas[]"]').value,
+    }));
+
+   
+    // Preparar datos para enviar
+    const data = {
+        idPractica,
+        fecha_inicio,
+        fecha_fin,
+        firma_estudiante: firmaEstudianteBase64,
+        firma_responsable: firmaResponsableBase64,
+        objetivos,
+        plan_trabajo,
+    };
+
+    // Enviar los datos al servidor
+    fetch('/agregar_informe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: response.message || 'El informe inicial ha sido guardado correctamente.',
+                });
+                document.getElementById('form-informe').reset(); // Resetear el formulario
+            } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Hubo un error al procesar la solicitud. Verifica tu conexión e intenta de nuevo.',
-                    confirmButtonText: 'Aceptar'
+                    text: response.error || 'No se pudo guardar el informe.',
                 });
             }
+        })
+        .catch(error => {
+            console.error('Error al guardar el informe:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al procesar la solicitud. Verifique su conexión e intente de nuevo.',
+            });
         });
+});
+
+// Función para convertir archivos a Base64
+async function convertirABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
     });
+}
+
     document.addEventListener('DOMContentLoaded', function () {
         // Realizar una solicitud a la API
         fetch('/datos_ultimos_semestres_activos')
@@ -361,6 +409,34 @@
                 alert("Hubo un error al cargar los semestres. Por favor, inténtelo nuevamente.");
             });
     });
+
+    function cargarDatosEstudiante(idEstudiante) {
+        if (!idEstudiante) {
+            console.error("ID de estudiante no proporcionado.");
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido.");
+            return;
+        }
+        fetch(`/obtener_estudiante_por_id/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos del estudiante');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('nombre').value = data.nombre || 'Sin nombre';
+                    document.getElementById('apellidos').value = data.apellidos || 'Sin apellidos';
+                    document.getElementById('codigo').value = data.codigo || 'Sin escuela';
+                } else {
+                    mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
+                }
+            })
+            .catch(error => {
+                console.error("Error al buscar el estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
+            });
+    }
 
     // Evento al seleccionar una institución
     document.getElementById('institucion').addEventListener('change', function() {
@@ -435,42 +511,35 @@
     // Función para buscar por Estudiante
     document.getElementById('btnBuscarE').addEventListener('click', function (event) {
         event.preventDefault();
-        const idEstudiante = idPersona; // Asegúrate de que idPersona tiene un valor válido
-        const nombreEstudianteInput = document.getElementById('nombre');
-        const apellidoEstudianteInput = document.getElementById('apellidos');
-        const codigoEstudianteInput = document.getElementById('codigo');
-
-        // Limpiar los campos antes de buscar
-        nombreEstudianteInput.value = '';
-        apellidoEstudianteInput.value = '';
-        codigoEstudianteInput.value = '';
-
+        const idEstudiante = idPersona;
         if (!idEstudiante) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
-
-        // Llamada a la ruta
-        fetch(`/obtener_estudiante_por_id/${idEstudiante}`)
+        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al obtener datos del estudiante');
-                }
-                return response.json();
-            })
+                    if (!response.ok) {
+                        throw new Error('Error al obtener datos del estudiante');
+                    }
+                    return response.json();
+                })
             .then(data => {
-                if (data && Object.keys(data).length > 0) {
-                    // Llenar los campos con los datos recibidos
-                    nombreEstudianteInput.value = data.nombre || 'Sin nombre';
-                    apellidoEstudianteInput.value = data.apellidos || 'Sin apellidos';
-                    codigoEstudianteInput.value = data.codUniversitario || 'Sin código';
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                } else if (data.mensaje) {
+                    mostrarAlerta("info", "Información", data.mensaje);
                 } else {
-                    mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
+                    const idInput = document.getElementById('id');
+                    if (idInput) {
+                        idInput.value = data.idPractica || '';
+                        idInput.disabled = true;
+                    }
+                    cargarDatosEstudiante(idEstudiante);
                 }
             })
             .catch(error => {
-                console.error("Error al buscar el estudiante:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
+                console.error("Error al buscar la práctica del estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
             });
     });
 

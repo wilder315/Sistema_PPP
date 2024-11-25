@@ -23,33 +23,43 @@ def get_institucion_responsable(numDoc):
 @router_informe.route('/agregar_informe', methods=['POST'])
 def agregar_informe():
     try:
-        idPractica = request.form.get('idPractica')
-        if not idPractica:
-            return jsonify({"success": False, "error": "El ID de la práctica no fue proporcionado."})
+        data = request.get_json()
 
-        objetivos = request.form.getlist('objetivo[]')
+        # Verificar campos obligatorios
+        idPractica = data.get('idPractica')
+        fechaInicio = data.get('fechaInicio')
+        fechaFin = data.get('fechaFin')
+        institucion = data.get('institucion')
+        nombreResponsable = data.get('nombreResponsable')
+        apellidoResponsable = data.get('apellidoResponsable')
+        cargoResponsable = data.get('cargoResponsable')
+        firmaEstudiante = data.get('firmaEstudiante')  # Base64
+        firmaResponsable = data.get('firmaResponsable')  # Base64
+        objetivos = data.get('objetivos', [])
+        plan_trabajo = data.get('planTrabajo', [])
 
-        # Obtener datos del plan de trabajo
-        plan_trabajo = []
-        semanas = request.form.getlist('semana[]')
-        fechas_inicio = request.form.getlist('fecha_inicio[]')
-        fechas_fin = request.form.getlist('fecha_fin[]')
-        actividades = request.form.getlist('actividad[]')
-        horas = request.form.getlist('horas[]')
+        # Validar datos
+        if not idPractica or not fechaInicio or not fechaFin or not institucion or not nombreResponsable or not apellidoResponsable or not cargoResponsable:
+            return jsonify({"success": False, "error": "Faltan campos obligatorios."})
 
-        for i in range(len(semanas)):
-            plan_trabajo.append({
-                "semana": semanas[i],
-                "fecha_inicio": fechas_inicio[i],
-                "fecha_fin": fechas_fin[i],
-                "actividad": actividades[i],
-                "horas": horas[i]
-            })
+        # Preparar datos para guardar en la base de datos
+        resultado = agregar_informe_inicial(
+            idPractica=idPractica,
+            fechaInicio=fechaInicio,
+            fechaFin=fechaFin,
+            institucion=institucion,
+            nombreResponsable=nombreResponsable,
+            apellidoResponsable=apellidoResponsable,
+            cargoResponsable=cargoResponsable,
+            firmaEstudiante=firmaEstudiante,
+            firmaResponsable=firmaResponsable,
+            objetivos=objetivos,
+            plan_trabajo=plan_trabajo
+        )
 
-        resultado = agregar_informe_inicial(idPractica, objetivos, plan_trabajo)
         return jsonify(resultado)
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": f"Error al procesar la solicitud: {str(e)}"})
     
 
 
