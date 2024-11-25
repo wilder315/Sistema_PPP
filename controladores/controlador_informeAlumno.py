@@ -1,7 +1,7 @@
 from bd import obtener_conexion
 from datetime import datetime
 
-# Obtener todas las escuelas
+# Obtener informes de los alumnos con sus prácticas y tipos de informes
 def obtener_informeAlumno():
     conexion = obtener_conexion()
     if not conexion:
@@ -16,8 +16,54 @@ def obtener_informeAlumno():
                 p.apellidos AS Apellidos_Alumno,
                 sa.nombre AS Semestre_Academico,
                 ppp.idPractica AS ID_Practica,
-                IFNULL(ii.idInforme, 'Por subir') AS Informe_Inicial,
-                IFNULL(ifin.idInforme, 'Por subir') AS Informe_Final
+                -- Informe inicial (tipo 1)
+                EXISTS(
+                    SELECT 1 
+                    FROM informes_practicas_preprofesionales ippp 
+                    JOIN informe i ON ippp.IidInforme = i.idInforme
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
+                ) AS Informe_Inicial_Existe,
+                (SELECT i.idInforme 
+                 FROM informes_practicas_preprofesionales ippp 
+                 JOIN informe i ON ippp.IidInforme = i.idInforme
+                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
+                 LIMIT 1) AS Informe_Inicial_ID,
+                -- Informe final (tipo 2)
+                EXISTS(
+                    SELECT 1 
+                    FROM informes_practicas_preprofesionales ippp 
+                    JOIN informe i ON ippp.IidInforme = i.idInforme
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
+                ) AS Informe_Final_Existe,
+                (SELECT i.idInforme 
+                 FROM informes_practicas_preprofesionales ippp 
+                 JOIN informe i ON ippp.IidInforme = i.idInforme
+                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
+                 LIMIT 1) AS Informe_Final_ID,
+                -- Informe de tipo 3
+                EXISTS(
+                    SELECT 1 
+                    FROM informes_practicas_preprofesionales ippp 
+                    JOIN informe i ON ippp.IidInforme = i.idInforme
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
+                ) AS Informe_Tipo3_Existe,
+                (SELECT i.idInforme 
+                 FROM informes_practicas_preprofesionales ippp 
+                 JOIN informe i ON ippp.IidInforme = i.idInforme
+                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
+                 LIMIT 1) AS Informe_Tipo3_ID,
+                -- Informe de tipo 4
+                EXISTS(
+                    SELECT 1 
+                    FROM informes_practicas_preprofesionales ippp 
+                    JOIN informe i ON ippp.IidInforme = i.idInforme
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
+                ) AS Informe_Tipo4_Existe,
+                (SELECT i.idInforme 
+                 FROM informes_practicas_preprofesionales ippp 
+                 JOIN informe i ON ippp.IidInforme = i.idInforme
+                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
+                 LIMIT 1) AS Informe_Tipo4_ID
             FROM 
                 persona p
             JOIN 
@@ -26,16 +72,10 @@ def obtener_informeAlumno():
                 practicas_preprofesionales ppp ON p.idPersona = ppp.idPersona
             JOIN 
                 semestre_academico sa ON ppp.idSemestre = sa.idSemestre
-            LEFT JOIN 
-                informes_practicas_preprofesionales ippp_i ON ppp.idPractica = ippp_i.idPractica
-            LEFT JOIN 
-                informe ii ON ippp_i.IidInforme = ii.idInforme AND ii.idTipoInforme = 1 -- Informe inicial
-            LEFT JOIN 
-                informes_practicas_preprofesionales ippp_f ON ppp.idPractica = ippp_f.idPractica
-            LEFT JOIN 
-                informe ifin ON ippp_f.IidInforme = ifin.idInforme AND ifin.idTipoInforme = 2 -- Informe final
             WHERE 
-                u.idTipoUsuario = 3;
+                u.idTipoUsuario = 3 -- Solo estudiantes
+            ORDER BY 
+                p.apellidos, p.nombre;
             """)
             column_names = [desc[0] for desc in cursor.description]
             rows = cursor.fetchall()
@@ -49,7 +89,6 @@ def obtener_informeAlumno():
         conexion.close()
     
     return informesAlumnos
-
 
 # reporte 4
 def obtener_reporte_horas_practicas():
@@ -480,4 +519,125 @@ def obtener_instituciones_por_escuela(id_escuela):
     except Exception as e:
         return {"error": str(e)}
     finally:
-        conexion.close()  
+        conexion.close() 
+
+# Controlador para obtener detalles de un informe
+def obtener_detalle_informe(idInforme):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    idInforme AS ID_Informe,
+                    fecha AS Fecha,
+                    estado AS Estado,
+                    idTipoInforme AS TipoInforme
+                FROM informe
+                WHERE idInforme = %s
+            """, (idInforme,))
+            resultado = cursor.fetchone()
+            
+            if not resultado:
+                return {"error": "No se encontró ningún informe con el ID proporcionado."}
+            
+            # Mapear el estado del informe
+            estado_map = {
+                "A": "Aprobado",
+                "P": "Pendiente de aprobación",
+                "R": "Rechazado"
+            }
+            
+            # Mapeamos los resultados a un diccionario
+            detalle_informe = {
+                "idInforme": resultado[0],
+                "fecha": resultado[1],
+                "estado": estado_map.get(resultado[2], "Estado desconocido"),
+                "tipoInforme": resultado[3]
+            }
+            return detalle_informe
+    except Exception as e:
+        return {"error": f"Error al obtener el detalle del informe: {str(e)}"}
+    finally:
+        conexion.close()
+
+def aprobar_informe(idInforme):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+
+    try:
+        with conexion.cursor() as cursor:
+            # Verificar el estado actual del informe
+            cursor.execute("""
+                SELECT estado
+                FROM informe
+                WHERE idInforme = %s
+            """, (idInforme,))
+            resultado = cursor.fetchone()
+
+            if not resultado:
+                return {"error": "El informe no existe."}
+
+            estado_actual = resultado[0]
+            if estado_actual == 'A':
+                return {"error": "El informe ya está aprobado."}
+
+            # Actualizar el estado del informe a 'A' (Aprobado)
+            cursor.execute("""
+                UPDATE informe
+                SET estado = 'A'
+                WHERE idInforme = %s
+            """, (idInforme,))
+
+            # Confirmar los cambios
+            conexion.commit()
+            
+            return {"mensaje": "El informe fue aprobado correctamente."}
+    except Exception as e:
+        conexion.rollback()  # Revertir los cambios en caso de error
+        return {"error": f"Error al aprobar el informe: {str(e)}"}
+    finally:
+        conexion.close()
+
+def rechazar_informe(idInforme):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+
+    try:
+        with conexion.cursor() as cursor:
+            # Verificar el estado actual del informe
+            cursor.execute("""
+                SELECT estado
+                FROM informe
+                WHERE idInforme = %s
+            """, (idInforme,))
+            resultado = cursor.fetchone()
+
+            if not resultado:
+                return {"error": "El informe no existe."}
+
+            estado_actual = resultado[0]
+            if estado_actual == 'R':
+                return {"error": "El informe ya está rechazado."}
+
+            # Actualizar el estado del informe a 'R' (Rechazado)
+            cursor.execute("""
+                UPDATE informe
+                SET estado = 'R'
+                WHERE idInforme = %s
+            """, (idInforme,))
+
+            # Confirmar los cambios
+            conexion.commit()
+
+            return {"mensaje": "El informe fue rechazado correctamente."}
+    except Exception as e:
+        conexion.rollback()  # Revertir los cambios en caso de error
+        return {"error": f"Error al rechazar el informe: {str(e)}"}
+    finally:
+        conexion.close()
+

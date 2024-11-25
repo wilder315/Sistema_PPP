@@ -538,7 +538,7 @@
                 data.forEach(tipo_practica => {
                     const option = document.createElement('option');
                     option.value = tipo_practica.idTipoPractica;
-                    option.textContent = tipo_practica.nombre;
+                    option.textContent = tipo_practica.nombre;semestreFinal
                     select.appendChild(option);
                 });
             })
@@ -708,6 +708,7 @@
     document.getElementById('btnGuardar').addEventListener('click', function (event) {
         event.preventDefault();
         const fechaInicio = document.getElementById('fechaInicio').value;
+        const fechaFin = document.getElementById('fechaFin').value;
         const horario = document.getElementById('horario').value;
         const modalidad = document.querySelector('input[name="modalidad"]:checked').value;
         const area = document.getElementById('area').value;
@@ -721,7 +722,7 @@
         const idPersona = document.getElementById('idPersonaMod').value;
         const idPractica = document.getElementById('id').value;
         if (
-            !idPractica || !fechaInicio || !modalidad || !horario || !area ||
+            !idPractica || !fechaInicio || !fechaFin || !modalidad || !horario || !area ||
             !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas ||
             !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona
         ) {
@@ -755,6 +756,7 @@
             body: JSON.stringify({
                 idPractica,
                 fechaInicio,
+                fechaFin,
                 horario,
                 modalidad,
                 area,
@@ -806,6 +808,7 @@
         if (data.numDocInstitucion) {
             obtenerDatosInstitucion(data.numDocInstitucion);
         }
+        semestreFinal();
     }
     
     // Función para cargar cumplimiento de los informes
@@ -925,7 +928,6 @@
         const idPractica = document.getElementById('id').value;
         const allChecksSelected =
             inicialEstudianteCheck.checked &&
-            inicialInstitucionCheck.checked &&
             finalEstudianteCheck.checked &&
             finalInstitucionCheck.checked;
         if (fechaFinInput.value && semestreSelect.value && allChecksSelected) {
@@ -973,8 +975,6 @@
     // Evento cuando fecha final cambia
     document.getElementById('fechaFin').addEventListener('change', function () {
         const fechaFin = this.value;
-        const tabEstado = document.querySelector('#estado-tab');
-        const bootstrapTab = new bootstrap.Tab(tabEstado);
         if (!fechaFin) {
             console.error("No se seleccionó una fecha válida.");
             return;
@@ -994,14 +994,25 @@
                     return;
                 }
                 selectSemestre.value = data.idSemestre;
-                bootstrapTab.show();
-                selectSemestre.focus();
             })
             .catch(error => {
                 console.error("Error en la solicitud para obtener el semestre:", error);
             });
     });
 
+    function semestreFinal(){
+        // Obtén el elemento
+        const fechaFinElement = document.getElementById('fechaFin');
+
+        // Crea el evento 'change'
+        const event = new Event('change', {
+            bubbles: true, // Permite que el evento burbujee en el DOM
+            cancelable: true // Indica que puede ser cancelado
+        });
+
+        // Desencadena el evento
+        fechaFinElement.dispatchEvent(event);
+    }
 
 </script>
 

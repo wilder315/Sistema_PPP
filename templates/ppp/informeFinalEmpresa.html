@@ -26,12 +26,18 @@
                             <div class="mb-3">
                                 <label for="numDoc_empresa" class="form-label">Documento Identidad Empresa: *</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="numDoc_empresa" name="numDoc_empresa" required>
-                                    <button class="btn btn-primary" type="button" id="buscar_empresa">
+                                    <div class="flex-grow-1 me-2">
+                                        <div class="custom-combo">
+                                            <input type="text" id="empresa" class="form-control" placeholder="Seleccionar empresa" autocomplete="off">
+                                            <ul id="dropdown-empresas" class="dropdown-menu"></ul>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary" type="button" id="buscar_empresa">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
                             </div>
+                            <input type="hidden" id="idEmpresaMod" name="idEmpresaMod">
                             <div class="mb-3">
                                 <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
                                 <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" required readonly>
@@ -40,21 +46,21 @@
                             <div class="row"> 
                                 <div class="col-lg-6 mb-3">
                                     <label for="doc_jefe" class="form-label">Documento Identidad Responsable:</label>
-                                    <input type="text" class="form-control" id="doc_jefe" name="doc_jefe" required readonly>
+                                    <input type="text" class="form-control" id="doc_jefe" name="doc_jefe" required readonly readonly>
                                 </div>
                                 <div class="col-lg-6 mb-3">
                                     <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
-                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required >
+                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required readonly>
                                 </div>
                             </div>
                             <div class=" row mb-3">
                                 <div class="col-lg-6">
                                     <label for="apellidos_responsable" class="form-label">Apellidos del Responsable:</label>
-                                    <input type="text" class="form-control" id="apellidos_responsable" name="apellidos_responsable" required >
+                                    <input type="text" class="form-control" id="apellidos_responsable" name="apellidos_responsable" required readonly>
                                 </div>
                                 <div class="col-lg-6">
                                     <label for="nombre_responsable" class="form-label">Nombres del Responsable:</label>
-                                    <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" required >
+                                    <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" required readonly>
                                 </div>
                                 
                             </div>
@@ -71,42 +77,47 @@
                             <div class="mb-3">
                                 <label for="doc_estudiante" class="form-label">Documento Identidad Prácticante: *</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="doc_estudiante" name="doc_estudiante" required>
-                                    <button class="btn btn-primary" type="button" id="buscar_estudiante">
+                                    <div class="flex-grow-1 me-2">
+                                        <div class="custom-combo">
+                                            <input type="text" id="estudiante" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
+                                            <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-secondary" type="button" id="btnBuscarE">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                </div>
-                                
+                                </div>    
                             </div>
+                            <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                            <input type="hidden" id="idPersonaMod" name="idPersonaMod">
+                            <input type="hidden" id="idInformeMod" name="idInformeMod">     
                             <div class="row mb-3">
                                 <div class="col-lg-6">
                                     <label for="apellidos_estudiante" class="form-label">Apellidos del Estudiante:</label>
-                                    <input type="text" class="form-control" id="apellidos_estudiante" name="apellidos_estudiante" required>
+                                    <input type="text" class="form-control" id="apellidos_estudiante" name="apellidos_estudiante" required readonly>
                                 </div>
                                 <div class="col-lg-6">
                                     <label for="nombre_estudiante" class="form-label">Nombres del Estudiante:</label>
-                                    <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required>
+                                    <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required readonly>
                                 </div>
                                 
                             </div>
                             <div class="row">
                                 <div class="col-lg-6 mb-3">
                                     <label for="fecha_inicio" class="form-label">Fecha de Inicio de la Práctica:</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required readonly>
                                 </div>
                                 <div class="col-lg-6 mb-3">
                                     <label for="fecha_fin" class="form-label">Fecha de Término de la Práctica:</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required readonly>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="area_estudiante" class="form-label">Area de Desarollo del Prácticante:</label>
-                                <input type="text" class="form-control" id="area_estudiante" name="area_estudiante" required>
+                                <input type="text" class="form-control" id="area_estudiante" name="area_estudiante" required readonly>
                             </div>
-                        </fieldset>
-                        
+                        </fieldset>        
                     </div>
-
                 </div> 
                 
                 <!-- Valoración sobre el Trabajo del Estudiante -->
@@ -168,249 +179,321 @@
 
 <script>
 
-        // Acción al buscar empresa
-        $('#buscar_empresa').on('click', function() {
-            var numDoc = $('#numDoc_empresa').val(); // Obtener el num del doc
-    
-            // Validar si el campo está vacío
-            if (numDoc === "") {
+    // Acción al buscar empresa
+    $('#buscar_empresa').on('click', function() {
+        var numDoc = $('#idEmpresaMod').val(); // Obtener el num del doc
+
+        // Validar si el campo está vacío
+        if (numDoc === "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debe ingresar un número de documento.',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                $('#idEmpresaMod').focus(); 
+            });
+            return;
+        }
+
+        // Hacer la solicitud AJAX
+        $.ajax({
+            url: "{{ url_for('router_jefe.obtener_jefe_por_docc', numDoc='') }}" + numDoc,  // Corregido para pasar el parámetro directamente
+            type: 'GET',
+            dataType: 'json', 
+            success: function(response) {
+                if (response.razonSocial) {
+                    // Si se encuentra, mostrar la razón social
+                    $('#nombre_empresa').val(response.razonSocial);
+                    $('#apellidos_responsable').val(response.apellidos);
+                    $('#nombre_responsable').val(response.nombre);
+                    $('#cargo_responsable').val(response.cargo);
+                    $('#doc_jefe').val(response.numDoc); 
+
+                    //enfocar
+                    $('#doc_estudiante').focus();
+                } else {
+                    // Si no se encuentra, mostrar un mensaje de error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se encontró la empresa con el número de documento ingresado.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        $('#doc_estudiante').focus(); // Enfocar en el campo después del error
+                    });
+                }
+            },
+            error: function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Debe ingresar un número de documento.',
+                    text: 'Hubo un error al buscar la empresa.',
                     confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    $('#numDoc_empresa').focus(); 
                 });
-                return;
             }
-    
-            // Hacer la solicitud AJAX
-            $.ajax({
-                url: "{{ url_for('router_jefe.obtener_jefe_por_docc', numDoc='') }}" + numDoc,  // Corregido para pasar el parámetro directamente
-                type: 'GET',
-                dataType: 'json', 
-                success: function(response) {
-                    if (response.razonSocial) {
-                        // Si se encuentra, mostrar la razón social
-                        $('#nombre_empresa').val(response.razonSocial);
-                        $('#apellidos_responsable').val(response.apellidos);
-                        $('#nombre_responsable').val(response.nombre);
-                        $('#cargo_responsable').val(response.cargo);
-                        $('#doc_jefe').val(response.numDoc); 
+        }); 
+    });
 
-                        //enfocar
-                        $('#doc_estudiante').focus();
-                    } else {
-                        // Si no se encuentra, mostrar un mensaje de error
+    // Función para mostrar y recuperar estudiantes en el dropdown-search
+    const inputEstudiante = document.getElementById('estudiante');
+    const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
+    let idPersona = 0;
+    inputEstudiante.addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_estudiantes_buscar')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEstudiantes.innerHTML = '';
+                const resultados = data.filter(estudiante => 
+                    `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(estudiante => {
+                        const li = document.createElement('li');
+                        li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
+                        li.dataset.id = estudiante.idPersona;
+                        li.addEventListener('click', () => {
+                            inputEstudiante.value = li.textContent;
+                            idPersona = estudiante.idPersona;
+                            document.getElementById('idPersonaMod').value = estudiante.idPersona;
+                            dropdownEstudiantes.classList.remove('show');
+                        });
+                        dropdownEstudiantes.appendChild(li);
+                    });
+                    dropdownEstudiantes.classList.add('show');
+                } else {
+                    dropdownEstudiantes.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error al cargar los estudiantes:', error));
+    });
+
+    // Función para mostrar y recuperar empresas en el dropdown-search
+    const inputEmpresa = document.getElementById('empresa');
+    const dropdownEmpresas = document.getElementById('dropdown-empresas');
+    let idEmpresa = 0;
+    inputEmpresa.addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_empresas')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEmpresas.innerHTML = '';
+                const resultados = data.filter(empresa => 
+                    empresa.nombre.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(empresa => {
+                        const li = document.createElement('li');
+                        li.textContent = empresa.nombre;
+                        li.dataset.id = empresa.idEmpresa;
+                        li.classList.add('dropdown-item'); // Clase de Bootstrap para estilo
+                        li.addEventListener('click', () => {
+                            inputEmpresa.value = li.textContent;
+                            idEmpresa = empresa.idEmpresa;
+                            document.getElementById('idEmpresaMod').value = empresa.idEmpresa;
+                            dropdownEmpresas.classList.remove('show');
+                        });
+                        dropdownEmpresas.appendChild(li);
+                    });
+                    dropdownEmpresas.classList.add('show'); // Clase de Bootstrap para mostrar el dropdown
+                } else {
+                    dropdownEmpresas.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error al cargar las empresas:', error));
+    });
+
+
+    // Evento para vista previa de la firma_imagen
+    document.getElementById('firma_imagen').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('firma_imagen-preview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        });
+
+    // Acción al buscar estudiante
+    $('#btnBuscarE').on('click', function() {
+        var doc_estudiante = $('#idPersonaMod').val(); // Obtener el doc_estudiante
+
+        // Validar si el campo está vacío
+        if (doc_estudiante === "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debe ingresar un número de documento.',
+                confirmButtonText: 'Aceptar'
+            });
+            return;
+        }
+
+        // Función para formatear la fecha
+        function convertirFecha(fecha) {
+            const date = new Date(fecha);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate() + 1).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Hacer la solicitud AJAX
+        $.ajax({
+            url: "{{ url_for('router_estudiante.obtener_estudiante_por_doc', doc_estudiante='') }}" + doc_estudiante,
+            type: 'GET',
+            dataType: 'json', 
+            success: function(response) {
+                if (response.nombre) {
+                    // Si se encuentra, mostrar el nombre
+                    $('#nombre_estudiante').val(response.nombre);
+                    $('#apellidos_estudiante').val(response.apellidos);
+                    $('#horas_pp').val(response.numeroHorasPPP); 
+                    
+                    // Convertir y asignar fechas
+                    if (response.fechaInicio) {
+                        let fechaInicio = convertirFecha(response.fechaInicio);
+                        $('#fecha_inicio').val(fechaInicio);
+                    }
+
+                    if (response.fechaFin) {
+                        let fechaFin = convertirFecha(response.fechaFin);
+                        $('#fecha_fin').val(fechaFin);
+                    }
+
+                    $('#area_estudiante').val(response.area); 
+
+                } else {
+                    // Si no se encuentra, mostrar un mensaje de error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se encontró el estudiante con el número de documento ingresado.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un error al buscar el estudiante.',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        });
+    });
+
+    // Enviar el formulario con AJAX
+    $('#form-informe-final-empresa').on('submit', function(event) {
+        event.preventDefault();  
+        
+        const formData = new FormData(this);  // Recoger los datos del formulario
+
+        //obtener la imagen  
+        var firma_imagen = $('#firma_imagen')[0].files[0];
+
+        // Crear un FileReader para convertir la imagen a base64
+        var reader = new FileReader();
+
+        reader.onloadend = function() {
+            // La imagen ya está convertida en base64
+            var base64Firma = reader.result;
+    
+            // Recoger los demás datos del formulario
+            var dataToSend = {
+                numDoc: $('#idPersonaMod').val(),
+                area_desarrollo: $('#area_estudiante').val(),
+                texto_responsabilidad: $('#responsabilidad').val(),
+                texto_otros_aspectos: $('#otros_aspectos').val(),
+                firma_imagen: base64Firma,  // Enviar la imagen como base64
+                cumplimiento_objetivos: $('#cumplimiento_objetivos').val(),
+                fecha: $('#fecha_firma').val()
+            };
+
+            // Hacer la solicitud AJAX para guardar el informe
+            $.ajax({
+                url: "{{ url_for('router_informeEmpresa.guardar_informe_final_empresa') }}",  // Aquí se llama al endpoint
+                type: 'POST',
+                //data: formData,
+                contentType: 'application/json', //enviar como JSON
+                data: JSON.stringify(dataToSend),  // Convertir el objeto a JSON para enviarlo en el body de la petición
+                success: function(response){
+                    console.log(response);
+                    if(response.message){
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'No se encontró la empresa con el número de documento ingresado.',
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: response.message,  // Respuesta del servidor
                             confirmButtonText: 'Aceptar'
                         }).then(() => {
-                            $('#doc_estudiante').focus(); // Enfocar en el campo después del error
+                            limpiarFormulario(); 
+                            // Realiza alguna acción después de un envío exitoso
                         });
-                    }
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un error al buscar la empresa.',
-                        confirmButtonText: 'Aceptar'
-                    });
-                }
-            }); 
-        });
-    
-        // Evento para vista previa de la firma_imagen
-        document.getElementById('firma_imagen').addEventListener('change', function (event) {
-                const file = event.target.files[0];
-                const preview = document.getElementById('firma_imagen-preview');
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    preview.src = '#';
-                    preview.style.display = 'none';
-                }
-            });
-
-        // Acción al buscar estudiante
-        $('#buscar_estudiante').on('click', function() {
-            var doc_estudiante = $('#doc_estudiante').val(); // Obtener el doc_estudiante
-    
-            // Validar si el campo está vacío
-            if (doc_estudiante === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Debe ingresar un número de documento.',
-                    confirmButtonText: 'Aceptar'
-                });
-                return;
-            }
-
-            function convertirFecha(fecha) {
-                // Crear un objeto Date a partir de la cadena
-                let date = new Date(fecha);
-                
-                // Formatear a YYYY-MM-DD
-                let year = date.getFullYear();
-                let month = (date.getMonth() + 1).toString().padStart(2, '0'); // Meses comienzan desde 0
-                let day = date.getDate().toString().padStart(2, '0');
-            
-                return `${year}-${month}-${day}`; // Retornar en formato compatible
-            }
-    
-            // Hacer la solicitud AJAX
-            $.ajax({
-                url: "{{ url_for('router_estudiante.obtener_estudiante_por_doc', doc_estudiante='') }}" + doc_estudiante,  // Corregido para pasar el parámetro correctamente
-                type: 'GET',
-                dataType: 'json', 
-                success: function(response) {
-                    if (response.nombre) {
-                        // Si se encuentra, mostrar el nombre
-                        $('#nombre_estudiante').val(response.nombre);
-                        $('#apellidos_estudiante').val(response.apellidos);
-                        $('#horas_pp').val(response.numeroHorasPPP); 
-                        
-                        // Convertir y asignar fechas
-                        if (response.fechaInicio) {
-                            let fechaInicio = convertirFecha(response.fechaInicio);
-                            $('#fecha_inicio').val(fechaInicio);
-                        }
-
-                        if (response.fechaFin) {
-                            let fechaFin = convertirFecha(response.fechaFin);
-                            $('#fecha_fin').val(fechaFin);
-                        }
-
-                        $('#area_estudiante').focus(); 
-
-                    } else {
-                        // Si no se encuentra, mostrar un mensaje de error
+                    } else if (response.error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'No se encontró el estudiante con el número de documento ingresado.',
+                            text: response.error,  // Mensaje de error desde el servidor
                             confirmButtonText: 'Aceptar'
                         });
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Hubo un error al buscar el estudiante.',
+                        text: 'Hubo un error al enviar el formulario.',
                         confirmButtonText: 'Aceptar'
                     });
                 }
             });
-        });
-    
-        // Enviar el formulario con AJAX
-        $('#form-informe-final-empresa').on('submit', function(event) {
-            event.preventDefault();  
-            
-            const formData = new FormData(this);  // Recoger los datos del formulario
+        }; //cierre agregado
 
-            //obtener la imagen  
-            var firma_imagen = $('#firma_imagen')[0].files[0];
-
-            // Crear un FileReader para convertir la imagen a base64
-            var reader = new FileReader();
-
-            reader.onloadend = function() {
-                // La imagen ya está convertida en base64
-                var base64Firma = reader.result;
-        
-                // Recoger los demás datos del formulario
-                var dataToSend = {
-                    numDoc: $('#doc_estudiante').val(),
-                    area_desarrollo: $('#area_estudiante').val(),
-                    texto_responsabilidad: $('#responsabilidad').val(),
-                    texto_otros_aspectos: $('#otros_aspectos').val(),
-                    firma_imagen: base64Firma,  // Enviar la imagen como base64
-                    cumplimiento_objetivos: $('#cumplimiento_objetivos').val(),
-                    fecha: $('#fecha_firma').val()
-                };
-
-                // Hacer la solicitud AJAX para guardar el informe
-                $.ajax({
-                    url: "{{ url_for('router_informeEmpresa.guardar_informe_final_empresa') }}",  // Aquí se llama al endpoint
-                    type: 'POST',
-                    //data: formData,
-                    contentType: 'application/json', //enviar como JSON
-                    data: JSON.stringify(dataToSend),  // Convertir el objeto a JSON para enviarlo en el body de la petición
-                    success: function(response){
-                        console.log(response);
-                        if(response.message){
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Éxito!',
-                                text: response.message,  // Respuesta del servidor
-                                confirmButtonText: 'Aceptar'
-                            }).then(() => {
-                                limpiarFormulario(); 
-                                // Realiza alguna acción después de un envío exitoso
-                            });
-                        } else if (response.error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.error,  // Mensaje de error desde el servidor
-                                confirmButtonText: 'Aceptar'
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Hubo un error al enviar el formulario.',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                });
-            }; //cierre agregado
-
-            //leer la imagen con base64
-            if (firma_imagen){
-                reader.readAsDataURL(firma_imagen);
-            }
-        });
-
-        // Función para limpiar los campos del formulario
-        function limpiarFormulario() {
-            // Limpiar campos de texto
-            $('#nombre_empresa').val('');
-            $('#doc_jefe').val('');
-            $('#cargo_responsable').val('');
-            $('#apellidos_responsable').val('');
-            $('#nombre_responsable').val('');
-            $('#nombre_estudiante').val('');
-            $('#apellidos_estudiante').val('');
-            $('#horas_pp').val('');
-            $('#area_estudiante').val('');
-            $('#cumplimiento_objetivos').val('');
-            $('#responsabilidad').val('');
-            $('#otros_aspectos').val('');
-            $('#fecha_firma').val('');
-            $('#fecha_inicio').val('');
-            $('#fecha_fin').val('');
-
-            // Limpiar el campo de archivo (firma)
-            $('#firma_imagen').val('');
-
-            $('#numDoc_empresa').val('');
-            $('#doc_estudiante').val(''); 
+        //leer la imagen con base64
+        if (firma_imagen){
+            reader.readAsDataURL(firma_imagen);
         }
+    });
+
+    // Función para limpiar los campos del formulario
+    function limpiarFormulario() {
+        // Limpiar campos de texto
+        $('#nombre_empresa').val('');
+        $('#doc_jefe').val('');
+        $('#cargo_responsable').val('');
+        $('#apellidos_responsable').val('');
+        $('#nombre_responsable').val('');
+        $('#nombre_estudiante').val('');
+        $('#apellidos_estudiante').val('');
+        $('#horas_pp').val('');
+        $('#area_estudiante').val('');
+        $('#cumplimiento_objetivos').val('');
+        $('#responsabilidad').val('');
+        $('#otros_aspectos').val('');
+        $('#fecha_firma').val('');
+        $('#fecha_inicio').val('');
+        $('#fecha_fin').val('');
+        $('#estudiante').val('');
+        $('#empresa').val('');
+        // Limpiar el campo de archivo (firma)
+        $('#firma_imagen').val('');
+        const firma_imagenPreview = document.getElementById('firma_imagen-preview');
+        if (firma_imagenPreview) {
+            firma_imagenPreview.src = '#';
+            firma_imagenPreview.style.display = 'none';
+        }
+        $('#idEmpresaMod').val('');
+        $('#idPersonaMod').val(''); 
+    }
 
         
 

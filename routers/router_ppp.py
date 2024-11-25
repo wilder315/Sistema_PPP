@@ -51,6 +51,7 @@ def agregar_practica():
     data = request.json
     idPractica = data.get('idPractica')
     fechaInicio = data.get('fechaInicio')
+    fechaFin = data.get('fechaFin')
     horario = data.get('horario')
     modalidad = data.get('modalidad')
     area = data.get('area')
@@ -64,7 +65,7 @@ def agregar_practica():
     idPersona = data.get('idPersona')
     supervisiones = data.get('supervisiones', [])
     resultado = controlador_practicas.agregar_practica(
-        idPractica, fechaInicio, horario, modalidad, area, numeroHorasPPP, 
+        idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, 
         numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, 
         numDocInstitucion, idTipoPractica, idPersona, supervisiones
     )

@@ -335,7 +335,6 @@
         tabContents.forEach(content => {
             content.classList.add('disabled');
         });
-        $('#btnFinalizar').hide();
     }
 
     // Función para habilitar los tabs
@@ -350,7 +349,6 @@
         tabContents.forEach(content => {
             content.classList.remove('disabled');
         });
-        $('#btnFinalizar').show();
     }
 
     function limpiarControles() {     
@@ -611,7 +609,6 @@
             });
         }
     }
-
 
     // Función para mostrar el estado del informe
     function actualizarEstadoIndicador(estado) {
@@ -1015,7 +1012,6 @@
             .map((textarea) => textarea.value.trim())
             .filter((value) => value !== '');
         if (
-            !idInforme ||
             !idPractica ||
             !fecha_entrega ||
             !introduccion ||

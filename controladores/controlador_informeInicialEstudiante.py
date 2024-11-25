@@ -222,7 +222,7 @@ def agregar_informe_final_estudiante(
                         bibliografia = %s, firma1 = %s, firma2 = %s
                     WHERE idInforme = %s
                 """, (
-                    'P', fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
+                    estado, fecha_entrega, introduccion, cantidad_trabajadores, mision, vision,
                     infraestructura_fisica, infraestructura_tecnologica, organigrama, area_trabajo,
                     labores_realizadas, anexos, bibliografia, firma1, firma2, idInforme
                 ))
@@ -244,7 +244,7 @@ def agregar_informe_final_estudiante(
             else:
                 cursor.execute("""
                     INSERT INTO informe (
-                        'P', fecha, introduccion, trabajadores, mision, vision, 
+                        estado, fecha, introduccion, trabajadores, mision, vision, 
                         infFisica, infTecnologica, organigrama, area, labores, anexos, 
                         bibliografia, idTipoInforme, firma1, firma2
                     )
