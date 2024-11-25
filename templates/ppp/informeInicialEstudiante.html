@@ -125,14 +125,16 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="firma_estudiante" class="form-label">Firma del Estudiante:</label>
-                                            <div class="input-group">
-                                                <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                            <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                            <div class="mt-2">
+                                                <img id="firma_estudiante-preview" src="#" alt="Vista previa de la firma_estudiante" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="firma_responsable" class="form-label">Firma del Responsable:</label>
-                                            <div class="input-group">
-                                                <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                            <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                            <div class="mt-2">
+                                                <img id="firma_responsable-preview" src="#" alt="Vista previa de la firma_responsable" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
                                             </div>
                                         </div>
                                     </div>
@@ -363,6 +365,44 @@ document.getElementById('btnGuardar').addEventListener('click', async function (
             });
         });
 });
+
+// Variables globales para almacenar las firmas previas
+let firma_estudianteBase64Previo = null;
+let firma_responsableBase64Previo = null;
+
+// Evento para vista previa de la firma_estudiante
+document.getElementById('firma_estudiante').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('firma_estudiante-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    });
+
+    // Evento para vista previa de la firma_responsable
+    document.getElementById('firma_responsable').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('firma_responsable-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    });
 
 // Función para convertir archivos a Base64
 async function convertirABase64(file) {
