@@ -1,29 +1,40 @@
 {% extends "/ppp/home.html" %}
-{% block titulo %} Informe Inicial (Empresa) {% endblock %}
+{% block head %}
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Popper.js -->
+<script src="https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_informe_inicial_empresa.css') }}">
+
+{% endblock %}
+{% block titulo %} Informe Inicial (Empresa) {%endblock %}
 {% block contenido %}
 <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
-    <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: -10px;">
-        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
+    <ol class="breadcrumb" style="padding-bottom: 0px; margin-bottom: -10px">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('router_main.index') }}">Inicio</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a>
+        </li>
         <li class="breadcrumb-item active">Informe Inicial (Empresa)</li>
     </ol>
 </nav>
-<style>
-    body {
-        overflow: hidden;
-    }
-    .scrollable {
-        height: 42%;
-        overflow-y: auto;
-    }
-    fieldset {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-    }
-    .form-label {
-        margin-bottom: 5px;
-    }
-</style>
 
 <div class="container-fluid my-4">
     <div class="card w-100">
@@ -32,95 +43,173 @@
         </div>
         <div class="card-body">
             <form id="form-informe-empresa">
-
                 <!-- Tabs -->
                 <ul class="nav nav-tabs" id="tabs-informe" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="tab-generales" data-bs-toggle="tab" href="#panel-generales" role="tab" aria-controls="panel-generales" aria-selected="true">Datos Generales</a>
+                        <a class="nav-link active" id="tab-generales" data-bs-toggle="tab" href="#panel-generales"
+                            role="tab" aria-controls="panel-generales" aria-selected="true">Datos Generales</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-compromiso-labores" data-bs-toggle="tab" href="#panel-compromiso-labores" role="tab" aria-controls="panel-compromiso-labores" aria-selected="false">Compromiso y Labores</a>
+                        <a class="nav-link" id="tab-compromiso-labores" data-bs-toggle="tab"
+                            href="#panel-compromiso-labores" role="tab" aria-controls="panel-compromiso-labores"
+                            aria-selected="false">Compromiso y Labores</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-firmas" data-bs-toggle="tab" href="#panel-firmas" role="tab" aria-controls="panel-firmas" aria-selected="false">Firmas</a>
+                        <a class="nav-link" id="tab-firmas" data-bs-toggle="tab" href="#panel-firmas" role="tab"
+                            aria-controls="panel-firmas" aria-selected="false">Firmas</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-listado" data-bs-toggle="tab" href="#panel-listado" role="tab"
+                            aria-controls="panel-listado" aria-selected="false">Listado</a>
                     </li>
                 </ul>
-                
+
                 <div class="tab-content mt-4" id="tabs-informe-content">
                     <!-- Datos Generales -->
-                    <div class="tab-pane fade show active" id="panel-generales" role="tabpanel" aria-labelledby="tab-generales">
+                    <div class="tab-pane fade show active" id="panel-generales" role="tabpanel"
+                        aria-labelledby="tab-generales">
                         <fieldset>
                             <legend>Datos del Estudiante</legend>
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <label for="apellidos_estudiante" class="form-label">Apellidos:</label>
-                                    <select class="form-control" id="apellidos_estudiante" name="apellidos_estudiante">
-                                        <option value="" disabled selected>Seleccione un estudiante</option>
-                                    </select>
+                                    <label for="busqueda_estudiante" class="form-label">Buscar Estudiante:</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" id="busqueda_estudiante"
+                                            placeholder="Escriba nombre o apellidos" autocomplete="off" />
+                                        <button type="button" class="btn btn-secondary btn-sm mt-2"
+                                            id="limpiar_estudiante">
+                                            Limpiar campos
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
+                                    <label for="estudiante_seleccionado_nombre" class="form-label">Estudiante
+                                        Seleccionado:</label>
+                                    <input type="text" class="form-control" id="estudiante_seleccionado_nombre" readonly
+                                        disabled />
+                                    <input type="hidden" id="estudiante_seleccionado" name="estudiante_seleccionado" />
+                                </div>
+                                <div class="col-md-2">
                                     <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                                        readonly required />
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <label for="fecha_fin" class="form-label">Fecha de Final:</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" readonly
+                                        required />
                                 </div>
+                            </div>
+
+                            <!-- Tabla de resultados -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabla_estudiantes">
+                                    <thead>
+                                        <tr>
+                                            <th>Apellidos y Nombres</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Fin</th>
+                                            <th>Seleccionar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
                         </fieldset>
                         <fieldset>
                             <legend>Datos de la Institución</legend>
-                            <div class="row">
+                            <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <label for="nombre_empresa" class="form-label">Razón Social de la Institución:</label>
-                                    <select class="form-control" id="nombre_empresa" name="nombre_empresa">
-                                        <option value="" disabled selected>Seleccione una institución</option>
-                                    </select>
+                                    <label for="busqueda_institucion" class="form-label">Buscar Institución:</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" id="busqueda_institucion"
+                                            placeholder="Escriba la razón social" autocomplete="off" />
+                                        <button type="button" class="btn btn-secondary btn-sm mt-2"
+                                            id="limpiar_institucion">
+                                            Limpiar campos
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
+                                    <label for="institucion_seleccionada_nombre" class="form-label">Institución
+                                        Seleccionada:</label>
+                                    <input type="text" class="form-control" id="institucion_seleccionada_nombre"
+                                        readonly disabled />
+                                    <input type="hidden" id="institucion_seleccionada"
+                                        name="institucion_seleccionada" />
+                                </div>
+                                <div class="col-md-2">
                                     <label for="responsable" class="form-label">Nombre del Responsable:</label>
-                                    <input type="text" class="form-control" id="responsable" name="responsable" readonly>
+                                    <input type="text" class="form-control" id="responsable" name="responsable" readonly
+                                        required />
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
-                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
+                                    <input type="text" class="form-control" id="cargo_responsable"
+                                        name="cargo_responsable" readonly required />
                                 </div>
                             </div>
+
+                            <!-- Tabla de resultados instituciones -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabla_instituciones">
+                                    <thead>
+                                        <tr>
+                                            <th>RUC</th>
+                                            <th>Razón Social</th>
+                                            <th>Responsable</th>
+                                            <th>Cargo</th>
+                                            <th>Seleccionar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
                         </fieldset>
+
                     </div>
 
                     <!-- Compromiso y Labores -->
-                    <div class="tab-pane fade" id="panel-compromiso-labores" role="tabpanel" aria-labelledby="tab-compromiso-labores">
+                    <div class="tab-pane fade" id="panel-compromiso-labores" role="tabpanel"
+                        aria-labelledby="tab-compromiso-labores">
                         <div class="row">
                             <div class="col-md-6">
                                 <fieldset>
                                     <legend>Aceptación y Compromiso</legend>
                                     <div class="mb-3">
-                                        <label for="aceptacion" class="form-label">Aceptación y compromiso de la empresa:</label>
-                                        <textarea class="form-control" id="aceptacion" name="aceptacion" rows="7" required></textarea>
+                                        <label for="aceptacion" class="form-label">Aceptación y compromiso de la
+                                            empresa:</label>
+                                        <textarea class="form-control" id="aceptacion" name="aceptacion" rows="7"
+                                            maxlength="255" required>
+                                        </textarea>
                                     </div>
                                 </fieldset>
                             </div>
                             <div class="col-md-6">
                                 <fieldset>
                                     <legend>Labores del Practicante</legend>
-                                    <button type="button" class="btn btn-primary btn-sm mb-2" id="agregarLabor">
-                                        <i class="fas fa-plus"></i> Agregar Labor
-                                    </button>
-                                    <table class="table table-bordered" id="tabla-labores">
-                                        <thead>
-                                            <tr>
-                                                <th>Descripción de la labor</th>
-                                                <th>Opciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><input type="text" class="form-control" name="labores[]" placeholder="Descripción de la labor" required></td>
-                                                <td><button class="btn btn-danger btn-sm" onclick="eliminarFilaLabor(this)">Eliminar</button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="mb-3">
+                                        <!-- En la sección de Labores del Practicante -->
+                                        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal"
+                                            data-bs-target="#modalLaborPrincipal">
+                                            <i class="fas fa-plus"></i> Agregar Labor
+                                        </button>
+                                        <!-- Tabla de Labores -->
+                                        <div class="table-responsive">
+                                            <table class="table" id="tablaLabores">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 30px"></th>
+                                                        <th>Labor</th>
+                                                        <th style="width: 150px">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
                                 </fieldset>
                             </div>
                         </div>
@@ -132,113 +221,188 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label for="firma_responsable" class="form-label">Firma del Responsable:</label>
-                                    <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                    <input type="file" class="form-control" id="firma_responsable" name="firma1"
+                                        accept="image/*" required />
                                 </div>
                                 <div class="col-md-6">
                                     <label for="firma_estudiante" class="form-label">Firma del Estudiante:</label>
-                                    <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                    <input type="file" class="form-control" id="firma_estudiante" name="firma2"
+                                        accept="image/*" required />
                                 </div>
                             </div>
                         </fieldset>
                     </div>
+                    <div class="tab-pane fade" id="panel-listado" role="tabpanel" aria-labelledby="tab-listado">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-hover" id="tabla-informes">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Estudiante</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
+                <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Informe
+                    </button>
                 </div>
             </form>
+            <!-- Modal para Labor Principal -->
+            <div class="modal fade" id="modalLaborPrincipal" tabindex="-1" aria-labelledby="modalLaborPrincipalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLaborPrincipalLabel">Agregar Nueva Labor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group mb-3">
+                                <label for="nuevaLabor" class="form-label">Labor:</label>
+                                <input type="text" class="form-control" id="nuevaLabor" maxlength="250"
+                                    placeholder="Ej: Administrativa, Gestión, etc.">
+                                <small class="text-muted">Caracteres restantes: <span
+                                        id="contadorCaracteres">250</span></small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="btnRegistrarLabor">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para Labores Específicas -->
+            <div class="modal fade" id="modalLaboresEspecificas" tabindex="-1"
+                aria-labelledby="modalLaboresEspecificasLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLaboresEspecificasLabel">Agregar Labores para: <span
+                                    id="laborPrincipalTitle"></span></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="nuevaLaborEspecifica" class="form-label">Labor:</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="nuevaLaborEspecifica"
+                                        placeholder="Ingrese la labor">
+                                    <button class="btn btn-outline-primary" type="button"
+                                        id="btnAgregarLaborEspecifica">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <ul class="list-group" id="listaLaboresEspecificas"></ul>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary"
+                                id="btnGuardarLaboresEspecificas">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal para Ver/Modificar Informe -->
+            <div class="modal fade" id="modalInforme" tabindex="-1" aria-labelledby="modalInformeLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalInformeLabel">Detalles del Informe</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-ver-modificar">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Estudiante:</label>
+                                        <input type="text" class="form-control" id="modal_estudiante" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Fecha:</label>
+                                        <input type="date" class="form-control" id="modal_fecha">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Aceptación:</label>
+                                        <input type="text" class="form-control" id="modal_aceptacion" maxlength="255">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Labores Principales:</label>
+                                        <div id="modal_labores_principales"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Firma Responsable:</label>
+                                        <div class="mb-2">
+                                            <img id="modal_firma1_preview" class="img-fluid" style="max-height: 100px;">
+                                        </div>
+                                        <input type="file" class="form-control" id="modal_firma1" accept="image/*">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Firma Estudiante:</label>
+                                        <div class="mb-2">
+                                            <img id="modal_firma2_preview" class="img-fluid" style="max-height: 100px;">
+                                        </div>
+                                        <input type="file" class="form-control" id="modal_firma2" accept="image/*">
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="modal_id_informe">
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="btnGuardarCambios" style="display: none;">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Cargar estudiantes
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/datos_estudiantes')
-            .then(response => response.json())
-            .then(data => {
-                const selectEstudiantes = document.getElementById('apellidos_estudiante');
-                data.forEach(estudiante => {
-                    const option = document.createElement('option');
-                    option.value = estudiante.idPersona;
-                    option.textContent = `${estudiante.apellidos}, ${estudiante.nombre}`;
-                    selectEstudiantes.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error al cargar estudiantes:', error));
-    });
-
-    // Actualizar nombres del estudiante según el seleccionado
-    document.getElementById('apellidos_estudiante').addEventListener('change', function () {
-        const selectedId = this.value;
-        fetch(`/datos_estudiantes`)
-            .then(response => response.json())
-            .then(data => {
-                const estudiante = data.find(e => e.idPersona == selectedId);
-                if (estudiante) {
-                    document.getElementById('nombres_estudiante').value = estudiante.nombre;
-                }
-            });
-    });
-
-    // Cargar instituciones
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/datos_instituciones')
-            .then(response => response.json())
-            .then(data => {
-                const selectInstituciones = document.getElementById('nombre_empresa');
-                data.forEach(institucion => {
-                    const option = document.createElement('option');
-                    option.value = institucion.numDoc;
-                    option.textContent = institucion.razonSocial;
-                    selectInstituciones.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error al cargar instituciones:', error));
-    });
-
-    // Actualizar datos del responsable según la institución seleccionada
-    document.getElementById('nombre_empresa').addEventListener('change', function () {
-        const selectedNumDoc = this.value;
-        fetch(`/jefe_institucion?ruc=${selectedNumDoc}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    document.getElementById('responsable').value = data[0].nombre || 'N/A';
-                    document.getElementById('cargo_responsable').value = data[0].cargo || 'N/A';
-                }
-            })
-            .catch(error => {
-                console.error('Error al cargar datos del responsable:', error);
-            });
-    });
-
-    // Eliminar fila de labor
-    function eliminarFilaLabor(btn) {
-        $(btn).closest('tr').remove();
-    }
-
-    // Enviar formulario
-    $('#form-informe-empresa').on('submit', function (event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-
-        $.ajax({
-            url: "{{ url_for('router_informe.agregar_informe_empresa') }}",
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                Swal.fire('¡Éxito!', 'El informe ha sido guardado correctamente.', 'success');
-            },
-            error: function () {
-                Swal.fire('Error', 'No se pudo guardar el informe.', 'error');
-            }
-        });
-    });
+    // Definir las URLs globalmente
+    const URLS = {
+        buscarEstudiantes: "{{ url_for('router_informeEmpresa.buscar_estudiantes') }}",
+        buscarInstituciones: "{{ url_for('router_informeEmpresa.buscar_instituciones') }}",
+        guardarInforme: "{{ url_for('router_informeEmpresa.guardar_informe_inicial_empresa') }}",
+        listarInformes: "{{ url_for('router_informeEmpresa.listar_informes_empresa') }}",
+        //obtenerInforme: "{{ url_for('router_informeEmpresa.obtener_informe', id_informe=0) }}".slice(0, -1),
+        obtenerInforme: "{{ url_for('router_informeEmpresa.obtener_informe', id_informe=0) }}".replace('/0', ''), // Mejor manera de manejar la URL base
+        actualizarInforme: "{{ url_for('router_informeEmpresa.actualizar_informe') }}"
+    };
 </script>
+
+
+<script src="{{ url_for('static', filename='js/informe-empresa/estudiantes.js') }}"></script>
+<script src="{{ url_for('static', filename='js/informe-empresa/instituciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/informe-empresa/labores.js') }}"></script>
+<script src="{{ url_for('static', filename='js/informe-empresa/registro.js') }}"></script>
+<script src="{{ url_for('static', filename='js/informe-empresa/listado.js') }}"></script>
+
 {% endblock %}

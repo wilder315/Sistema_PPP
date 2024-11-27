@@ -1,10 +1,12 @@
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, jsonify
 import controladores.controlador_informeEmpresa as controlador_informeEmpresa
 from werkzeug.utils import secure_filename
 import os
 import base64
 import uuid
 from io import BytesIO
+import json
+
 
 
 router_informeEmpresa = Blueprint('router_informeEmpresa', __name__)
@@ -77,3 +79,99 @@ def guardar_informe_final_empresa():
         
     except Exception as e: 
         return jsonify({"error": f"Error en el servidor: {str(e)}"}), 500
+
+
+@router_informeEmpresa.route('/buscar_estudiantes', methods=['GET'])
+def buscar_estudiantes():
+    try:
+        termino_busqueda = request.args.get('termino', '')
+        if len(termino_busqueda) < 2:
+            return jsonify([])
+            
+        estudiantes = controlador_informeEmpresa.buscar_estudiantes_practicas(termino_busqueda)
+        return jsonify(estudiantes)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
+@router_informeEmpresa.route('/buscar_instituciones', methods=['GET'])
+def buscar_instituciones():
+    try:
+        termino_busqueda = request.args.get('termino', '')
+        if len(termino_busqueda) < 2:
+            return jsonify([])
+            
+        instituciones = controlador_informeEmpresa.buscar_instituciones(termino_busqueda)
+        return jsonify(instituciones)
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500    
+    
+@router_informeEmpresa.route('/guardar_informe_inicial_empresa', methods=['POST'])
+def guardar_informe_inicial_empresa():
+    try:
+        # Obtener los datos del formulario
+        aceptacion = request.form.get('aceptacion')
+        labor = request.form.get('labor')  # labores principales
+        labores = request.form.get('labores')  # labores específicas
+        firma1 = request.files.get('firma1')
+        firma2 = request.files.get('firma2')
+
+        if not all([aceptacion, labor, labores, firma1, firma2]):
+            return jsonify({"error": "Faltan campos requeridos"}), 400
+
+        # Llamar al controlador
+        resultado = controlador_informeEmpresa.guardar_informeInicialEmpresa(
+            aceptacion,
+            json.loads(labor),
+            json.loads(labores),
+            firma1,
+            firma2
+        )
+        
+        print(resultado)
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        print("Error en guardar_informe_inicial_empresa:", str(e))
+        return jsonify({"error": str(e)}), 500
+    
+    
+
+@router_informeEmpresa.route('/listar_informes_empresa', methods=['GET'])
+def listar_informes_empresa():
+    try:
+        informes = controlador_informeEmpresa.obtener_informes_empresa()
+        return jsonify(informes)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
+@router_informeEmpresa.route('/obtener_informe/<int:id_informe>', methods=['GET'])
+def obtener_informe(id_informe):
+    try:
+        informe = controlador_informeEmpresa.obtener_informe_por_id(id_informe)
+        return jsonify(informe)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@router_informeEmpresa.route('/actualizar_informe', methods=['POST'])
+def actualizar_informe():
+    try:
+        id_informe = request.form.get('idInforme')
+        fecha = request.form.get('fecha')
+        aceptacion = request.form.get('aceptacion')
+        labor = request.form.get('labor')  
+        labores = request.form.get('labores')  
+        firma1 = request.files.get('firma1')
+        firma2 = request.files.get('firma2')
+
+        resultado = controlador_informeEmpresa.actualizar_informe(
+            id_informe, fecha, aceptacion, labor, labores, firma1, firma2
+        )
+        return jsonify(resultado)
+    except Exception as e:
+        print("Error en ruta actualizar_informe:", str(e))
+        return jsonify({"error": str(e)}), 500     

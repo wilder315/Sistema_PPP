@@ -1,0 +1,51 @@
+body {
+    overflow: hidden;
+}
+
+.scrollable {
+    height: 42%;
+    overflow-y: auto;
+}
+
+fieldset {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+.form-label {
+    margin-bottom: 5px;
+}
+
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.labores-especificas {
+    margin-left: 20px;
+    border-left: 2px solid #dee2e6;
+    padding-left: 15px;
+}
+
+.btn-link {
+    padding: 0;
+    color: #6c757d;
+}
+
+.labor-principal {
+    font-weight: 500;
+}
+
+.caracteres-contador {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+}
+
+.caracteres-contador span {
+    font-weight: bold;
+}
