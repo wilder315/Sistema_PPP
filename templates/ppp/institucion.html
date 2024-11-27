@@ -220,10 +220,6 @@
             }
         });
 
-        $('#modalInstitucion').on('shown.bs.modal', function () {
-            initMap();
-        });
-
         // Variables globales
         let lat = null;
         let lng = null;
@@ -234,23 +230,39 @@
         function initMap(modo) {
             const defaultLat = -12.043;
             const defaultLng = -77.028;
-            if (lat !== null && lng !== null) {
-                mostrarMapa(lat, lng, modo === 'agregar' ? true : false);
-            } else if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        lat = position.coords.latitude;
-                        lng = position.coords.longitude;
-                        mostrarMapa(lat, lng, modo === 'agregar' ? true : false);
-                    },
-                    function () {
-                        alert("No se pudo obtener la ubicación actual. Se usará una ubicación predeterminada.");
-                        mostrarMapa(defaultLat, defaultLng, modo === 'agregar' ? true : false);
-                    }
-                );
+            if (modo === 'agregar') {
+                lat = null;
+                lng = null;
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            lat = position.coords.latitude;
+                            lng = position.coords.longitude;
+                            mostrarMapa(lat, lng, true);
+                        },
+                        () => {
+                            alert("No se pudo obtener la ubicación actual. Se usará una ubicación predeterminada.");
+                            mostrarMapa(defaultLat, defaultLng, true);
+                        }
+                    );
+                } else {
+                    alert("Geolocalización no soportada en este navegador.");
+                    mostrarMapa(defaultLat, defaultLng, true);
+                }
+            } else if (modo === 'modificar') {
+                if (lat !== null && lng !== null) {
+                    mostrarMapa(lat, lng, true);
+                } else {
+                    alert("No se han definido coordenadas para modificar.");
+                }
+            } else if (modo === 'ver') {
+                if (lat !== null && lng !== null) {
+                    mostrarMapa(lat, lng, false);
+                } else {
+                    alert("No se han definido coordenadas para visualizar.");
+                }
             } else {
-                alert("Geolocalización no soportada en este navegador.");
-                mostrarMapa(defaultLat, defaultLng, modo === 'agregar' ? true : false);
+                console.error("Modo desconocido: " + modo);
             }
         }
 
@@ -286,17 +298,6 @@
             } else {
                 obtenerDireccion(lat, lng);
             }
-        }
-
-        // Función para obtener la dirección de las coordenadas
-        function obtenerDireccion(lat, lng) {
-            const geocoder = new google.maps.Geocoder();
-            const latLng = new google.maps.LatLng(lat, lng);  
-            geocoder.geocode({ 'location': latLng }, function (results, status) {
-                if (status === 'OK' && results[0]) {
-                    document.getElementById("direccionMod").value = results[0].formatted_address;
-                }
-            });
         }
 
         // Función para obtener la dirección (país y ciudad) a partir de la latitud y longitud
@@ -454,6 +455,7 @@
             $('#ciudadMod').val('');
             lat = null;
             lng = null;
+            initMap('agregar');
             $('#modalInstitucion').modal('show');
             cargarJefes();
             habilitarControles();
@@ -492,7 +494,7 @@
                         cargarJefes(response.jefe);
                         lat = parseFloat(response.latitud);
                         lng = parseFloat(response.longitud);
-                        mostrarMapa(lat, lng, true);
+                        initMap('modificar');
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();

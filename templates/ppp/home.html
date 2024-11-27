@@ -172,19 +172,29 @@
                                     </a>
                                 </li>
                                 <li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}" id="practicas">
-                                        <i class="fas fa-graduation-cap fa-lg"></i>
-                                        <span class="align-middle">Prácticas Pre Profesionales</span>
+                                    <a class="sidebar-link" href="{{ url_for('router_main.linea_desarrollo') }}">
+                                        <i class="fas fa-wave-square fa-lg"></i>
+                                        <span class="align-middle">Línea de desarrollo</span>
                                     </a>
                                 </li>
                                 <li class="sidebar-item">
-                                    <a class="sidebar-link"
-                                        href="{{ url_for('router_main.reporte_estudiantes_practicas') }}"
-                                        id="listapracticas">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.reporte_estudiantes_practicas') }}" id="listapracticas">
                                         <i class="fas fa-graduation-cap fa-lg"></i>
                                         <span class="align-middle">Lista de Prácticas</span>
                                     </a>
                                 </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_email.mostrar_formulario_masivo') }}">
+                                        <i class="fas fa-envelope fa-lg"></i>
+                                        <span class="align-middle">Mensaje masivo</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.ppp') }}" id="practicas">
+                                        <i class="fas fa-graduation-cap fa-lg"></i>
+                                        <span class="align-middle">Prácticas Pre Profesionales</span>
+                                    </a>
+                                </li>                     
                             </ul>
                         </div>
                     </li>

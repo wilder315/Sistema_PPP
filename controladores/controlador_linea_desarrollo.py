@@ -57,7 +57,7 @@ def agregar_linea_desarrollo(nombre, estado, idEscuela):
                 VALUES (%s, %s, %s)
             """, (nombre, estado, idEscuela))
             conexion.commit()
-            return {"mensaje": "Plan trabajo agregado correctamente"}
+            return {"mensaje": "Línea de desarrollo agregada correctamente"}
     except Exception as e: 
         conexion.rollback()
         return {"error": str(e)}

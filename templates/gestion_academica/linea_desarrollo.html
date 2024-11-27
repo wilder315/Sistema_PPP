@@ -1,4 +1,4 @@
-{% extends "/gestion_academica/index.html" %}
+{% extends "/ppp/index.html" %}
 {% block titulo %} Línea de desarrollo {% endblock %}
 {% block contenido %}
 
@@ -37,6 +37,26 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalConfirmar" tabindex="-1" aria-labelledby="modalConfirmarLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center fw-bold" id="modal-title-confirmar"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p><span id="texto-confirmar"></span><strong id="nombreLineaConfirmar"></strong>?</p>
+                <input type="hidden" id="idLineaConfirmar" name="idLineaConfirmar">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmarLinea">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL LÍNEA DE DESARROLLO -->
 <div class="modal fade" id="modalLineaDesarrollo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -49,7 +69,6 @@
                 <form id="formLineaDesarrollo">
                     <input type="hidden" id="idLineaMod" name="idLineaMod">
                     
-                    <!-- Validación para el nombre: Solo letras -->
                     <div class="mb-3">
                         <label for="nombreLineaMod" class="form-label">Nombre:</label>
                         <input type="text" class="form-control" id="nombreLineaMod" name="nombreLineaMod" required

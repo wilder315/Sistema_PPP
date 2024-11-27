@@ -212,7 +212,7 @@ def modificar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idP
 
 def eliminar_institucion(numDoc):
     if not numDoc:
-        return {"error": "El número de documento es requerido."}
+        return {"error": "El número de documento es requerido."}  
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."} 
@@ -226,9 +226,20 @@ def eliminar_institucion(numDoc):
             referencia_practica = cursor.fetchone()[0]
             if referencia_practica > 0:
                 return {"error": "No se puede eliminar una institución que está vinculada a una práctica."}
+            cursor.execute("""
+                SELECT idUbicacion
+                FROM institucion
+                WHERE numDoc = %s
+            """, (numDoc,))
+            idUbicacion = cursor.fetchone()           
+            if not idUbicacion:
+                return {"error": "Institución no encontrada."}
+            idUbicacion = idUbicacion[0]
             cursor.execute("DELETE FROM institucion WHERE numDoc = %s", (numDoc,))
+            if idUbicacion:
+                cursor.execute("DELETE FROM ubicacion WHERE idUbicacion = %s", (idUbicacion,))
             conexion.commit()
-            return {"mensaje": "Institución eliminada correctamente."}
+            return {"mensaje": "Institución y su ubicación asociada eliminadas correctamente."}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
