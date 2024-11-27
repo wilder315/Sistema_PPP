@@ -10,15 +10,13 @@ def obtener_instituciones():
         with conexion.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT i.numDoc, i.razonSocial, i.tel, i.correo, CONCAT(p.apellidos, ' ', p.nombre) AS jefe, 
-                CONCAT(pa.nombre, ', ', dep.nombre, ', ', pro.nombre, ', ', dis.nombre) AS ubicacion 
+                SELECT i.numDoc, i.razonSocial, i.tel, i.correo, 
+                    CONCAT(p.apellidos, ' ', p.nombre) AS jefe, 
+                    IFNULL(CONCAT(i.direccion, ', ', u.ciudad, ', ', u.pais), 'Sin ubicación') AS ubicacion 
                 FROM institucion i
                 INNER JOIN persona p ON i.idPersona = p.idPersona
                 INNER JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc
-                INNER JOIN distrito dis on dis.idDistrito = i.idDistrito
-                INNER JOIN provincia pro on pro.idProvincia = dis.idProvincia
-                INNER JOIN departamento dep on dep.idDepartamento = pro.idDepartamento
-                INNER JOIN pais pa on pa.idPais = dep.idPais
+                LEFT JOIN ubicacion u ON u.idUbicacion = i.idUbicacion
                 ORDER BY i.razonSocial ASC
             """
             )
@@ -121,16 +119,15 @@ def obtener_institucion_por_numdoc(numDoc):
         with conexion.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT i.numDoc, i.razonSocial, i.giro, i.direccion, i.tel, i.correo,
-                       i.idDistrito AS distrito, pro.idProvincia AS provincia, dep.idDepartamento AS departamento, pa.idPais AS pais, p.idPersona AS jefe, i.idTipoDoc
+                SELECT i.numDoc, i.razonSocial, i.giro, i.direccion, i.tel, i.correo, 
+                       i.idUbicacion AS ubicacion, p.idPersona AS jefe, i.idTipoDoc, 
+                       u.latitud, u.longitud  -- Agregar latitud y longitud
                 FROM institucion i
-                INNER JOIN distrito d ON i.idDistrito = d.idDistrito
-                INNER JOIN provincia pro on pro.idProvincia = d.idProvincia
-                INNER JOIN departamento dep on dep.idDepartamento = pro.idDepartamento
-                INNER JOIN pais pa on pa.idPais = dep.idPais
                 INNER JOIN persona p ON i.idPersona = p.idPersona
-                INNER JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc WHERE i.numDoc = %s
-            """
+                INNER JOIN tipo_documento td ON i.idTipoDoc = td.idTipoDoc
+                LEFT JOIN ubicacion u ON u.idUbicacion = i.idUbicacion
+                WHERE i.numDoc = %s
+                """
             , (numDoc,))
             row = cursor.fetchone()
             if row:
@@ -144,16 +141,31 @@ def obtener_institucion_por_numdoc(numDoc):
     finally:
         conexion.close()
 
-def agregar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
+def agregar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, pais, ciudad, latitud, longitud):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO institucion (numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc)
+                SELECT idUbicacion 
+                FROM ubicacion 
+                WHERE pais = %s AND ciudad = %s AND latitud = %s AND longitud = %s
+            """, (pais, ciudad, latitud, longitud))
+            ubicacion_existente = cursor.fetchone()      
+            if ubicacion_existente:
+                idUbicacion = ubicacion_existente[0]
+            else:
+                cursor.execute("""
+                    INSERT INTO ubicacion (pais, ciudad, latitud, longitud) 
+                    VALUES (%s, %s, %s, %s)
+                """, (pais, ciudad, latitud, longitud))
+                conexion.commit()
+                idUbicacion = cursor.lastrowid
+            cursor.execute("""
+                INSERT INTO institucion (numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, idUbicacion)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc))
+            """, (numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, idUbicacion))
             conexion.commit()
             return {"mensaje": "Institución agregada correctamente"}
     except Exception as e:
@@ -162,18 +174,34 @@ def agregar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idDis
     finally:
         conexion.close()
 
-def modificar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc):
+def modificar_institucion(numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, pais, ciudad, latitud, longitud):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
+                SELECT idUbicacion 
+                FROM ubicacion 
+                WHERE pais = %s AND ciudad = %s AND latitud = %s AND longitud = %s
+            """, (pais, ciudad, latitud, longitud))
+            ubicacion_existente = cursor.fetchone()
+
+            if ubicacion_existente:
+                idUbicacion = ubicacion_existente[0]
+            else:
+                cursor.execute("""
+                    INSERT INTO ubicacion (pais, ciudad, latitud, longitud) 
+                    VALUES (%s, %s, %s, %s)
+                """, (pais, ciudad, latitud, longitud))
+                conexion.commit()
+                idUbicacion = cursor.lastrowid
+            cursor.execute("""
                 UPDATE institucion 
                 SET razonSocial = %s, giro = %s, direccion = %s, tel = %s, correo = %s, 
-                    idDistrito = %s, idPersona = %s, idTipoDoc = %s
+                    idPersona = %s, idTipoDoc = %s, idUbicacion = %s
                 WHERE numDoc = %s
-            """, (razonSocial, giro, direccion, tel, correo, idDistrito, idPersona, idTipoDoc, numDoc))
+            """, (razonSocial, giro, direccion, tel, correo, idPersona, idTipoDoc, idUbicacion, numDoc))
             conexion.commit()
             return {"mensaje": "Institución modificada correctamente"}
     except Exception as e:

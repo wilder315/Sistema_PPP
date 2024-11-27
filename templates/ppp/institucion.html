@@ -49,7 +49,6 @@
                     <input type="hidden" id="idInstitucionMod" name="idInstitucionMod">
 
                     <div class="row">
-                        <!-- Validación de RUC: Solo 11 dígitos numéricos -->
                         <div class="col-md-6 mb-3">
                             <label for="numDocMod" class="form-label">RUC:</label>
                             <input type="text" class="form-control form-control-sm" id="numDocMod" name="numDocMod" required
@@ -57,7 +56,6 @@
                                 oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11)">
                         </div>
 
-                        <!-- Validación de Giro: Solo letras -->
                         <div class="col-md-6 mb-3">
                             <label for="giroMod" class="form-label">Giro:</label>
                             <input type="text" class="form-control form-control-sm" id="giroMod" name="giroMod" required
@@ -66,76 +64,47 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="razonSocialMod" class="form-label">Razón Social:</label>
-                        <input type="text" class="form-control form-control-sm" id="razonSocialMod" name="razonSocialMod" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="direccionMod" class="form-label">Dirección:</label>
-                        <input type="text" class="form-control form-control-sm" id="direccionMod" name="direccionMod" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="razonSocialMod" class="form-label">Razón Social:</label>
+                            <input type="text" class="form-control form-control-sm" id="razonSocialMod" name="razonSocialMod" required>
+                        </div>
+    
+                        <div class="col-md-6 mb-3">
+                            <label for="direccionMod" class="form-label">Dirección:</label>
+                            <input type="text" class="form-control form-control-sm" id="direccionMod" name="direccionMod" required>
+                        </div>
                     </div>
 
                     <div class="row">
-                        <!-- Validación de Correo -->
                         <div class="col-md-6 mb-3">
                             <label for="correoMod" class="form-label">Correo:</label>
                             <input type="email" class="form-control form-control-sm" id="correoMod" name="correoMod" required>
                         </div>
 
-                        <!-- Validación de Teléfono: Solo números, máximo 9 -->
                         <div class="col-md-6 mb-3">
                             <label for="telMod" class="form-label">Teléfono:</label>
-                            <input type="text" class="form-control form-control-sm" id="telMod" name="telMod" required
-                                pattern="\d{9}" title="Debe contener 9 dígitos" maxlength="9"
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Validación de País -->
-                        <div class="col-md-6 mb-3">
-                            <label for="paisMod" class="form-label">País:</label>
-                            <select id="paisMod" class="form-control form-control-sm" name="paisMod" required>
-                                <!-- Opciones dinámicas -->
-                            </select>
-                        </div>
-
-                        <!-- Validación de Departamento: Solo números -->
-                        <div class="col-md-6 mb-3">
-                            <label for="departamentoMod" class="form-label">Departamento:</label>
-                            <select id="departamentoMod" class="form-control form-control-sm" name="departamentoMod" required
-                                pattern="\d+" title="Solo números">
-                                <!-- Opciones dinámicas -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Validación de Provincia: Solo números -->
-                        <div class="col-md-6 mb-3">
-                            <label for="provinciaMod" class="form-label">Provincia:</label>
-                            <select id="provinciaMod" class="form-control form-control-sm" name="provinciaMod" required
-                                pattern="\d+" title="Solo números">
-                                <!-- Opciones dinámicas -->
-                            </select>
-                        </div>
-
-                        <!-- Validación de Distrito: Solo números -->
-                        <div class="col-md-6 mb-3">
-                            <label for="distritoMod" class="form-label">Distrito:</label>
-                            <select id="distritoMod" class="form-control form-control-sm" name="distritoMod" required
-                                pattern="\d+" title="Solo números">
-                                <!-- Opciones dinámicas -->
-                            </select>
+                            <input type="text" class="form-control" id="telMod" name="telMod" maxlength="16" 
+                                pattern="\+?[0-9]{1,15}" 
+                                title="Debe ingresar un número válido en formato internacional (máximo 15 dígitos y opcional '+')" 
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 16)">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="jefeMod" class="form-label">Representante Legal:</label>
-                        <select id="jefeMod" class="form-control form-control-sm" name="jefeMod" required>
-                            <!-- Opciones dinámicas -->
-                        </select>
+                        <select id="jefeMod" class="form-control form-control-sm" name="jefeMod" required></select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ubicacionMod" class="form-label">Ubicación:</label>
+                        <div id="map" style="height: 400px; width: 100%;"></div>
+                        <input type="hidden" id="idUbicacion" name="idUbicacion">
+                        <input type="hidden" id="latitudMod" name="latitudMod">
+                        <input type="hidden" id="longitudMod" name="longitudMod">
+                        <input type="hidden" id="ciudadMod" name="ciudadMod">
+                        <input type="hidden" id="paisMod" name="paisMod">
                     </div>
 
                     <div class="text-end">
@@ -180,7 +149,7 @@
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.4/js/buttons.print.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
-
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATvnPg-ReFPinDTHmx4RXee3pNo0gZCpI&callback=initMap&libraries=places" async defer></script>
 <script>
     $(document).ready(function () {
         if ($.fn.DataTable.isDataTable('#tabla-institucion')) {
@@ -251,6 +220,113 @@
             }
         });
 
+        $('#modalInstitucion').on('shown.bs.modal', function () {
+            initMap();
+        });
+
+        // Variables globales
+        let lat = null;
+        let lng = null;
+        let map = null;
+        let marker = null;
+
+        // Inicializar el mapa dependiendo del caso (Agregar, Ver, Modificar)
+        function initMap(modo) {
+            const defaultLat = -12.043;
+            const defaultLng = -77.028;
+            if (lat !== null && lng !== null) {
+                mostrarMapa(lat, lng, modo === 'agregar' ? true : false);
+            } else if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        lat = position.coords.latitude;
+                        lng = position.coords.longitude;
+                        mostrarMapa(lat, lng, modo === 'agregar' ? true : false);
+                    },
+                    function () {
+                        alert("No se pudo obtener la ubicación actual. Se usará una ubicación predeterminada.");
+                        mostrarMapa(defaultLat, defaultLng, modo === 'agregar' ? true : false);
+                    }
+                );
+            } else {
+                alert("Geolocalización no soportada en este navegador.");
+                mostrarMapa(defaultLat, defaultLng, modo === 'agregar' ? true : false);
+            }
+        }
+
+        // Función para inicializar y mostrar el mapa con el marcador
+        function mostrarMapa(lat, lng, draggable) {
+            const mapOptions = {
+                center: { lat: lat, lng: lng },
+                zoom: 15,
+            };
+            map = new google.maps.Map(document.getElementById("map"), mapOptions);
+            marker = new google.maps.Marker({
+                map: map,
+                position: { lat: lat, lng: lng },
+                draggable: draggable,
+            });
+            if (draggable) {
+                google.maps.event.addListener(marker, "dragend", function (event) {
+                    lat = event.latLng.lat();
+                    lng = event.latLng.lng();
+                    document.getElementById("latitudMod").value = lat;
+                    document.getElementById("longitudMod").value = lng;
+                    obtenerDireccion(lat, lng);
+                });
+                google.maps.event.addListener(map, "click", function (event) {
+                    const clickedLocation = event.latLng;
+                    marker.setPosition(clickedLocation);
+                    lat = clickedLocation.lat();
+                    lng = clickedLocation.lng();
+                    document.getElementById("latitudMod").value = lat;
+                    document.getElementById("longitudMod").value = lng;
+                    obtenerDireccion(lat, lng);  // Obtener y mostrar la dirección
+                });
+            } else {
+                obtenerDireccion(lat, lng);
+            }
+        }
+
+        // Función para obtener la dirección de las coordenadas
+        function obtenerDireccion(lat, lng) {
+            const geocoder = new google.maps.Geocoder();
+            const latLng = new google.maps.LatLng(lat, lng);  
+            geocoder.geocode({ 'location': latLng }, function (results, status) {
+                if (status === 'OK' && results[0]) {
+                    document.getElementById("direccionMod").value = results[0].formatted_address;
+                }
+            });
+        }
+
+        // Función para obtener la dirección (país y ciudad) a partir de la latitud y longitud
+        function obtenerDireccion(lat, lng) {
+            const geocoder = new google.maps.Geocoder();
+            const latLng = new google.maps.LatLng(lat, lng);
+            geocoder.geocode({ 'location': latLng }, function (results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    if (results[0]) {
+                        let country = '';
+                        let city = '';
+                        results[0].address_components.forEach(function (component) {
+                            if (component.types.includes("locality")) {
+                                city = component.long_name;
+                            }
+                            if (component.types.includes("country")) {
+                                country = component.long_name;
+                            }
+                        });
+                        document.getElementById("ciudadMod").value = city;
+                        document.getElementById("paisMod").value = country;
+                    } else {
+                        console.log("No se pudo encontrar una dirección para estas coordenadas.");
+                    }
+                } else {
+                    console.log("Error en la geocodificación: " + status);
+                }
+            });
+        }
+
         // Funcion para mostrar alerta
         function mostrarAlerta(tipo, titulo, mensaje) {
             Swal.fire({
@@ -259,186 +335,6 @@
                 html: mensaje,
                 showConfirmButton: true,
                 timer: 5000
-            });
-        }
-
-        // Función para cargar país, departamento, provincia, distrito según respuesta
-        function cargarPaisesRespuesta(selectedPaisId) {
-            $.ajax({
-                url: '/datos_paises',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var paisSelect = $('#paisMod');
-                    paisSelect.empty();
-                    paisSelect.append('<option value="" disabled selected>Seleccionar país</option>');
-                    response.forEach(function (pais) {
-                        var selected = parseInt(pais.idPais) === parseInt(selectedPaisId) ? 'selected' : '';  
-                        paisSelect.append(`<option value="${pais.idPais}" ${selected}>${pais.nombre}</option>`);
-                    });
-
-                    // Verificar si se pasó un país seleccionado y cargar sus departamentos
-                    if (selectedPaisId) {
-                        cargarDepartamentosRespuesta(selectedPaisId); // Cargar departamentos según el país seleccionado
-                    }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los países.");
-                }
-            });
-        }
-
-        function cargarDepartamentosRespuesta(idPais, selectedDepartamentoId = null) {
-            $.ajax({
-                url: `/datos_departamentos/${idPais}`,
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var departamentoSelect = $('#departamentoMod');
-                    departamentoSelect.empty();
-                    departamentoSelect.append('<option value="" disabled selected>Seleccionar departamento</option>');
-                    response.forEach(function (departamento) {
-                        var selected = parseInt(departamento.idDepartamento) === parseInt(selectedDepartamentoId) ? 'selected' : '';  
-                        departamentoSelect.append(`<option value="${departamento.idDepartamento}" ${selected}>${departamento.nombre}</option>`);
-                    });
-
-                    // Verificar si se pasó un departamento seleccionado y cargar sus provincias
-                    if (selectedDepartamentoId) {
-                        cargarProvinciasRespuesta(selectedDepartamentoId); // Cargar provincias según el departamento seleccionado
-                    }
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los departamentos.");
-                }
-            });
-    }
-
-        function cargarProvinciasRespuesta(idDepartamento, selectedProvinciaId = null) {
-            $.ajax({
-                url: `/datos_provincias/${idDepartamento}`,
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var provinciaSelect = $('#provinciaMod');
-                    provinciaSelect.empty();
-                    provinciaSelect.append('<option value="" disabled selected>Seleccionar provincia</option>');
-                    response.forEach(function (provincia) {
-                        var selected = parseInt(provincia.idProvincia) === parseInt(selectedProvinciaId) ? 'selected' : '';  
-                        provinciaSelect.append(`<option value="${provincia.idProvincia}" ${selected}>${provincia.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar las provincias.");
-                }
-            });
-        }
-        $('#provinciaMod').on('change', function () {
-            var idProvincia = $(this).val();
-            $('#distritoMod').prop('disabled', false);
-            cargarDistritosRespuesta(idProvincia);
-        });
-        function cargarDistritosRespuesta(idProvincia, selectedDistritoId = null) {
-            $.ajax({
-                url: `/datos_distritos/${idProvincia}`,
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var distritoSelect = $('#distritoMod');
-                    distritoSelect.empty();
-                    distritoSelect.append('<option value="" disabled selected>Seleccionar distrito</option>');
-                    response.forEach(function (distrito) {
-                        var selected = parseInt(distrito.idDistrito) === parseInt(selectedDistritoId) ? 'selected' : '';  
-                        distritoSelect.append(`<option value="${distrito.idDistrito}" ${selected}>${distrito.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los distritos.");
-                }
-            });
-        }
-        
-
-        // Función para cargar los países dinámicamente
-        function cargarPaises(selectedPaisId) {
-            $.ajax({
-                url: '/datos_paises',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var paisSelect = $('#paisMod');
-                    paisSelect.empty();
-                    paisSelect.append('<option value="" disabled selected>Seleccionar país</option>');
-                    response.forEach(function (pais) {
-                        var selected = parseInt(pais.idPais) === parseInt(selectedPaisId) ? 'selected' : '';  
-                        paisSelect.append(`<option value="${pais.idPais}" ${selected}>${pais.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los países.");
-                }
-            });
-        }
-
-        // Función para cargar los departamentos dinámicamente
-        function cargarDepartamentos(selectedDepartamentoId) {
-            $.ajax({
-                url: '/datos_departamentos',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var departamentoSelect = $('#departamentoMod');
-                    departamentoSelect.empty();
-                    departamentoSelect.append('<option value="" disabled selected>Seleccionar departamento</option>');
-                    response.forEach(function (departamento) {
-                        var selected = parseInt(departamento.idDepartamento) === parseInt(selectedDepartamentoId) ? 'selected' : '';  
-                        departamentoSelect.append(`<option value="${departamento.idDepartamento}" ${selected}>${departamento.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los departamentos.");
-                }
-            });
-        }
-
-        // Función para cargar las provincias dinámicamente
-        function cargarProvincias(selectedProvinciaId) {
-            $.ajax({
-                url: '/datos_provincias',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var provinciaSelect = $('#provinciaMod');
-                    provinciaSelect.empty();
-                    provinciaSelect.append('<option value="" disabled selected>Seleccionar provincia</option>');
-                    response.forEach(function (provincia) {
-                        var selected = parseInt(provincia.idProvincia) === parseInt(selectedProvinciaId) ? 'selected' : '';  
-                        provinciaSelect.append(`<option value="${provincia.idProvincia}" ${selected}>${provincia.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los provincias.");
-                }
-            });
-        }
-
-        // Función para cargar las distritos dinámicamente
-        function cargarDistritos(selectedDistritoId) {
-            $.ajax({
-                url: '/datos_distritos',
-                type: 'GET',
-                contentType: 'application/json',
-                success: function (response) {
-                    var distritoSelect = $('#distritoMod');
-                    distritoSelect.empty();
-                    distritoSelect.append('<option value="" disabled selected>Seleccionar distrito</option>');
-                    response.forEach(function (distrito) {
-                        var selected = parseInt(distrito.idDistrito) === parseInt(selectedDistritoId) ? 'selected' : '';  
-                        distritoSelect.append(`<option value="${distrito.idDistrito}" ${selected}>${distrito.nombre}</option>`);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    mostrarAlerta("error", "Error", "Hubo un error al cargar los distritos.");
-                }
             });
         }
 
@@ -472,7 +368,11 @@
             $('#direccionMod').prop('disabled', true);
             $('#correoMod').prop('disabled', true);
             $('#telMod').prop('disabled', true);
+            $('#idUbicacion').prop('disabled', true);
+            $('#latitudMod').prop('disabled', true);
+            $('#longitudMod').prop('disabled', true);
             $('#paisMod').prop('disabled', true);
+            $('#ciudadMod').prop('disabled', true);
             $('#departamentoMod').prop('disabled', true);
             $('#provinciaMod').prop('disabled', true);
             $('#distritoMod').prop('disabled', true);
@@ -488,7 +388,11 @@
             $('#direccionMod').prop('disabled', false);
             $('#correoMod').prop('disabled', false);
             $('#telMod').prop('disabled', false);
+            $('#idUbicacion').prop('disabled', false);
+            $('#latitudMod').prop('disabled', false);
+            $('#longitudMod').prop('disabled', false);
             $('#paisMod').prop('disabled', false);
+            $('#ciudadMod').prop('disabled', false);
             $('#departamentoMod').prop('disabled', false);
             $('#provinciaMod').prop('disabled', false);
             $('#distritoMod').prop('disabled', false);
@@ -506,7 +410,7 @@
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Ver Institucion");
+                        $('#modal-title').text("Ver Institución");
                         $('#formInstitucion')[0].reset();
                         $('#idInstitucionMod').val(response.numDoc);
                         $('#numDocMod').val(response.numDoc);
@@ -515,25 +419,10 @@
                         $('#direccionMod').val(response.direccion);
                         $('#correoMod').val(response.correo);
                         $('#telMod').val(response.tel);
-                        // Cargar país y luego departamentos, provincias y distritos en secuencia
-                        cargarPaises();
-                        cargarPaisesRespuesta(response.pais); // Carga países y selecciona el correspondiente
-                        $('#paisMod').val(response.pais);
-                        $('#paisMod').trigger('change');
-
-                        // Al cargar países se selecciona y carga departamentos, luego provincias, y finalmente distritos
-                        $('#departamentoMod').on('loaded', function() {
-                            $('#departamentoMod').val(response.departamento);
-                            $('#departamentoMod').trigger('change');
-                        });
-                        $('#provinciaMod').on('loaded', function() {
-                            $('#provinciaMod').val(response.provincia);
-                            $('#provinciaMod').trigger('change');
-                        });
-                        $('#distritoMod').on('loaded', function() {
-                            $('#distritoMod').val(response.distrito);
-                        });
                         cargarJefes(response.jefe);
+                        lat = parseFloat(response.latitud);
+                        lng = parseFloat(response.longitud);
+                        initMap('ver');
                         deshabilitarControles();
                         $('#btnCancelar').hide();
                         $('#btnGuardar').hide();
@@ -559,13 +448,21 @@
             $('#direccionMod').val('');
             $('#correoMod').val('');
             $('#telMod').val('');
-            cargarPaisesRespuesta();
+            $('#latitudMod').val('');
+            $('#longitudMod').val('');
+            $('#paisMod').val('');
+            $('#ciudadMod').val('');
+            lat = null;
+            lng = null;
+            $('#modalInstitucion').modal('show');
             cargarJefes();
             habilitarControles();
             $('#btnCancelar').show();
             $('#btnGuardar').show();
             $('#btnCerrar').hide();
-            $('#modalInstitucion').modal('show');
+            $('#modalInstitucion').on('shown.bs.modal', function () {
+                initMap();
+            });
         });
 
         // Evento para Modificar Institución
@@ -579,7 +476,7 @@
                     if (response.error) {
                         mostrarAlerta("error", "Error", response.error);
                     } else {
-                        $('#modal-title').text("Ver Institucion");
+                        $('#modal-title').text("Modificar Institución");
                         $('#formInstitucion')[0].reset();
                         $('#idInstitucionMod').val(response.numDoc);
                         $('#numDocMod').val(response.numDoc);
@@ -588,11 +485,14 @@
                         $('#direccionMod').val(response.direccion);
                         $('#correoMod').val(response.correo);
                         $('#telMod').val(response.tel);
-                        cargarPaises(response.pais);
-                        cargarDepartamentos(response.departamento);
-                        cargarProvincias(response.provincia);
-                        cargarDistritos(response.distrito);
+                        $('#paisMod').val(response.pais);
+                        $('#ciudadMod').val(response.ciudad);
+                        $('#latitudMod').val(response.latitud);
+                        $('#longitudMod').val(response.longitud);
                         cargarJefes(response.jefe);
+                        lat = parseFloat(response.latitud);
+                        lng = parseFloat(response.longitud);
+                        mostrarMapa(lat, lng, true);
                         habilitarControles();
                         $('#btnCancelar').show();
                         $('#btnGuardar').show();
@@ -606,6 +506,7 @@
             });
         });
 
+
         $('#formInstitucion').submit(function (e) {
             e.preventDefault();
             if ($('#idInstitucionMod').val() === '') {
@@ -616,7 +517,10 @@
                     direccion: $('#direccionMod').val(),
                     correo: $('#correoMod').val(),
                     tel: $('#telMod').val(),
-                    idDistrito: $('#distritoMod').val(),
+                    latitud: $('#latitudMod').val(),
+                    longitud: $('#longitudMod').val(),
+                    ciudad: $('#ciudadMod').val(),
+                    pais: $('#paisMod').val(),
                     idPersona: $('#jefeMod').val()
                 };
                 $.ajax({
@@ -645,7 +549,10 @@
                     direccion: $('#direccionMod').val(),
                     correo: $('#correoMod').val(),
                     tel: $('#telMod').val(),
-                    idDistrito: $('#distritoMod').val(),
+                    latitud: $('#latitudMod').val(),
+                    longitud: $('#longitudMod').val(),
+                    ciudad: $('#ciudadMod').val(),
+                    pais: $('#paisMod').val(),
                     idPersona: $('#jefeMod').val()          
                 };
                 $.ajax({

@@ -188,13 +188,20 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono 1:</label>
-                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" required>
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="16" 
+                                pattern="\+?[0-9]{1,15}" 
+                                title="Debe ingresar un número válido en formato internacional (máximo 15 dígitos y opcional '+')" 
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 16)">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="tel2Mod" class="form-label">Teléfono 2:</label>
-                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" required>
+                            <input type="text" class="form-control" id="tel2Mod" name="tel2Mod" maxlength="16" 
+                                pattern="\+?[0-9]{1,15}" 
+                                title="Debe ingresar un número válido en formato internacional (máximo 15 dígitos y opcional '+')"              
+                                oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 16)">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="generoMod" class="form-label">Género:</label>

@@ -58,11 +58,16 @@ def agregar_institucion():
     direccion = datos.get('direccion')
     correo = datos.get('correo')
     tel = datos.get('tel')
-    idDistrito = datos.get('idDistrito')
     idPersona = datos.get('idPersona')
+    pais = datos.get('pais')
+    ciudad = datos.get('ciudad')
+    latitud = datos.get('latitud')
+    longitud = datos.get('longitud')
+
     idTipoDoc = 3
+    
     resultado = controlador_institucion.agregar_institucion(
-        numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc
+        numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, pais, ciudad, latitud, longitud
     )
     return jsonify(resultado)
 
@@ -75,11 +80,15 @@ def modificar_institucion():
     direccion = datos.get('direccion')
     correo = datos.get('correo')
     tel = datos.get('tel')
-    idDistrito = datos.get('idDistrito')
     idPersona = datos.get('idPersona')
-    idTipoDoc = 3
+    idTipoDoc = datos.get('idTipoDoc', 3)
+    pais = datos.get('pais')
+    ciudad = datos.get('ciudad')
+    latitud = datos.get('latitud')
+    longitud = datos.get('longitud')
+
     resultado = controlador_institucion.modificar_institucion(
-        numDoc, giro, razonSocial, direccion, tel, correo, idDistrito, idPersona, idTipoDoc
+        numDoc, giro, razonSocial, direccion, tel, correo, idPersona, idTipoDoc, pais, ciudad, latitud, longitud
     )
     return jsonify(resultado)
 
