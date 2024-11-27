@@ -98,6 +98,12 @@ def agregar_semestre(nombre, fechaInicio, fechaFin, estado):
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            if estado == 'A':
+                cursor.execute("""
+                    UPDATE semestre_academico 
+                    SET estado = 'I' 
+                    WHERE estado = 'A'
+                """)
             cursor.execute("""
                 INSERT INTO semestre_academico (nombre, fechaInicio, fechaFin, estado) 
                 VALUES (%s, %s, %s, %s)
@@ -142,12 +148,34 @@ def eliminar_semestre(idSemestre):
                 FROM practicas_preprofesionales
                 WHERE idSemestre = %s
             """, (idSemestre,))
-            referencia_practica = cursor.fetchone()[0]
-            
+            referencia_practica = cursor.fetchone()[0]           
             if referencia_practica > 0:
                 return {"error": "No se puede eliminar un semestre en uso."}
+            cursor.execute("""
+                SELECT estado
+                FROM semestre_academico
+                WHERE idSemestre = %s
+            """, (idSemestre,))
+            resultado = cursor.fetchone()           
+            if not resultado:
+                return {"error": "El semestre no existe."} 
+            estado_semestre = resultado[0]
             cursor.execute("DELETE FROM semestre_academico WHERE idSemestre = %s", (idSemestre,))
-            conexion.commit()       
+            if estado_semestre == 'A':
+                cursor.execute("""
+                    SELECT idSemestre
+                    FROM semestre_academico
+                    ORDER BY nombre DESC
+                    LIMIT 1
+                """)
+                semestre_mas_reciente = cursor.fetchone()               
+                if semestre_mas_reciente:
+                    cursor.execute("""
+                        UPDATE semestre_academico
+                        SET estado = 'A'
+                        WHERE idSemestre = %s
+                    """, (semestre_mas_reciente[0],))
+            conexion.commit()
             return {"mensaje": "Semestre eliminado correctamente"}
     except Exception as e:
         conexion.rollback()

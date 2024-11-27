@@ -85,9 +85,11 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="tel1Mod" class="form-label">Teléfono:</label>
-                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="9" 
-                                pattern="\d{9}" title="Debe ingresar 9 números" required
-                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)">
+                            <input type="text" class="form-control" id="tel1Mod" name="tel1Mod" maxlength="16" 
+                                pattern="\+?[0-9]{1,15}" 
+                                title="Debe ingresar un número válido en formato internacional (máximo 15 dígitos y opcional '+')" 
+                                required
+                                oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '').slice(0, 16)">
                         </div>
                     </div>
 
@@ -227,7 +229,11 @@
                 { data: "nombre" },
                 { data: "tel1", className: 'text-center' },
                 { data: "cargo" },
-                { data: "institucion" },
+                { data: "institucion",
+                    render: function(data, type, row) {
+                        return data ? data : "Sin institución asignada";
+                    }
+                },
                 {
                     data: null,
                     className: 'text-center',

@@ -19,10 +19,11 @@ class ControladorEmail:
         try:
             with conexion.cursor() as cursor:
                 cursor.execute("""
-                    SELECT nombre, apellidos, correoP, correoUSAT
-                    FROM persona 
-                    WHERE estado = 'A'
-                    ORDER BY apellidos, nombre
+                    SELECT p.nombre, p.apellidos, p.correoP, p.correoUSAT
+                    FROM persona p
+                    LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                    WHERE p.estado = 'A' AND u.idTipoUsuario = 3
+                    ORDER BY p.apellidos ASC, p.nombre ASC 
                 """)
                 estudiantes = []
                 for row in cursor.fetchall():
