@@ -1,0 +1,214 @@
+<div class="modal fade" id="modalFichaEvaluacion" tabindex="-1" aria-labelledby="modalFichaEvaluacionLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFichaEvaluacionLabel">Ficha de Evaluación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formFichaEvaluacion">
+                    <input type="hidden" id="modal_idFichaEvaluacion">
+                    <input type="hidden" id="modal_idPractica">
+
+                    <!-- Datos del Estudiante -->
+                    <div class="row mb-4">
+                        <h4>Datos del Estudiante</h4>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombres y apellidos:</label>
+                            <input type="text" class="form-control" id="modal_nombres_estudiante" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Escuela Profesional:</label>
+                            <input type="text" class="form-control" id="modal_escuela_profesional" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Periodo de prácticas:</label>
+                            <input type="text" class="form-control" id="modal_periodo_practicas" >
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Área de desempeño:</label>
+                            <input type="text" class="form-control" id="modal_area_desempeno" >
+                        </div>
+                    </div>
+
+                    <!-- Datos de la Empresa -->
+                    <div class="row mb-4">
+                        <h4>Datos de la Empresa</h4>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre de la empresa:</label>
+                            <input type="text" class="form-control" id="modal_nombre_empresa">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Dirección:</label>
+                            <input type="text" class="form-control" id="modal_direccion_empresa">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre del responsable:</label>
+                            <input type="text" class="form-control" id="modal_nombre_responsable">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Correo del responsable:</label>
+                            <input type="email" class="form-control" id="modal_correo_responsable">
+                        </div>
+                    </div>
+
+                    <!-- Características Evaluadas -->
+                    <div class="row mb-4">
+                        <h4>Características Evaluadas</h4>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Responsabilidad:</label>
+                            <select class="form-select modal-evaluacion" id="modal_responsabilidad" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Proactividad:</label>
+                            <select class="form-select modal-evaluacion" id="modal_proactividad" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Comunicación Asertiva:</label>
+                            <select class="form-select modal-evaluacion" id="modal_comunicacion_asertiva" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Trabajo en Equipo:</label>
+                            <select class="form-select modal-evaluacion" id="modal_trabajo_equipo" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Compromiso con la Calidad:</label>
+                            <select class="form-select modal-evaluacion" id="modal_compromiso_calidad" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Organización del Trabajo:</label>
+                            <select class="form-select modal-evaluacion" id="modal_organizacion_trabajo" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Puntualidad y Asistencia:</label>
+                            <select class="form-select modal-evaluacion" id="modal_puntualidad_asistencia" disabled>
+                                <option value="D">Deficiente</option>
+                                <option value="R">Regular</option>
+                                <option value="B">Bueno</option>
+                                <option value="M">Muy Bueno</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Resultados de Aprendizaje -->
+                    <div class="row mb-4">
+                        <h4>Resultados de Aprendizaje</h4>
+                        <div id="resultadosContainer">
+                            {% for i in range(1, 11) %}
+                            <div class="col-12 mb-3">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <label class="form-label">Resultado {{i}}:</label>
+                                        <textarea class="form-control" id="modal_resultado{{i}}" rows="2"
+                                            readonly></textarea>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Calificación:</label>
+                                        <select class="form-select modal-evaluacion"
+                                            id="modal_calificacion_resultado{{i}}" disabled>
+                                            <option value="">Seleccione...</option>
+                                            <option value="D">Deficiente</option>
+                                            <option value="R">Regular</option>
+                                            <option value="B">Bueno</option>
+                                            <option value="M">Muy Bueno</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Conclusiones -->
+                    <div class="row mb-4">
+                        <h4>Conclusiones</h4>
+                        <div class="col-12">
+                            <textarea class="form-control" id="modal_conclusiones" rows="4" readonly></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Firma -->
+                    <div class="row mb-4">
+                        <h4>Firma del Responsable</h4>
+                        <div class="col-12">
+                            <div class="firma-container">
+                                <img id="modal_firma_preview" src="" alt="Firma" class="img-fluid"
+                                    style="max-height: 200px; display: none;">
+                                <div id="modal_firma_placeholder" class="text-muted">No hay firma disponible</div>
+                            </div>
+                            <div id="modal_firma_input_container" style="display: none;">
+                                <label class="form-label mt-2">Actualizar firma:</label>
+                                <input type="file" class="form-control" id="modal_firma" name="firma"
+                                    accept=".png,.jpg,.jpeg,.pdf">
+                                <small class="text-muted">Formatos permitidos: PNG, JPG, JPEG, PDF</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCambios" style="display: none;">
+                    Guardar cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .firma-container {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+    }
+
+    .modal-evaluacion {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+</style>

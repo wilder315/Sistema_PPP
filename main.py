@@ -23,6 +23,7 @@ from routers.router_objetivo import router_objetivo
 from routers.router_jefe import router_jefe
 from routers.router_informeInicialEstudiante import router_informe
 from routers.router_informeEmpresa import router_informeEmpresa
+from routers.router_ficha_evaluacion import router_ficha_evaluacion
 
 app = Flask(__name__)
 app.debug = False
@@ -60,6 +61,7 @@ app.register_blueprint(router_objetivo)
 app.register_blueprint(router_jefe)
 app.register_blueprint(router_informe)
 app.register_blueprint(router_informeEmpresa)
+app.register_blueprint(router_ficha_evaluacion)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,566 @@
+{% extends "ppp/home.html" %}
+
+{% block titulo %}Ficha de Evaluación de Desempeño{% endblock %}
+
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de
+                Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item active">Ficha de Evaluación de Desempeño</li>
+    </ol>
+</nav>
+
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="card-title">Búsqueda de Estudiante</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" id="busqueda_estudiante"
+                        placeholder="Ingrese nombre o apellidos del estudiante">
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary" id="btnBuscar">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="card mb-4" id="resultadosBusqueda" style="display: none;">
+        <div class="card-header">
+            <h4>Resultados de la búsqueda</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombres y Apellidos</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaEstudiantes">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Ficha de Evaluación -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Ficha de Evaluación de Desempeño</h2>
+        </div>
+        <div class="card-body">
+            <form id="fichaEvaluacionForm">
+                <!-- Datos del Estudiante -->
+                <div class="row mb-4">
+                    <h4>Datos del Estudiante</h4>
+                    <div class="col-md-6 mb-3">
+                        <label for="nombres_estudiante" class="form-label">Nombres y apellidos del estudiante:</label>
+                        <input type="text" class="form-control" id="nombres_estudiante" name="nombres_estudiante"
+                            readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="escuela_profesional" class="form-label">Escuela Profesional:</label>
+                        <input type="text" class="form-control" id="escuela_profesional" name="escuela_profesional"
+                            readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="periodo_practicas" class="form-label">Periodo de prácticas:</label>
+                        <input type="text" class="form-control" id="periodo_practicas" name="periodo_practicas"
+                            readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="area_desempeno" class="form-label">Área de desempeño del estudiante:</label>
+                        <input type="text" class="form-control" id="area_desempeno" name="area_desempeno" readonly>
+                    </div>
+                </div>
+
+                <!-- Datos de la Empresa -->
+                <div class="row mb-4">
+                    <h4>Datos de la Empresa</h4>
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre_empresa" class="form-label">Nombre de la Empresa:</label>
+                        <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="direccion_empresa" class="form-label">Dirección de la empresa:</label>
+                        <input type="text" class="form-control" id="direccion_empresa" name="direccion_empresa"
+                            readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre_responsable" class="form-label">Nombre del responsable:</label>
+                        <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable"
+                            readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="correo_responsable" class="form-label">Correo del responsable:</label>
+                        <input type="email" class="form-control" id="correo_responsable" name="correo_responsable"
+                            readonly>
+                    </div>
+                </div>
+
+                <!-- Características a evaluarse -->
+                <div class="row mb-4">
+                    <h4>Características a evaluarse</h4>
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Características a evaluarse</th>
+                                        <th class="text-center">Deficiente</th>
+                                        <th class="text-center">Regular</th>
+                                        <th class="text-center">Bueno</th>
+                                        <th class="text-center">Muy bueno</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1. Responsabilidad</td>
+                                        <td class="text-center"><input type="radio" name="responsabilidad" value="D"
+                                                required></td>
+                                        <td class="text-center"><input type="radio" name="responsabilidad" value="R">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="responsabilidad" value="B">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="responsabilidad" value="M">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2. Proactividad</td>
+                                        <td class="text-center"><input type="radio" name="proactividad" value="D"
+                                                required></td>
+                                        <td class="text-center"><input type="radio" name="proactividad" value="R"></td>
+                                        <td class="text-center"><input type="radio" name="proactividad" value="B"></td>
+                                        <td class="text-center"><input type="radio" name="proactividad" value="M"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3. Comunicación asertiva</td>
+                                        <td class="text-center"><input type="radio" name="comunicacion_asertiva"
+                                                value="D" required></td>
+                                        <td class="text-center"><input type="radio" name="comunicacion_asertiva"
+                                                value="R"></td>
+                                        <td class="text-center"><input type="radio" name="comunicacion_asertiva"
+                                                value="B"></td>
+                                        <td class="text-center"><input type="radio" name="comunicacion_asertiva"
+                                                value="M"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4. Trabajo en equipo</td>
+                                        <td class="text-center"><input type="radio" name="trabajo_equipo" value="D"
+                                                required></td>
+                                        <td class="text-center"><input type="radio" name="trabajo_equipo" value="R">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="trabajo_equipo" value="B">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="trabajo_equipo" value="M">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>5. Compromiso con la calidad</td>
+                                        <td class="text-center"><input type="radio" name="compromiso_calidad" value="D"
+                                                required></td>
+                                        <td class="text-center"><input type="radio" name="compromiso_calidad" value="R">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="compromiso_calidad" value="B">
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="compromiso_calidad" value="M">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>6. Organización en el trabajo</td>
+                                        <td class="text-center"><input type="radio" name="organizacion_trabajo"
+                                                value="D" required></td>
+                                        <td class="text-center"><input type="radio" name="organizacion_trabajo"
+                                                value="R"></td>
+                                        <td class="text-center"><input type="radio" name="organizacion_trabajo"
+                                                value="B"></td>
+                                        <td class="text-center"><input type="radio" name="organizacion_trabajo"
+                                                value="M"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>7. Puntualidad y asistencia</td>
+                                        <td class="text-center"><input type="radio" name="puntualidad_asistencia"
+                                                value="D" required></td>
+                                        <td class="text-center"><input type="radio" name="puntualidad_asistencia"
+                                                value="R"></td>
+                                        <td class="text-center"><input type="radio" name="puntualidad_asistencia"
+                                                value="B"></td>
+                                        <td class="text-center"><input type="radio" name="puntualidad_asistencia"
+                                                value="M"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultados de aprendizaje -->
+                <div class="row mb-4">
+                    <h4>Resultados de aprendizaje</h4>
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Resultados de aprendizaje</th>
+                                        <th class="text-center">Deficiente</th>
+                                        <th class="text-center">Regular</th>
+                                        <th class="text-center">Bueno</th>
+                                        <th class="text-center">Muy bueno</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultadosAprendizajeBody">
+                                    <!-- Primera fila (obligatoria) -->
+                                    <tr>
+                                        <td>
+                                            <textarea class="form-control" name="resultado1" rows="2" required
+                                                placeholder="Ingrese el resultado de aprendizaje"></textarea>
+                                        </td>
+                                        <td class="text-center"><input type="radio" name="calificacion_resultado1"
+                                                value="D" required></td>
+                                        <td class="text-center"><input type="radio" name="calificacion_resultado1"
+                                                value="R"></td>
+                                        <td class="text-center"><input type="radio" name="calificacion_resultado1"
+                                                value="B"></td>
+                                        <td class="text-center"><input type="radio" name="calificacion_resultado1"
+                                                value="M"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-secondary" id="btnAgregarResultado">
+                                <i class="fas fa-plus"></i> Agregar Resultado
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusiones -->
+                <div class="row mb-4">
+                    <h4>Conclusiones</h4>
+                    <div class="col-12">
+                        <textarea class="form-control" name="conclusiones" rows="4" required
+                            placeholder="Ingrese las conclusiones de la evaluación"></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <h4>Firma del Representante</h4>
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="firma" class="form-label">Firma (PNG, JPG, JPEG o PDF)</label>
+                            <input type="file" class="form-control" id="firma" name="firma" accept=".png,.jpg,.jpeg,.pdf" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary" id="btnGuardar" disabled>
+                            Guardar Evaluación
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                            Limpiar Formulario
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('btnBuscar').addEventListener('click', buscarEstudiantes);
+    document.getElementById('busqueda_estudiante').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarEstudiantes();
+        }
+    });
+
+    // Contador para los resultados de aprendizaje
+    let contadorResultados = 1;
+
+    document.getElementById('btnAgregarResultado').addEventListener('click', function () {
+        if (contadorResultados >= 10) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Límite alcanzado',
+                text: 'No se pueden agregar más de 10 resultados de aprendizaje'
+            });
+            return;
+        }
+
+        contadorResultados++;
+        const tbody = document.getElementById('resultadosAprendizajeBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>
+            <textarea class="form-control" name="resultado${contadorResultados}" rows="2" 
+                    placeholder="Ingrese el resultado de aprendizaje"></textarea>
+        </td>
+        <td class="text-center"><input type="radio" name="calificacion_resultado${contadorResultados}" value="D"></td>
+        <td class="text-center"><input type="radio" name="calificacion_resultado${contadorResultados}" value="R"></td>
+        <td class="text-center"><input type="radio" name="calificacion_resultado${contadorResultados}" value="B"></td>
+        <td class="text-center"><input type="radio" name="calificacion_resultado${contadorResultados}" value="M"></td>
+    `;
+        tbody.appendChild(tr);
+    });
+
+    function buscarEstudiantes() {
+        const termino = document.getElementById('busqueda_estudiante').value;
+        if (termino.length < 3) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Ingrese al menos 3 caracteres para buscar'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Buscando...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`/api/estudiante/buscar?nombre=${encodeURIComponent(termino)}&modo=busqueda`)
+            .then(response => response.json())
+            .then(data => {
+                Swal.close();
+                mostrarResultados(data.estudiantes || []);
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al buscar estudiantes'
+                });
+            });
+    }
+
+    function mostrarResultados(estudiantes) {
+        const tabla = document.getElementById('tablaEstudiantes');
+        const contenedor = document.getElementById('resultadosBusqueda');
+
+        tabla.innerHTML = '';
+        if (estudiantes.length === 0) {
+            contenedor.style.display = 'none';
+            Swal.fire({
+                icon: 'info',
+                title: 'Sin resultados',
+                text: 'No se encontraron estudiantes con ese criterio de búsqueda'
+            });
+            return;
+        }
+
+        estudiantes.forEach(estudiante => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+            <td>${estudiante.nombre_completo}</td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="seleccionarEstudiante('${estudiante.id}', '${estudiante.nombre_completo}')">
+                    <i class="fas fa-check"></i> Seleccionar
+                </button>
+            </td>
+        `;
+            tabla.appendChild(fila);
+        });
+
+        contenedor.style.display = 'block';
+    }
+
+    function seleccionarEstudiante(idEstudiante, nombreCompleto) {
+        // Asegurarse de que idEstudiante sea un número
+        const id = parseInt(idEstudiante);
+        if (isNaN(id)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'ID de estudiante inválido'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Cargando datos...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`/api/estudiante/buscar?id=${id}&modo=seleccion`)
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Error al cargar los datos del estudiante');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                Swal.close();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                llenarCamposFormulario(data);
+                document.getElementById('btnGuardar').disabled = false;
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error al cargar los datos del estudiante'
+                });
+            });
+    }
+
+
+    function llenarCamposFormulario(data) {
+        document.getElementById('nombres_estudiante').value = data.nombres_estudiante || '';
+        document.getElementById('escuela_profesional').value = data.escuela_profesional || '';
+        document.getElementById('periodo_practicas').value = data.periodo_practicas || '';
+        document.getElementById('area_desempeno').value = data.area_desempeno || '';
+        document.getElementById('nombre_empresa').value = data.nombre_empresa || '';
+        document.getElementById('direccion_empresa').value = data.direccion_empresa || '';
+        document.getElementById('nombre_responsable').value = data.nombre_responsable || '';
+        document.getElementById('correo_responsable').value = data.correo_responsable || '';
+
+        let idPracticaInput = document.getElementById('idPractica');
+        if (!idPracticaInput) {
+            idPracticaInput = document.createElement('input');
+            idPracticaInput.type = 'hidden';
+            idPracticaInput.id = 'idPractica';
+            document.getElementById('fichaEvaluacionForm').appendChild(idPracticaInput);
+        }
+        idPracticaInput.value = data.idPractica || '';
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('busqueda_estudiante').value = '';
+        document.getElementById('resultadosBusqueda').style.display = 'none';
+        document.getElementById('btnGuardar').disabled = true;
+
+        const campos = [
+            'nombres_estudiante', 'escuela_profesional', 'periodo_practicas',
+            'area_desempeno', 'nombre_empresa', 'direccion_empresa',
+            'nombre_responsable', 'correo_responsable'
+        ];
+
+        campos.forEach(campo => {
+            document.getElementById(campo).value = '';
+        });
+
+        const idPracticaInput = document.getElementById('idPractica');
+        if (idPracticaInput) {
+            idPracticaInput.value = '';
+        }
+    }
+
+    document.getElementById('fichaEvaluacionForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+    
+        if (!document.getElementById('idPractica')?.value) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, seleccione un estudiante válido'
+            });
+            return;
+        }
+    
+        // Crear un objeto FormData
+        const formData = new FormData();
+    
+        // Agregar todos los campos al FormData
+        formData.append('idPractica', document.getElementById('idPractica').value);
+        formData.append('nombres_estudiante', document.getElementById('nombres_estudiante').value);
+        formData.append('escuela_profesional', document.getElementById('escuela_profesional').value);
+        formData.append('periodo_practicas', document.getElementById('periodo_practicas').value);
+        formData.append('area_desempeno', document.getElementById('area_desempeno').value);
+        formData.append('nombre_empresa', document.getElementById('nombre_empresa').value);
+        formData.append('direccion_empresa', document.getElementById('direccion_empresa').value);
+        formData.append('nombre_responsable', document.getElementById('nombre_responsable').value);
+        formData.append('correo_responsable', document.getElementById('correo_responsable').value);
+    
+        // Agregar características evaluadas
+        formData.append('responsabilidad', document.querySelector('input[name="responsabilidad"]:checked')?.value);
+        formData.append('proactividad', document.querySelector('input[name="proactividad"]:checked')?.value);
+        formData.append('comunicacion_asertiva', document.querySelector('input[name="comunicacion_asertiva"]:checked')?.value);
+        formData.append('trabajo_equipo', document.querySelector('input[name="trabajo_equipo"]:checked')?.value);
+        formData.append('compromiso_calidad', document.querySelector('input[name="compromiso_calidad"]:checked')?.value);
+        formData.append('organizacion_trabajo', document.querySelector('input[name="organizacion_trabajo"]:checked')?.value);
+        formData.append('puntualidad_asistencia', document.querySelector('input[name="puntualidad_asistencia"]:checked')?.value);
+    
+        // Agregar conclusiones
+        formData.append('conclusiones', document.querySelector('textarea[name="conclusiones"]').value);
+    
+        // Agregar la firma
+        const firmaInput = document.getElementById('firma');
+        if (firmaInput.files[0]) {
+            formData.append('firma', firmaInput.files[0]);
+        }
+    
+        // Agregar resultados de aprendizaje
+        for (let i = 1; i <= contadorResultados; i++) {
+            const resultado = document.querySelector(`textarea[name="resultado${i}"]`)?.value;
+            const calificacion = document.querySelector(`input[name="calificacion_resultado${i}"]:checked`)?.value;
+            if (resultado) {
+                formData.append(`resultado${i}`, resultado);
+                formData.append(`calificacion_resultado${i}`, calificacion);
+            }
+        }
+    
+        Swal.fire({
+            title: 'Guardando...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    
+        fetch('/api/ficha_evaluacion', {
+            method: 'POST',
+            body: formData  // Enviar FormData directamente
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: 'Ficha de evaluación guardada correctamente',
+                confirmButtonText: 'Aceptar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload();
+                }
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error al guardar la evaluación'
+            });
+        });
+    });
+
+
+</script>
+{% endblock %}

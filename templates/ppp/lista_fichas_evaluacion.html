@@ -1,0 +1,249 @@
+{% extends "ppp/home.html" %}
+
+{% block titulo %}Lista de Fichas de Evaluación{% endblock %}
+
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de
+                Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item active">Lista de Fichas de Evaluación</li>
+    </ol>
+</nav>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Lista de Fichas de Evaluación de Desempeño</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tablaFichas" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Estudiante</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir el modal aquí -->
+{% include 'ppp/modal_ficha_evaluacion.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#tablaFichas').DataTable({
+            ajax: {
+                url: '/api/fichas_evaluacion',
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: 'idFichaEvaluacion' },
+                { data: 'nombres_estudiante' },
+                {
+                    data: 'fecha_evaluacion',
+                    render: function (data) {
+                        return moment(data).format('DD/MM/YYYY');
+                    }
+                },
+                { data: 'estado' },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `
+                            <button class="btn btn-primary btn-sm" onclick="verFicha(${row.idFichaEvaluacion})">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="editarFicha(${row.idFichaEvaluacion})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+            },
+            responsive: true,
+            order: [[0, 'desc']]
+        });
+    });
+
+    function cargarDatosFicha(data, modoEdicion = false) {
+        // Datos básicos
+        $('#modal_idFichaEvaluacion').val(data.idFichaEvaluacion);
+        $('#modal_idPractica').val(data.idPractica);
+        $('#modal_nombres_estudiante').val(data.nombres_estudiante);
+        $('#modal_escuela_profesional').val(data.escuela_profesional);
+        $('#modal_periodo_practicas').val(data.periodo_practicas);
+        $('#modal_area_desempeno').val(data.area_desempeno);
+        $('#modal_nombre_empresa').val(data.nombre_empresa);
+        $('#modal_direccion_empresa').val(data.direccion_empresa);
+        $('#modal_nombre_responsable').val(data.nombre_responsable);
+        $('#modal_correo_responsable').val(data.correo_responsable);
+
+        // Características evaluadas
+        $('#modal_responsabilidad').val(data.responsabilidad || '');
+        $('#modal_proactividad').val(data.proactividad || '');
+        $('#modal_comunicacion_asertiva').val(data.comunicacion_asertiva || '');
+        $('#modal_trabajo_equipo').val(data.trabajo_equipo || '');
+        $('#modal_compromiso_calidad').val(data.compromiso_calidad || '');
+        $('#modal_organizacion_trabajo').val(data.organizacion_trabajo || '');
+        $('#modal_puntualidad_asistencia').val(data.puntualidad_asistencia || '');
+        $('#modal_conclusiones').val(data.conclusiones || '');
+
+        // Resultados y calificaciones
+        for (let i = 1; i <= 10; i++) {
+            const resultadoKey = `resultado${i}`;
+            const calificacionKey = `calificacion_resultado${i}`;
+
+            // Cargar el resultado y calificación
+            const resultado = data[resultadoKey] || '';
+            const calificacion = data[calificacionKey] || '';
+
+            $(`#modal_resultado${i}`).val(resultado);
+            $(`#modal_calificacion_resultado${i}`).val(calificacion);
+
+            // Configurar el modo edición para estos campos
+            $(`#modal_resultado${i}`).prop('readonly', !modoEdicion);
+            $(`#modal_calificacion_resultado${i}`).prop('disabled', !modoEdicion);
+        }
+
+        // Firma
+        const firmaPreview = $('#modal_firma_preview');
+        const firmaPlaceholder = $('#modal_firma_placeholder');
+        if (data.firma) {
+            firmaPreview.attr('src', data.firma).show();
+            firmaPlaceholder.hide();
+        } else {
+            firmaPreview.hide();
+            firmaPlaceholder.show();
+        }
+
+        // Configurar modo (ver/editar)
+        const elementos = $('#formFichaEvaluacion').find('input, select, textarea');
+        elementos.prop('readonly', !modoEdicion);
+        elementos.prop('disabled', !modoEdicion);
+        $('#btnGuardarCambios').toggle(modoEdicion);
+        $('#modal_firma_input_container').toggle(modoEdicion);
+    }
+    // Función para ver una ficha
+    function verFicha(id) {
+        fetch(`/api/ficha_evaluacion/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener la ficha');
+                }
+                return response.json();
+            })
+            .then(data => {
+                cargarDatosFicha(data, false);
+                $('#modalFichaEvaluacion').modal('show');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar la ficha');
+            });
+    }
+
+    // Función para editar una ficha
+    function editarFicha(id) {
+        fetch(`/api/ficha_evaluacion/${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener la ficha');
+                }
+                return response.json();
+            })
+            .then(data => {
+                cargarDatosFicha(data, true);
+                $('#modalFichaEvaluacion').modal('show');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar la ficha');
+            });
+    }
+
+    $('#btnGuardarCambios').click(function () {
+        const formData = new FormData();
+
+        // Datos del Estudiante
+        formData.append('nombres_estudiante', $('#modal_nombres_estudiante').val());
+        formData.append('escuela_profesional', $('#modal_escuela_profesional').val());
+        formData.append('periodo_practicas', $('#modal_periodo_practicas').val());
+        formData.append('area_desempeno', $('#modal_area_desempeno').val());
+
+        // Datos de la Empresa
+        formData.append('nombre_empresa', $('#modal_nombre_empresa').val());
+        formData.append('direccion_empresa', $('#modal_direccion_empresa').val());
+        formData.append('nombre_responsable', $('#modal_nombre_responsable').val());
+        formData.append('correo_responsable', $('#modal_correo_responsable').val());
+
+
+        // Características evaluadas
+        formData.append('responsabilidad', $('#modal_responsabilidad').val());
+        formData.append('proactividad', $('#modal_proactividad').val());
+        formData.append('comunicacion_asertiva', $('#modal_comunicacion_asertiva').val());
+        formData.append('trabajo_equipo', $('#modal_trabajo_equipo').val());
+        formData.append('compromiso_calidad', $('#modal_compromiso_calidad').val());
+        formData.append('organizacion_trabajo', $('#modal_organizacion_trabajo').val());
+        formData.append('puntualidad_asistencia', $('#modal_puntualidad_asistencia').val());
+
+        // Resultados y calificaciones
+        for (let i = 1; i <= 10; i++) {
+            const resultado = $(`#modal_resultado${i}`).val();
+            const calificacion = $(`#modal_calificacion_resultado${i}`).val();
+
+            // Solo enviar si hay un resultado o una calificación
+            if (resultado || calificacion) {
+                formData.append(`resultado${i}`, resultado || '');
+                formData.append(`calificacion_resultado${i}`, calificacion || '');
+            }
+        }
+
+        // Conclusiones
+        formData.append('conclusiones', $('#modal_conclusiones').val());
+
+        // Firma
+        const firmaInput = $('#modal_firma')[0];
+        if (firmaInput && firmaInput.files[0]) {
+            formData.append('firma', firmaInput.files[0]);
+        }
+
+        const id = $('#modal_idFichaEvaluacion').val();
+
+        fetch(`/api/ficha_evaluacion/${id}`, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Ficha actualizada correctamente');
+                    $('#modalFichaEvaluacion').modal('hide');
+                    $('#tablaFichas').DataTable().ajax.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al actualizar la ficha');
+            });
+    });
+</script>
+{% endblock %}
