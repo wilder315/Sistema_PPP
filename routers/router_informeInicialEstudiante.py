@@ -24,17 +24,14 @@ def get_institucion_responsable(numDoc):
 def agregar_informe_inicial_estudiante_route():
     try:
         data = request.get_json()
-        
-        # Extraer datos del JSON recibido
-        idInforme = data.get("idInforme")  # Puede ser None si es un nuevo informe
+        idInforme = data.get("idInforme")
         idPractica = data.get("idPractica")
         fecha = data.get('fecha')
         objetivos = data.get("objetivos", [])
         plan_trabajos = data.get("plan_trabajos", [])
-        firma1 = data.get("firma1")  # Firma del estudiante
-        firma2 = data.get("firma2")  # Firma del responsable
+        firma1 = data.get("firma1")
+        firma2 = data.get("firma2")
 
-        # Llamar a la función de controlador
         resultado = agregar_informe_inicial_estudiante(
             idInforme=idInforme,
             idPractica=idPractica,
@@ -44,11 +41,7 @@ def agregar_informe_inicial_estudiante_route():
             firma1=firma1,
             firma2=firma2
         )
-        
-
-        # Devolver resultado al cliente
         return jsonify(resultado)
-
     except Exception as e:
         print(f"Error en la ruta: {e}")
         return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
@@ -126,6 +119,11 @@ def obtener_informe_final_estudiante(idEstudiante, idPractica):
     resultado = controlador_informeInicialEstudiante.obtener_informe_final_estudiante(idEstudiante, idPractica)
     return jsonify(resultado)
 
+@router_informe.route("/obtener_informe_inicial_estudiante/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
+def obtener_informe_inicial_estudiante(idEstudiante, idPractica):
+    resultado = controlador_informeInicialEstudiante.obtener_informe_inicial_estudiante(idEstudiante, idPractica)
+    return jsonify(resultado)
+
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
     try:
@@ -159,3 +157,9 @@ def agregar_informe_final_empresa():
 def estado_informe_final(idEstudiante):
     resultado = controlador_informeInicialEstudiante.obtener_estado_informe_final_estudiante(idEstudiante)
     return jsonify(resultado)
+
+@router_informe.route("/estado_informe_inicial/<int:idEstudiante>", methods=["GET"])
+def estado_informe_inicial(idEstudiante):
+    resultado = controlador_informeInicialEstudiante.obtener_estado_informe_inicial_estudiante(idEstudiante)
+    return jsonify(resultado)
+

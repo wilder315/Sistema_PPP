@@ -47,22 +47,18 @@ def obtener_responsable_institucion(numDoc):
         conexion.close()
 
 def agregar_informe_inicial_estudiante(
-        idInforme, idPractica, fecha, objetivos, plan_trabajos, firma1, firma2
-    ):
+    idInforme, idPractica, fecha, objetivos, plan_trabajos, firma1, firma2
+):
     conexion = obtener_conexion()
-    tipoInforme = 1  # Asumiendo que 1 corresponde a "Informe Inicial"
-    estado = 'P'  # Estado inicial del informe
+    tipoInforme = 1
+    estado = 'P'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-    
-    # Validar datos obligatorios
     if not idPractica or not fecha or not firma1 or not firma2:
         return {"error": "Faltan datos obligatorios para registrar el informe inicial."}
-
     try:
         with conexion.cursor() as cursor:
-            if idInforme:
-                # Actualización del informe inicial existente
+            if idInforme:  # Si `idInforme` está presente, actualizamos el informe existente
                 cursor.execute("""
                     UPDATE informe
                     SET estado = %s, fecha = %s, firma1 = %s, firma2 = %s
@@ -70,11 +66,10 @@ def agregar_informe_inicial_estudiante(
                 """, (
                     estado, fecha, firma1, firma2, idInforme
                 ))
-                # Eliminar objetivos y plan de trabajo antiguos asociados al informe
+                # Eliminar objetivos y plan de trabajo anteriores
                 cursor.execute("DELETE FROM objetivos WHERE idInforme = %s", (idInforme,))
                 cursor.execute("DELETE FROM plan_trabajo WHERE idInforme = %s", (idInforme,))
-            else:
-                # Registro de un nuevo informe inicial
+            else:  # Si no hay `idInforme`, creamos uno nuevo
                 cursor.execute("""
                     INSERT INTO informe (
                         estado, fecha, firma1, firma2, idTipoInforme
@@ -83,16 +78,16 @@ def agregar_informe_inicial_estudiante(
                 """, (
                     estado, fecha, firma1, firma2, tipoInforme
                 ))
-                idInforme = cursor.lastrowid
-
-            # Insertar objetivos
+                idInforme = cursor.lastrowid  # Obtener el ID del nuevo informe
+            
+            # Insertar los nuevos objetivos
             for objetivo in objetivos:
                 cursor.execute("""
                     INSERT INTO objetivos (descripcion, idInforme)
                     VALUES (%s, %s)
                 """, (objetivo, idInforme))
-
-            # Insertar plan de trabajo
+            
+            # Insertar los nuevos planes de trabajo
             for plan_trabajo in plan_trabajos:
                 if not all(key in plan_trabajo for key in ['semana', 'fechaInicio', 'fechaFin', 'actividades', 'horas']):
                     return {"error": "El plan de trabajo no tiene todos los campos requeridos."}
@@ -107,16 +102,22 @@ def agregar_informe_inicial_estudiante(
                     plan_trabajo['horas'],
                     idInforme
                 ))
-
-            # Asociar el informe con la práctica preprofesional
+            
+            # Verificar si ya existe la relación en informes_practicas_preprofesionales
             cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
-                VALUES (%s, %s)
+                SELECT COUNT(*) FROM informes_practicas_preprofesionales
+                WHERE idPractica = %s AND IidInforme = %s
             """, (idPractica, idInforme))
-
+            relacion_existe = cursor.fetchone()[0] > 0
+            
+            if not relacion_existe:  # Si no existe, insertamos la relación
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                """, (idPractica, idInforme))
+            
             conexion.commit()
             return {"mensaje": "Informe inicial de estudiante registrado correctamente."}
-
     except Exception as e:
         print(f"Error al registrar o modificar el informe inicial: {str(e)}")
         conexion.rollback()
@@ -372,6 +373,91 @@ def obtener_estado_informe_final_estudiante(idEstudiante):
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 WHERE pp.idPersona = %s
                   AND i.idTipoInforme = 3
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante,))
+            
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                estado = resultado[0]
+                if estado == 'A':  # Aprobado
+                    return {"estado": 3}
+                elif estado == 'P':  # Pendiente
+                    return {"estado": 2}
+                elif estado == 'R':  # Rechazado
+                    return {"estado": 1}
+            return {"estado": 0}  # No tiene informe de tipo 3
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def obtener_informe_inicial_estudiante(idEstudiante, idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}   
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    i.fecha, i.idInforme, i.firma1, i.firma2
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s AND pp.idPractica = %s AND i.idTipoInforme = 1
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante, idPractica))
+            informe = cursor.fetchone()           
+            if not informe:
+                return {"error": "No se encontró un informe inicial asociado a esta práctica."}  
+            column_names = [desc[0] for desc in cursor.description]
+            informe_dict = dict(zip(column_names, informe))
+            cursor.execute("""
+                SELECT idObjetivos, descripcion
+                FROM objetivos
+                WHERE idInforme = %s
+            """, (informe_dict['idInforme'],))
+            objetivos = cursor.fetchall()
+            informe_dict['objetivos'] = [
+                {"idObjetivos": obj[0], "descripcion": obj[1]} for obj in objetivos
+            ]
+            cursor.execute("""
+                SELECT idPlab, semana, fechaInicio, fechaFin, actividades, horas
+                FROM plan_trabajo
+                WHERE idInforme = %s
+            """, (informe_dict['idInforme'],))
+            actividades = cursor.fetchall()
+            informe_dict['actividades'] = [
+                {
+                    "idPlab": act[0],
+                    "semana": act[1],
+                    "fechaInicio": act[2],
+                    "fechaFin": act[3],
+                    "actividades": act[4],
+                    "horas": act[5],
+                } for act in actividades
+            ]          
+            return informe_dict
+    except Exception as e:
+        return {"error": f"Error al obtener el informe inicial: {str(e)}"} 
+    finally:
+        conexion.close()
+
+def obtener_estado_informe_inicial_estudiante(idEstudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT i.estado
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s
+                  AND i.idTipoInforme = 1
                 ORDER BY i.fecha DESC
                 LIMIT 1
             """, (idEstudiante,))

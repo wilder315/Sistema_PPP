@@ -13,19 +13,27 @@
     body {
         overflow: hidden;
     }
-    .scrollable {
-    height: 42%;
-    overflow-y: auto;
-    }
     fieldset {
         margin-bottom: 20px;
         padding-bottom: 15px;
     }
     .form-label {
         margin-bottom: 5px;
-        
+    }
+    td > textarea {
+        padding: 0;
+    }
+
+    td {
+        padding: 0 !important;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
     }
 </style>
+
 <div class="container-fluid my-4">
     <div class="card w-100" style="height: 100%;">
         <div class="card-header bg-red-usat text-white">
@@ -35,9 +43,9 @@
             <form id="form-informe">
                 <!-- Encabezado -->
                 <fieldset>   
-                    <div class="row">      
-                        <div class="col-5">
-                            <label for="estudiante" class="form-label">Estudiante:</label>
+                    <div class="row align-items-end">      
+                        <div class="col-4">
+                            <label for="estudianteb" class="form-label">Estudiante:</label>
                             <div class="d-flex align-items-end">
                                 <div class="flex-grow-1 me-2">
                                     <div class="custom-combo">
@@ -49,11 +57,15 @@
                                     <i class="bi bi-search"></i>
                                 </button>
                             </div>
-                        </div>                                     
-                        <div class="col"></div>  
+                        </div>
+                        <div class="col-4 offset-4 d-flex justify-content-end align-items-center">
+                            <span id="estado-indicador" class="badge d-none me-3"></span>
+                            <button id="btnCancelar" type="button" class="btn btn-danger me-2">Cancelar</button>
+                            <button id="btnGuardar" type="submit" class="btn btn-primary">Guardar Informe</button>     
+                        </div> 
                         <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
-                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">  
-                        <input type="hidden" id="idInformeMod" name="idInformeMod">                                                                                       
+                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">
+                        <input type="hidden" id="idInformeMod" name="idInformeMod">                                                                                                
                     </div>   
                 </fieldset>
                 <div class="row">    
@@ -102,14 +114,12 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="institucion" class="form-label">Nombre de la Institución:</label>
-                                            <select class="form-control" id="institucion" name="institucion" required>
-                                                <option value="" selected disabled>Seleccione una institución</option>
-                                            </select>
+                                            <input type="text" class="form-control" id="institucion" name="nombre_responsable" readonly>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="nombre_responsable" class="form-label">Nombre del Responsable:</label>
-                                            <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" readonly>
-                                        </div>
+                                            <label for="cargo_responsable" class="form-label">Cargo:</label>
+                                            <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
+                                        </div>    
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
@@ -117,30 +127,30 @@
                                             <input type="text" class="form-control" id="apellido_responsable" name="apellido_responsable" readonly>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="cargo_responsable" class="form-label">Cargo:</label>
-                                            <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" readonly>
+                                            <label for="nombre_responsable" class="form-label">Nombre del Responsable:</label>
+                                            <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="firmas" role="tabpanel" aria-labelledby="firmas-tab">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label for="firma_estudiante" class="form-label">Firma del Estudiante:</label>
-                                            <input type="file" class="form-control" id="firma_estudiante" name="firma_estudiante" accept="image/*" required>
+                                            <label for="firma1" class="form-label">Firma del Estudiante:</label>
+                                            <input type="file" class="form-control" id="firma1" name="firma1" accept="image/*" required>
                                             <div class="mt-2">
-                                                <img id="firma_estudiante-preview" src="#" alt="Vista previa de la firma_estudiante" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                                                <img id="firma1-preview" src="#" alt="Vista previa de la firma1" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="firma_responsable" class="form-label">Firma del Responsable:</label>
-                                            <input type="file" class="form-control" id="firma_responsable" name="firma_responsable" accept="image/*" required>
+                                            <label for="firma2" class="form-label">Firma del Responsable:</label>
+                                            <input type="file" class="form-control" id="firma2" name="firma2" accept="image/*" required>
                                             <div class="mt-2">
-                                                <img id="firma_responsable-preview" src="#" alt="Vista previa de la firma_responsable" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                                                <img id="firma2-preview" src="#" alt="Vista previa de la firma2" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="fecha_entrega" class="form-label">Fecha de Entrega del Informe:</label>
-                                            <input type="date" class="form-control" id="fecha_entrega" name="fecha_entrega" required readonly>
+                                            <label for="fecha" class="form-label">Fecha de Entrega del Informe:</label>
+                                            <input type="date" class="form-control" id="fecha" name="fecha" required readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -169,12 +179,12 @@
                                     <fieldset>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
-                                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                                <label for="fechaInicio" class="form-label">Fecha de Inicio:</label>
+                                                <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required readonly>
                                             </div>
                                             <div class="col-md-6">
-                                                <label for="fecha_fin" class="form-label">Fecha de Término:</label>
-                                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                                                <label for="fechaFin" class="form-label">Fecha de Término:</label>
+                                                <input type="date" class="form-control" id="fechaFin" name="fechaFin" required readonly>
                                             </div>
                                         </div>
                                     </fieldset>
@@ -190,15 +200,15 @@
                                         <table class="table table-bordered" id="tabla-objetivos">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 15%;" class="text-center">Nº</th>
+                                                    <th style="width: 15%;" class="text-center">N°</th>
                                                     <th>Objetivo</th>
-                                                    <th style="width: 10%;">Seleccionar</th>
+                                                    <th style="width: 10%;">Select</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td><input type="text" class="form-control" name="numero_objetivo[]" placeholder="1" required></td>
-                                                    <td><input type="text" class="form-control" name="objetivo[]" placeholder="Descripción del objetivo" required></td>
+                                                    <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
+                                                    <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
                                                     <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
                                                 </tr>
                                             </tbody>
@@ -216,22 +226,22 @@
                                         <table class="table table-bordered" id="tabla-plan-trabajo">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 10%;">Semana</th>
-                                                    <th>Fechas</th>
+                                                    <th style="width: 6%;">N°</th>
+                                                    <th style="width: 18%;">Fechas</th>
                                                     <th>Actividades</th>
-                                                    <th>Horas</th>
-                                                    <th style="width: 10%;">Seleccionar</th>
+                                                    <th style="width: 10%;">Horas</th>
+                                                    <th style="width: 10%;">Select</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td><input type="text" class="form-control" name="semana[]" placeholder="1" required></td>
+                                                    <td><input type="text" min="0" class="form-control" name="semana[]" value=1 required readonly></td>
                                                     <td>
                                                         <input type="date" class="form-control" name="fecha_inicio[]" required>
                                                         <input type="date" class="form-control" name="fecha_fin[]" required>
                                                     </td>
-                                                    <td><input type="text" class="form-control" name="actividad[]" placeholder="Descripción de la actividad" required></td>
-                                                    <td><input type="number" class="form-control" name="horas[]" placeholder="Horas" required></td>
+                                                    <td><textarea type="text" class="form-control" name="actividad[]" required></textarea></td>
+                                                    <td><input type="number" class="form-control" name="horas[]" required></td>
                                                     <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
                                                 </tr>
                                             </tbody>
@@ -239,248 +249,212 @@
                                     </fieldset>
                                 </div>
                             </div>
-                        </div>
-                        
+                        </div>   
                     </div>
-                </div>
-                <div class="text-end">
-                    <button id="btnGuardar" type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    $(document).ready(function() {
-        cargarInstituciones();
+    // Evento para cuando cargas la página
+    document.addEventListener('DOMContentLoaded', function() {
+        limpiarControles();
     });
 
-    // Agregar nueva fila de objetivo
-    $('#agregarObjetivo').on('click', function() {
-        const nuevaFila = `<tr>
-            <td><input type="text" class="form-control" name="numero_objetivo[]" placeholder="#" required></td>
-            <td><input type="text" class="form-control" name="objetivo[]" placeholder="Descripción del objetivo" required></td>
-            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
-        </tr>`;
-        $('#tabla-objetivos tbody').append(nuevaFila);
+    // Evento para Cancelar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        limpiarControles();
     });
 
-    // Eliminar filas seleccionadas de objetivos
-    $('#eliminarObjetivo').on('click', function() {
-        $('.seleccionar-objetivo:checked').closest('tr').remove();
-    });
-
-    // Agregar nueva fila de plan de trabajo
-    $('#agregarPlanTrabajo').on('click', function() {
-        const nuevaFila = `<tr>
-            <td><input type="text" class="form-control" name="semana[]" placeholder="Semana" required></td>
-            <td>
-                <input type="date" class="form-control" name="fecha_inicio[]" required>
-                <input type="date" class="form-control" name="fecha_fin[]" required>
-            </td>
-            <td><input type="text" class="form-control" name="actividad[]" placeholder="Descripción de la actividad" required></td>
-            <td><input type="number" class="form-control" name="horas[]" placeholder="Horas" required></td>
-            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
-        </tr>`;
-        $('#tabla-plan-trabajo tbody').append(nuevaFila);
-    });
-
-    // Función para cargar las prácticas dinámicamente
-
-
-    // Eliminar filas seleccionadas del plan de trabajo
-    $('#eliminarPlanTrabajo').on('click', function() {
-        $('.seleccionar-plan:checked').closest('tr').remove();
-    });
-
-    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
-    event.preventDefault(); // Evitar el envío automático del formulario
-
-    try {
-        // Obtener valores del formulario
-        const idInforme = document.getElementById('idInformeMod').value || null;
-        const idPractica = document.getElementById('id').value;
-        const fechaEntrega = document.getElementById('fecha_entrega').value;
-
-        // Procesar archivos de firmas en Base64
-        const firmaEstudianteInput = document.getElementById('firma_estudiante');
-        const firmaResponsableInput = document.getElementById('firma_responsable');
-
-        const firmaEstudiante = firmaEstudianteInput.files[0]
-            ? await convertirABase64(firmaEstudianteInput.files[0])
-            : null;
-
-        const firmaResponsable = firmaResponsableInput.files[0]
-            ? await convertirABase64(firmaResponsableInput.files[0])
-            : null;
-
-        // Recopilar los objetivos
-        const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos input[name="objetivo[]"]'))
-            .map(input => input.value.trim())
-            .filter(value => value !== '');
-
-        // Recopilar el plan de trabajo
-        const planTrabajo = Array.from(document.querySelectorAll('#tabla-plan-trabajo tbody tr')).map(row => ({
-            semana: row.querySelector('input[name="semana[]"]').value.trim(),
-            fechaInicio: row.querySelector('input[name="fecha_inicio[]"]').value,
-            fechaFin: row.querySelector('input[name="fecha_fin[]"]').value,
-            actividades: row.querySelector('input[name="actividad[]"]').value.trim(),
-            horas: parseInt(row.querySelector('input[name="horas[]"]').value, 10)
-        }));
-
-        // Validar campos obligatorios
-        if (!idPractica || !fechaEntrega || !firmaEstudiante || !firmaResponsable) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Campos incompletos',
-                text: 'Por favor, complete todos los campos obligatorios.',
-            });
-            return;
-        }
-
-        // Crear el objeto de datos para enviar
-        const data = {
-            idInforme,
-            idPractica,
-            fecha: fechaEntrega,
-            objetivos,
-            plan_trabajos: planTrabajo,
-            firma1: firmaEstudiante,
-            firma2: firmaResponsable,
-        };
-
-        // Realizar la solicitud al backend
-        const response = await fetch('/agregar_informe_inicial_estudiante', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        // Manejar la respuesta del servidor
-        if (response.ok && result.mensaje) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Informe guardado',
-                text: result.mensaje,
-            });
-            // Limpiar el formulario o redirigir si es necesario
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error al guardar',
-                text: result.error || 'No se pudo guardar el informe.',
-            });
-        }
-    } catch (error) {
-        console.error('Error al procesar la solicitud:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un error al procesar la solicitud. Verifique su conexión e intente de nuevo.',
+    // Función para convertir archivos a Base64
+    function convertirABase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
         });
     }
-});
 
-// Función para convertir archivos a Base64
-async function convertirABase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-    });
-}
+    // Función para formatear la fecha
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 
-// Variables globales para almacenar las firmas previas
-let firma_estudianteBase64Previo = null;
-let firma_responsableBase64Previo = null;
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
 
-// Evento para vista previa de la firma_estudiante
-document.getElementById('firma_estudiante').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        const preview = document.getElementById('firma_estudiante-preview');
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.src = '#';
-            preview.style.display = 'none';
+    // Función para deshabilitar los tabs
+    function disableTabs() {
+        const tabs = document.querySelectorAll('.datos-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.datos-tabs .tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.add('disabled');
+            tab.setAttribute('aria-disabled', 'true');
+            tab.removeAttribute('data-bs-toggle');
+        });
+        tabContents.forEach(content => {
+            content.classList.add('disabled');
+        });
+    }
+
+    // Función para habilitar los tabs
+    function enableTabs() {
+        const tabs = document.querySelectorAll('.datos-tabs .nav-link');
+        const tabContents = document.querySelectorAll('.datos-tabs .tab-pane');
+        tabs.forEach(tab => {
+            tab.classList.remove('disabled');
+            tab.removeAttribute('aria-disabled');
+            tab.setAttribute('data-bs-toggle', 'tab');
+        });
+        tabContents.forEach(content => {
+            content.classList.remove('disabled');
+        });
+    }
+
+    function limpiarControles() {     
+        const camposTexto = [
+            'nombre', 'apellidos', 'escuelap', 'código', 'semestre', 
+            'institución', 'nombre_responsable', 'apellido_responsable', 
+            'cargo_responsable', 'fecha', 'fechaInicio', 'fechaFin', 
+            'estudianteb', 'id', 'idInformeMod', 'idPersonaMod', 'firma1', 
+            'firma2'
+        ];
+        camposTexto.forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = '';
+        });
+        const camposHabilitables = ['estudianteb', 'dropdown-estudiantes', 'id', 'idPersonaMod'];
+        camposHabilitables.forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.disabled = false;
+        });
+        const firmaEstudiantePreview = document.getElementById('firma1-preview');
+        if (firmaEstudiantePreview) {
+            firmaEstudiantePreview.src = '#';
+            firmaEstudiantePreview.style.display = 'none';
         }
-    });
-
-    // Evento para vista previa de la firma_responsable
-    document.getElementById('firma_responsable').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        const preview = document.getElementById('firma_responsable-preview');
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            preview.src = '#';
-            preview.style.display = 'none';
+        const firmaResponsablePreview = document.getElementById('firma2-preview');
+        if (firmaResponsablePreview) {
+            firmaResponsablePreview.src = '#';
+            firmaResponsablePreview.style.display = 'none';
         }
-    });
+        idPersona = '';
+        firma1Base64Previo = null;
+        firma2Base64Previo = null;
+        const tablaObjetivos = document.getElementById('tabla-objetivos');
+        if (tablaObjetivos) {
+            const tbodyO = tablaObjetivos.querySelector('tbody');
+            if (tbodyO) {
+                tbodyO.innerHTML = `
+                    <tr>
+                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
+                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
+                    </tr>
+                `;
+            }
+        }
+        const tablaPlan = document.getElementById('tabla-plan-trabajo');
+        if (tablaPlan) {
+            const tbodyP = tablaPlan.querySelector('tbody');
+            if (tbodyP) {
+                tbodyP.innerHTML = `
+                    <tr>
+                        <td><input type="text" min="0" class="form-control" name="semana[]" value=1 required readonly></td>
+                        <td>
+                            <input type="date" class="form-control" name="fecha_inicio[]" required>
+                            <input type="date" class="form-control" name="fecha_fin[]" required>
+                        </td>
+                        <td><textarea type="text" class="form-control" name="actividad[]" required></textarea></td>
+                        <td><input type="number" class="form-control" name="horas[]" required></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
+                    </tr>
+                `;
+            }
+        }
+        const estudianteTab = document.getElementById('estudiante-tab');
+        if (estudianteTab) {
+            const bootstrapTab = new bootstrap.Tab(estudianteTab);
+            bootstrapTab.show();
+        }
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (estadoIndicador) {
+            estadoIndicador.textContent = '';
+            estadoIndicador.classList.add('d-none');
+            estadoIndicador.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+        }
+        disableTabs();
+    }
 
-// Función para convertir archivos a Base64
-async function convertirABase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
-    });
-}
+    // Función para cargar datos de la institución
+    function obtenerDatosInstitucion(numDocInstitucion) {
+        const institucionInput = document.getElementById('institucion');
+        const nombreJefeInput = document.getElementById('nombre_responsable');
+        const apellidoJefeInput = document.getElementById('apellido_responsable');
+        const cargoJefeInput = document.getElementById('cargo_responsable');
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Realizar una solicitud a la API
-        fetch('/datos_ultimos_semestres_activos')
+        nombreJefeInput.value = '';
+        apellidoJefeInput.value = '';
+        cargoJefeInput.value = '';
+        fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Error en la respuesta del servidor");
+                    throw new Error('Error al obtener datos de la institución');
                 }
                 return response.json();
             })
             .then(data => {
-                // Verifica si hay un error en los datos retornados
-                if (data.error) {
-                    console.error(data.error);
-                    document.getElementById('semestre').value = "Error al cargar datos";
-                    alert("Error: " + data.error);
-                    return;
-                }
-
-                // Verifica si hay datos disponibles
-                if (data.length > 0) {
-                    // Suponiendo que deseas usar el primer semestre activo
-                    document.getElementById('semestre').value = data[0].nombre || "Semestre no definido";
+                if (data && data.length > 0) {
+                    institucionInput.value = data[0].razonSocial || 'Razón social no disponible';
+                    nombreJefeInput.value = data[0].nombre;
+                    apellidoJefeInput.value = data[0].apellidos;
+                    cargoJefeInput.value = data[0].cargo;
                 } else {
-                    // Muestra un mensaje si no hay semestres activos
-                    document.getElementById('semestre').value = "No hay semestres activos";
-                    alert("No hay ningún semestre activo disponible.");
+                    institucionInput.value = 'Razón social no disponible';
+                    nombreJefeInput.value = 'No se nombre de jefe';
+                    apellidoJefeInput.value = 'No se apellido de jefe';
+                    cargoJefeInput.value = 'No se encontró cargo';
                 }
             })
             .catch(error => {
-                // Manejo de errores generales
-                console.error('Error al obtener los datos de semestres:', error);
-                document.getElementById('semestre').value = "Error al cargar datos";
-                alert("Hubo un error al cargar los semestres. Por favor, inténtelo nuevamente.");
+                console.error('Error al obtener los datos de la institución:', error);
+                institucionInput.value = 'Razón social no disponible';    
+                nombreJefeInput.value = 'No se nombre de jefe';
+                apellidoJefeInput.value = 'No se apellido de jefe';
+                cargoJefeInput.value = 'No se encontró cargo';
             });
-    });
+    }
 
+    // Función para cargar datos de la práctica
+    function cargarDatosPractica(data) {
+        document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
+        document.getElementById('idPersonaMod').value = data.idPersona || '';
+        document.getElementById('fechaInicio').value = data.fechaInicio ? formatFechaParaInput(data.fechaInicio) : '';
+        document.getElementById('fechaFin').value = data.fechaFin ? formatFechaParaInput(data.fechaFin) : '';
+        if (data.numDocInstitucion) {
+            obtenerDatosInstitucion(data.numDocInstitucion);
+        }
+    }
+
+    // Función para cargar datos del estudiante
     function cargarDatosEstudiante(idEstudiante) {
         if (!idEstudiante) {
             console.error("ID de estudiante no proporcionado.");
@@ -498,7 +472,7 @@ async function convertirABase64(file) {
                 if (data && Object.keys(data).length > 0) {
                     document.getElementById('nombre').value = data.nombre || 'Sin nombre';
                     document.getElementById('apellidos').value = data.apellidos || 'Sin apellidos';
-                    document.getElementById('codigo').value = data.codigo || 'Sin escuela';
+                    document.getElementById('codigo').value = data.codUniversitario || 'Sin código';
                 } else {
                     mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
                 }
@@ -509,120 +483,261 @@ async function convertirABase64(file) {
             });
     }
 
-    // Evento al seleccionar una institución
-    document.getElementById('institucion').addEventListener('change', function() {
-        const numDocInstitucion = this.value;
-        if (numDocInstitucion) {
-            obtenerDatosInstitucion(numDocInstitucion);
-        }
-    });
-
-
-    // Cargar instituciones en el select
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_instituciones')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('institucion');
-                data.forEach(institucion => {
-                    const option = document.createElement('option');
-                    option.value = institucion.numDoc;
-                    option.textContent = institucion.razonSocial;
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    });
-    function obtenerDatosInstitucion(numDocInstitucion) {
-        const nombreJefeInput = document.getElementById('nombre_responsable');
-        const apellidoJefeInput = document.getElementById('apellido_responsable');
-        const cargoJefeInput = document.getElementById('cargo_responsable');
-
-        nombreJefeInput.value = '';
-        apellidoJefeInput.value = '';
-        cargoJefeInput.value = '';
-        fetch(`/jefe_institucion?ruc=${numDocInstitucion}`)
+    // Función para cargar el semestre
+    function cargarUltimosSemestresActivos(elementoID) {
+        fetch('/datos_ultimos_semestres_activos')
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Error al obtener datos de la institución');
+                    throw new Error("Error en la respuesta del servidor");
                 }
                 return response.json();
             })
             .then(data => {
-                if (data && data.length > 0) {
-                    nombreJefeInput.value = data[0].nombre;
-                    apellidoJefeInput.value = data[0].apellidos;
-                    cargoJefeInput.value = data[0].cargo;
+                const elemento = document.getElementById(elementoID);
+                if (data.error) {
+                    console.error(data.error);
+                    elemento.value = "Error al cargar datos";
+                    alert("Error: " + data.error);
+                    return;
+                }
+                if (data.length > 0) {
+                    elemento.value = data[0].nombre || "Semestre no definido";
                 } else {
-                    nombreJefeInput.value = 'No se nombre de jefe';
-                    apellidoJefeInput.value = 'No se apellido de jefe';
-                    cargoJefeInput.value = 'No se encontró cargo';
+                    elemento.value = "No hay semestres activos";
+                    alert("No hay ningún semestre activo disponible.");
                 }
             })
             .catch(error => {
-                console.error('Error al obtener los datos de la institución:', error);
-                    nombreJefeInput.value = 'No se nombre de jefe';
-                    apellidoJefeInput.value = 'No se apellido de jefe';
-                    cargoJefeInput.value = 'No se encontró cargo';
+                console.error('Error al obtener los datos de semestres:', error);
+                const elemento = document.getElementById(elementoID);
+                elemento.value = "Error al cargar datos";
+                alert("Hubo un error al cargar los semestres. Por favor, inténtelo nuevamente.");
             });
     }
 
-    document.getElementById('institucion').addEventListener('change', function() {
-        const numDocInstitucion = this.value;
-        if (numDocInstitucion) {
-            obtenerDatosInstitucion(numDocInstitucion);
-        }
+    // Llama a la función cuando el documento esté listo
+    document.addEventListener('DOMContentLoaded', function () {
+        cargarUltimosSemestresActivos('semestre');
     });
+
+    // Evento para desaparecer la lista de estudiantes
     document.addEventListener('click', function(event) {
         if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
             dropdownEstudiantes.classList.remove('show');
         }
     });
-    // Función para formatear la fecha
-    function formatFechaParaInput(fecha) {
-        const date = new Date(fecha);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate() + 1).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
 
-    // Función para buscar por Estudiante
-    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
-        event.preventDefault();
-        const idEstudiante = idPersona;
-        const fechaActualFormateada = formatFechaParaInput(new Date());
-        if (!idEstudiante) {
-            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
+    // Variables globales para almacenar las firmas previas
+    let firma1Base64Previo = null;
+    let firma2Base64Previo = null;
+
+    // Función para cargar datos del informe
+    function cargarDatosInforme(informe) {
+        if (!informe || informe.error) {
+            mostrarAlerta("warning", "Advertencia", informe ? informe.error : "No se encontraron datos del informe.");
             return;
         }
-        fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
-            .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error al obtener datos del estudiante');
-                    }
-                    return response.json();
-                })
-            .then(data => {
-                if (data.error) {
-                    mostrarAlerta("error", "Error", data.error);
-                } else if (data.mensaje) {
-                    mostrarAlerta("info", "Información", data.mensaje);
-                } else {
-                    const idInput = document.getElementById('id');
-                    if (idInput) {
-                        idInput.value = data.idPractica || '';
-                        idInput.disabled = true;
-                    }
-                    cargarDatosEstudiante(idEstudiante);
-                    document.getElementById('fecha_entrega').value = fechaActualFormateada;
-                    
-                }
-            })
-            .catch(error => {
-                console.error("Error al buscar la práctica del estudiante:", error);
-                mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+        document.getElementById('idInformeMod').value = informe.idInforme || '';
+
+        const firma1Preview = document.getElementById('firma1-preview');
+        if (informe.firma1) {
+            firma1Base64Previo = informe.firma1;
+            firma1Preview.src = `data:image/png;base64,${informe.firma1}`;
+            firma1Preview.style.display = 'block';
+        } else {
+            firma1Base64Previo = null;
+            firma1Preview.src = '#';
+            firma1Preview.style.display = 'none';
+        }
+
+        const firma2Preview = document.getElementById('firma2-preview');
+        if (informe.firma2) {
+            firma2Base64Previo = informe.firma2;
+            firma2Preview.src = `data:image/png;base64,${informe.firma2}`;
+            firma2Preview.style.display = 'block';
+        } else {
+            firma2Base64Previo = null;
+            firma2Preview.src = '#';
+            firma2Preview.style.display = 'none';
+        }
+
+        // Llenar la tabla de objetivos
+        const objetivosTableBody = document.querySelector('#tabla-objetivos tbody');
+        objetivosTableBody.innerHTML = '';
+        if (informe.objetivos && informe.objetivos.length > 0) {
+            informe.objetivos.forEach((objetivo, index) => {
+                const row = `
+                    <tr>
+                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="${index + 1}" required readonly></td>
+                        <td><textarea type="text" class="form-control" name="objetivo[]" required>${objetivo.descripcion}</textarea></td>
+                        <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
+                    </tr>
+                `;
+                objetivosTableBody.insertAdjacentHTML('beforeend', row);
             });
+        } else {
+            // Si no hay objetivos, mostrar una fila vacía
+            const emptyRow = `
+                <tr>
+                    <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="1" required readonly></td>
+                    <td><textarea type="text" class="form-control" name="objetivo[]" required></textarea></td>
+                    <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
+                </tr>
+            `;
+            objetivosTableBody.insertAdjacentHTML('beforeend', emptyRow);
+        }
+
+        // Llenar la tabla de planes de trabajo
+        const planesTableBody = document.querySelector('#tabla-plan-trabajo tbody');
+        planesTableBody.innerHTML = '';
+        if (informe.actividades && informe.actividades.length > 0) {
+            informe.actividades.forEach((plan, index) => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control text-center" name="semana[]" value="${plan.semana}" readonly>
+                        </td>
+                        <td>
+                            <input type="date" class="form-control" name="fecha_inicio[]" value="${formatFechaParaInput(plan.fechaInicio)}" required>
+                            <input type="date" class="form-control" name="fecha_fin[]" value="${formatFechaParaInput(plan.fechaFin)}" required>
+                        </td>
+                        <td>
+                            <textarea class="form-control" name="actividad[]" required>${plan.actividades}</textarea>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="horas[]" value="${plan.horas}" required>
+                        </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input seleccionar-plan">
+                        </td>
+                    </tr>
+                `;
+                planesTableBody.insertAdjacentHTML('beforeend', row);
+            });
+ 
+        } else {
+            // Si no hay planes, mostrar una fila vacía
+            const emptyRow = `
+                <tr>
+                    <td><input type="text" class="form-control text-center" name="semana[]" value="1" readonly></td>
+                    <td>
+                        <input type="date" class="form-control" name="fecha_inicio[]" required>
+                        <input type="date" class="form-control" name="fecha_fin[]" required>
+                    </td>
+                    <td><textarea class="form-control" name="actividad[]" required></textarea></td>
+                    <td><input type="number" class="form-control" name="horas[]" required></td>
+                    <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
+                </tr>
+            `;
+            planesTableBody.insertAdjacentHTML('beforeend', emptyRow);
+        }
+
+    }
+
+    // Función para mostrar el estado del informe
+    function actualizarEstadoIndicador(estado) {
+        const estadoIndicador = document.getElementById('estado-indicador');
+        estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+
+        if (estado === 3) {
+            estadoIndicador.textContent = 'Aprobado';
+            estadoIndicador.classList.add('bg-success');
+        } else if (estado === 2) {
+            estadoIndicador.textContent = 'Pendiente de aprobación';
+            estadoIndicador.classList.add('bg-warning');
+        } else if (estado === 1) {
+            estadoIndicador.textContent = 'Rechazado';
+            estadoIndicador.classList.add('bg-danger');
+        } else {
+            estadoIndicador.textContent = '';
+            estadoIndicador.classList.add('d-none');
+        }
+    }
+
+    // Evento para agregar nuevo objetivo
+    $('#agregarObjetivo').on('click', function() {
+        const tablaBody = $('#tabla-objetivos tbody');
+        let nuevoNumero = 1;
+        const numerosExistentes = tablaBody.find('input[name="numero_objetivo[]"]').map(function() {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+        if (numerosExistentes.length > 0) {
+            nuevoNumero = Math.max(...numerosExistentes) + 1;
+        }
+        const nuevaFila = `<tr>
+            <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="${nuevoNumero}" required readonly></td>
+            <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-objetivo"></td>
+        </tr>`;
+        tablaBody.append(nuevaFila);
+    });
+
+    // Evento para eliminar un objetivo
+    $('#eliminarObjetivo').on('click', function() {
+        $('.seleccionar-objetivo:checked').closest('tr').remove();
+    });
+
+    // Evento para agregar nueva actividad al plan de trabajo
+    $('#agregarPlanTrabajo').on('click', function() {
+        const tablaBody = $('#tabla-plan-trabajo tbody');
+        let nuevoNumero = 1;
+        const numerosExistentes = tablaBody.find('input[name="semana[]"]').map(function() {
+            return parseInt($(this).val(), 10) || 0;
+        }).get();
+
+        if (numerosExistentes.length > 0) {
+            nuevoNumero = Math.max(...numerosExistentes) + 1;
+        }
+        const nuevaFila = `<tr>
+            <td><input type="text" min="0" class="form-control" name="semana[]" value="${nuevoNumero}" required readonly></td>
+            <td>
+                <input type="date" class="form-control" name="fecha_inicio[]" required>
+                <input type="date" class="form-control" name="fecha_fin[]" required>
+            </td>
+            <td><textarea type="text" class="form-control" name="actividad[]" required></textarea></td>
+            <td><input type="number" class="form-control" name="horas[]" required></td>
+            <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-plan"></td>
+        </tr>`;
+        tablaBody.append(nuevaFila);
+    });
+
+    // Evento para eliminar una actividad del plan de trabajo
+    $('#eliminarPlanTrabajo').on('click', function() {
+        $('.seleccionar-plan:checked').closest('tr').remove();
+    });
+
+    // Evento para vista previa de la firma1
+    document.getElementById('firma1').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('firma1-preview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        });
+
+    // Evento para vista previa de la firma2
+    document.getElementById('firma2').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('firma2-preview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
     });
 
     // Función para mostrar y recuperar estudiantes en el dropdown-search
@@ -631,7 +746,7 @@ async function convertirABase64(file) {
     let idPersona = 0;
     inputEstudiante.addEventListener('input', function() {
         const searchText = this.value.toLowerCase();
-        fetch('/datos_estudiantes')
+        fetch('/datos_estudiantes_buscar')
             .then(response => response.json())
             .then(data => {
                 dropdownEstudiantes.innerHTML = '';
@@ -658,6 +773,281 @@ async function convertirABase64(file) {
             })
             .catch(error => console.error('Error:', error));
     });
+
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault();
+        const idEstudiante = idPersona;
+        const fechaActualFormateada = formatFechaParaInput(new Date());
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
+            return;
+        }
+        fetch(`/estado_informe_inicial/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener el estado del informe inicial');
+                }
+                return response.json();
+            })
+            .then(estadoData => {
+                const estado = estadoData.estado;
+                estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+                if (estado === 3) {
+                    estadoIndicador.textContent = 'Aprobado';
+                    estadoIndicador.classList.add('bg-success');
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_inicial_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe inicial del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        cargarUltimosSemestresActivos('semestre');
+                                        setFormularioSoloLectura(true, false);
+                                        document.getElementById('estudianteb').disabled = true;
+                                        document.getElementById('fecha').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe inicial:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe inicial del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else if (estado === 2 || estado === 1) {
+                    if (estado === 1) {
+                        estadoIndicador.textContent = 'Rechazado';
+                        estadoIndicador.classList.add('bg-danger');
+                        mostrarAlerta("warning", "Advertencia", "El estudiante tiene un informe inicial rechazado.");
+                    } else {
+                        estadoIndicador.textContent = 'Pendiente de aprobación';
+                        estadoIndicador.classList.add('bg-warning');
+                    }
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_inicial_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe inicial del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        cargarUltimosSemestresActivos('semestre');
+                                        enableTabs();
+                                        document.getElementById('estudianteb').disabled = true;
+                                        document.getElementById('fecha').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe inicial:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe inicial del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else {
+                    estadoIndicador.textContent = '';
+                    estadoIndicador.classList.add('d-none');
+                }
+                fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener datos del estudiante');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            mostrarAlerta("error", "Error", data.error);
+                            limpiarControles();
+                        } else if (data.mensaje) {
+                            mostrarAlerta("info", "Información", data.mensaje);
+                            limpiarControles();
+                        } else {
+                            const idInput = document.getElementById('id');
+                            if (idInput) {
+                                idInput.value = data.idPractica || '';
+                                idInput.disabled = true;
+                            }
+                            cargarDatosPractica(data);
+                            cargarDatosEstudiante(idEstudiante);
+                            cargarUltimosSemestresActivos('semestre');
+                            enableTabs();
+                            document.getElementById('estudianteb').disabled = true;
+                            document.getElementById('fecha').value = fechaActualFormateada;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar la práctica del estudiante:", error);
+                        mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                    });
+            })
+            .catch(error => {
+                console.error("Error al obtener el estado del informe inicial:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar el estado del informe inicial.");
+            });
+    });
+
+    // Función para habilitar/deshabilitar controles
+    function setFormularioSoloLectura(soloLectura) {
+        enableTabs();
+        const inputs = document.querySelectorAll('.tab-content input, .tab-content textarea, .tab-content select, .tab-content button:not(.nav-link)');
+        inputs.forEach(input => {
+            if (soloLectura) {
+                input.setAttribute('disabled', 'true');
+            } else {
+                input.removeAttribute('disabled');
+            }
+        });
+        const guardarBtn = document.getElementById('btnGuardar');
+        const cancelarBtn = document.getElementById('btnCancelar');
+        if (guardarBtn) {
+            guardarBtn.style.display = soloLectura ? 'none' : '';
+        }
+        if (cancelarBtn) {
+            cancelarBtn.style.display = '';
+        }
+    }
+
+    // Función para guardar el informe
+    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const idPractica = document.getElementById('id').value;
+        const idInforme = document.getElementById('idInformeMod').value;
+        const fecha = document.getElementById('fecha').value;
+
+        const firma1Input = document.getElementById('firma1');
+        const firma2Input = document.getElementById('firma2');
+        const firma1Base64 = firma1Input.files[0]
+            ? await convertirABase64(firma1Input.files[0])
+            : firma1Base64Previo;
+        const firma2Base64 = firma2Input.files[0]
+            ? await convertirABase64(firma2Input.files[0])
+            : firma2Base64Previo;
+
+        // Capturar objetivos
+        const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos textarea[name="objetivo[]"]'))
+            .map((textarea) => textarea.value.trim())
+            .filter((value) => value !== '');
+
+        // Capturar plan de trabajo
+        const plan_trabajos = Array.from(document.querySelectorAll('#tabla-plan-trabajo tbody tr')).map((row) => {
+            const semana = row.querySelector('input[name="semana[]"]').value;
+            const fechaInicio = row.querySelector('input[name="fecha_inicio[]"]').value;
+            const fechaFin = row.querySelector('input[name="fecha_fin[]"]').value;
+            const actividades = row.querySelector('textarea[name="actividad[]"]').value.trim();
+            const horas = row.querySelector('input[name="horas[]"]').value;
+
+            // Validar que no falten campos
+            if (!semana || !fechaInicio || !fechaFin || !actividades || !horas) {
+                return null;
+            }
+
+            return {
+                semana: parseInt(semana),
+                fechaInicio,
+                fechaFin,
+                actividades,
+                horas: parseFloat(horas),
+            };
+        }).filter((item) => item !== null); // Filtrar filas incompletas
+
+        // Validar campos obligatorios
+        if (!idPractica || !fecha || !firma1Base64 || !firma2Base64 || objetivos.length === 0 || plan_trabajos.length === 0) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, complete todos los campos requeridos.");
+            return;
+        }
+
+        // Log para depuración
+        console.log('ID Práctica:', idPractica);
+        console.log('ID Informe:', idInforme);
+        console.log('Fecha:', fecha);
+        console.log('Firma 1:', firma1Base64);
+        console.log('Firma 2:', firma2Base64);
+        console.log('Objetivos:', objetivos);
+        console.log('Plan de Trabajo:', plan_trabajos);
+
+        // Preparar datos para enviar
+        const data = {
+            idInforme,
+            idPractica,
+            fecha,
+            objetivos,
+            plan_trabajos,
+            firma1: firma1Base64,
+            firma2: firma2Base64,
+        };
+
+        // Enviar solicitud al servidor
+        fetch('/agregar_informe_inicial_estudiante', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                } else {
+                    mostrarAlerta("success", "Éxito", data.mensaje);
+                    limpiarControles();
+                }
+            })
+            .catch((error) => {
+                console.error('Error al guardar el informe:', error);
+                mostrarAlerta("error", "Error", "Hubo un error al guardar el informe.");
+            });
+    });
+
 
 
 </script>

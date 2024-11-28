@@ -297,7 +297,7 @@
     function convertirABase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]); // Solo la parte Base64
+            reader.onload = () => resolve(reader.result.split(',')[1]);
             reader.onerror = error => reject(error);
             reader.readAsDataURL(file);
         });
@@ -314,14 +314,14 @@
         
     // Funcion para mostrar alerta
     function mostrarAlerta(tipo, titulo, mensaje) {
-            Swal.fire({
-                icon: tipo,
-                title: titulo,
-                html: mensaje,
-                showConfirmButton: true,
-                timer: 5000
-            });
-        }
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
 
     // Función para deshabilitar los tabs
     function disableTabs() {
@@ -516,6 +516,13 @@
             });
     }
 
+    // Evento para desaparecer la lista de estudiantes
+    document.addEventListener('click', function(event) {
+        if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
+            dropdownEstudiantes.classList.remove('show');
+        }
+    });
+
     // Variables globales para almacenar los archivos previos
     let organigramaBase64Previo = null;
     let anexosBase64Previo = null;
@@ -637,7 +644,6 @@
         const numerosExistentes = tablaBody.find('input[name="numC[]"]').map(function() {
             return parseInt($(this).val(), 10) || 0;
         }).get();
-
         if (numerosExistentes.length > 0) {
             nuevoNumero = Math.max(...numerosExistentes) + 1;
         }

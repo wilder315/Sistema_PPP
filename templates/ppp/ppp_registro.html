@@ -444,6 +444,13 @@
         disableTabs();
     }
 
+    // Evento para desaparecer la lista de estudiantes
+    document.addEventListener('click', function(event) {
+        if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
+            dropdownEstudiantes.classList.remove('show');
+        }
+    });
+
     // Función para nueva práctica
     function nuevaPractica() {
         const estudianteInput = document.getElementById('estudiante');
@@ -499,7 +506,7 @@
 
     // Evento para cargar los últimos semestres actuales dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_ultimos_semestres')
+        fetch('/datos_ultimos_semestres_activos')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('semestrea');
@@ -515,7 +522,7 @@
 
     // Evento para cargar los últimos semestres finales dinámicamente
     document.addEventListener('DOMContentLoaded', function() {
-        fetch('/datos_ultimos_semestres')
+        fetch('/datos_ultimos_semestres_activos')
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById('semestrefinal');
