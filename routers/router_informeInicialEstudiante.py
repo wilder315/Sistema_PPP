@@ -124,6 +124,11 @@ def obtener_informe_inicial_estudiante(idEstudiante, idPractica):
     resultado = controlador_informeInicialEstudiante.obtener_informe_inicial_estudiante(idEstudiante, idPractica)
     return jsonify(resultado)
 
+@router_informe.route("/obtener_constancia/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
+def obtener_constancia(idEstudiante, idPractica):
+    resultado = controlador_informeInicialEstudiante.obtener_constancia(idEstudiante, idPractica)
+    return jsonify(resultado)
+
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
     try:
@@ -163,3 +168,24 @@ def estado_informe_inicial(idEstudiante):
     resultado = controlador_informeInicialEstudiante.obtener_estado_informe_inicial_estudiante(idEstudiante)
     return jsonify(resultado)
 
+@router_informe.route("/estado_constancia/<int:idEstudiante>", methods=["GET"])
+def estado_constancia(idEstudiante):
+    resultado = controlador_informeInicialEstudiante.obtener_estado_constancia(idEstudiante)
+    return jsonify(resultado)
+
+@router_informe.route("/agregar_constancia", methods=["POST"])
+def agregar_constancia():
+    try:
+        data = request.get_json()
+        idInforme = data.get("idInforme")
+        idPractica = data.get("idPractica")
+        anexos = data.get("anexos")
+
+        resultado = controlador_informeInicialEstudiante.agregar_constancia(
+            idInforme, idPractica, anexos
+        )
+
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error en la ruta: {e}")
+        return jsonify({"error": str(e)})

@@ -2,6 +2,7 @@ from bd import obtener_conexion
 from datetime import datetime
 
 # Obtener informes de los alumnos con sus prácticas y tipos de informes
+# Obtener informes de los alumnos con sus prácticas y tipos de informes
 def obtener_informeAlumno():
     conexion = obtener_conexion()
     if not conexion:
@@ -63,7 +64,19 @@ def obtener_informeAlumno():
                  FROM informes_practicas_preprofesionales ippp 
                  JOIN informe i ON ippp.IidInforme = i.idInforme
                  WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
-                 LIMIT 1) AS Informe_Tipo4_ID
+                 LIMIT 1) AS Informe_Tipo4_ID,
+                -- Informe de tipo 6
+                EXISTS(
+                    SELECT 1 
+                    FROM informes_practicas_preprofesionales ippp 
+                    JOIN informe i ON ippp.IidInforme = i.idInforme
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
+                ) AS Informe_Tipo6_Existe,
+                (SELECT i.idInforme 
+                 FROM informes_practicas_preprofesionales ippp 
+                 JOIN informe i ON ippp.IidInforme = i.idInforme
+                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
+                 LIMIT 1) AS Informe_Tipo6_ID
             FROM 
                 persona p
             JOIN 
@@ -89,6 +102,7 @@ def obtener_informeAlumno():
         conexion.close()
     
     return informesAlumnos
+
 
 # reporte 4
 def obtener_reporte_horas_practicas():

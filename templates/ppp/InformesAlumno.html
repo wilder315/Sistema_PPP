@@ -31,12 +31,13 @@
                         <tr>
                             <th style="text-align:center">Apellidos</th>
                             <th style="text-align:center">Nombres</th>                 
-                            <th style="text-align:center">Semestre Académico</th>
-                            <th style="text-align:center">ID Práctica</th>
+                            <th style="text-align:center">Semestre</th>
+                            <th style="text-align:center">Práctica</th>
                             <th style="text-align:center">I. Estudiante</th>
                             <th style="text-align:center">I. Empresa</th>
                             <th style="text-align:center">F. Estudiante</th>
                             <th style="text-align:center">F. Empresa</th>
+                            <th style="text-align:center">Constancia</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,9 +76,6 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="btnRevisarInforme" type="button" class="btn btn-primary">
-                    <i class="fas fa-eye"></i> Revisar
-                </button>
                 <button id="btnAprobarInforme" type="button" class="btn btn-success">
                     <i class="fas fa-check"></i> Aprobar
                 </button>
@@ -159,6 +157,17 @@
                                     <i class="fas fa-eye"></i>
                                 </button>`;
                     }
+                },
+                {
+                    data: "Informe_Tipo6_Existe",
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Tipo6_ID : ''}" data-tipo="Contancia de Prácticas">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
+                    }
                 }
             ],
             language: {
@@ -196,7 +205,8 @@
             1: "Informe Inicial (Estudiante)",
             2: "Informe Inicial (Empresa)",
             3: "Informe Final (Estudiante)",
-            4: "Informe Final (Empresa)"
+            4: "Informe Final (Empresa)",
+            6: "Constancia de Prácticas"
         };
 
         // Configurar el título del modal
@@ -223,13 +233,6 @@
 
         // Mostrar el modal
         $('#modalVisualizarInforme').modal('show');
-    });
-
-    // Evento para el botón "Revisar Informe"
-    document.getElementById('btnRevisarInforme').addEventListener('click', function () {
-        const idInforme = document.getElementById('idInforme').textContent.trim(); // Recuperar el ID del control en el modal
-        console.log('Revisar informe con ID:', idInforme);
-        // Implementar funcionalidad para revisar el informe
     });
 
     // Evento para el botón "Aprobar Informe"

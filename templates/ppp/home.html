@@ -207,6 +207,13 @@
                         <div class="collapse" id="informes">
                             <ul class="sidebar-nav">
                                 <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_main.constancia') }}"
+                                        id="informeFinalEmpresa" style="display: flex;">
+                                        <i class="fas fa-file-alt fa-lg"></i>
+                                        <span class="align-middle">Constancia de Prácticas</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
                                     <a class="sidebar-link" href="{{ url_for('router_main.InformesAlumno') }}"
                                         id="informesAlumno" style="display: flex;">
                                         <i class="fas fa-chart-line fa-lg"></i>
@@ -239,6 +246,20 @@
                                         id="informeFinalEmpresa" style="display: flex;">
                                         <i class="fas fa-file-alt fa-lg"></i>
                                         <span class="align-middle">Informe Final Empresa</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_ficha_evaluacion.ficha_evaluacion') }}"
+                                        id="fichaEvaluacion" style="display: flex;">
+                                        <i class="fas fa-clipboard-check fa-lg"></i>
+                                        <span class="align-middle">Ficha de Evaluación de Desempeño</span>
+                                    </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link" href="{{ url_for('router_ficha_evaluacion.listar_fichas_evaluacion') }}"
+                                        id="listaFichasEvaluacion" style="display: flex;">
+                                        <i class="fas fa-list-alt fa-lg"></i>
+                                        <span class="align-middle">Lista de Fichas de Evaluación</span>
                                     </a>
                                 </li>
                             </ul>
@@ -283,21 +304,7 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_ficha_evaluacion.ficha_evaluacion') }}"
-                            id="fichaEvaluacion" style="display: flex;">
-                            <i class="fas fa-clipboard-check fa-lg"></i>
-                            <span class="align-middle">Ficha de Evaluación de Desempeño</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url_for('router_ficha_evaluacion.listar_fichas_evaluacion') }}"
-                            id="listaFichasEvaluacion" style="display: flex;">
-                            <i class="fas fa-list-alt fa-lg"></i>
-                            <span class="align-middle">Lista de Fichas de Evaluación</span>
-                        </a>
-                    </li>
+                    
                 </ul>
             </div>
         </nav>

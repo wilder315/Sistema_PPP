@@ -189,6 +189,11 @@ def institucion():
 def jefe(): 
     return render_template('ppp/jefe.html')
 
+@router_main.route('/constancia')
+@no_cache_and_login_required
+def constancia(): 
+    return render_template('ppp/constanciaPracticas.html')
+
 @router_main.route("/InformeInicialEstudiante")
 @no_cache_and_login_required
 def informeInicialEstudiante():

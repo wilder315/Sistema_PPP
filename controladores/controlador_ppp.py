@@ -201,7 +201,15 @@ def informes_practica(idPractica):
                         WHERE dipp.idPractica = p.idPractica 
                         AND i.idTipoInforme = 4 
                         AND i.estado = 'A'
-                    ) AS informe4
+                    ) AS informe4,
+                    EXISTS (
+                        SELECT 1 
+                        FROM informes_practicas_preprofesionales dipp
+                        JOIN informe i ON dipp.IidInforme = i.idInforme
+                        WHERE dipp.idPractica = p.idPractica 
+                        AND i.idTipoInforme = 6 
+                        AND i.estado = 'A'
+                    ) AS informe6
                 FROM 
                     practicas_preprofesionales p
                 WHERE 

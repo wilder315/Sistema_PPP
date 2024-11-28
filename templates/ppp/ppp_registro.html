@@ -301,8 +301,8 @@
                                     <div class="row mb-3">                     
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <label for="constancia" class="form-check-label ms-2">Constancia de PPP:</label>
-                                                <input type="checkbox" class="form-check-input" id="constancia" name="constancia">                      
+                                                <label for="constanciappp" class="form-check-label ms-2">Constancia de PPP:</label>
+                                                <input type="checkbox" class="form-check-input" id="constanciappp" name="constanciappp">                      
                                             </div>
                                         </div>          
                                     </div>
@@ -332,6 +332,9 @@
         e.preventDefault(); // Evita el cambio de estado
     });
     document.getElementById('finalinstitucion').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
+    document.getElementById('constanciappp').addEventListener('click', function (e) {
         e.preventDefault(); // Evita el cambio de estado
     });
 
@@ -824,6 +827,7 @@
         document.getElementById('inicialinstitucion').checked = data.informe2 || false;
         document.getElementById('finalestudiante').checked = data.informe3 || false;
         document.getElementById('finalinstitucion').checked = data.informe4 || false;
+        document.getElementById('constanciappp').checked = data.informe6 || false;
     }
 
     function cargarSupervisiones(idPractica) {
@@ -932,11 +936,14 @@
         const inicialInstitucionCheck = document.getElementById('inicialinstitucion');
         const finalEstudianteCheck = document.getElementById('finalestudiante');
         const finalInstitucionCheck = document.getElementById('finalinstitucion');
+        const constanciaCheck = document.getElementById('constanciappp');
         const idPractica = document.getElementById('id').value;
         const allChecksSelected =
             inicialEstudianteCheck.checked &&
+            inicialInstitucionCheck.checked &&
             finalEstudianteCheck.checked &&
-            finalInstitucionCheck.checked;
+            finalInstitucionCheck.checked &&
+            constanciaCheck.checked;
         if (fechaFinInput.value && semestreSelect.value && allChecksSelected) {
             fetch(`/finalizar_practica/${idPractica}`, {
                 method: 'POST',

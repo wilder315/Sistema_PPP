@@ -96,8 +96,7 @@ def buscar_estudiantes_practicas(termino_busqueda):
                 FROM persona p
                 INNER JOIN practicas_preprofesionales pp ON p.idPersona = pp.idPersona
                 WHERE p.estado = 'A' 
-                AND pp.idEstado = 1 
-                AND pp.estadoVigencia = 'A'
+                AND pp.idEstado in (1, 2)
                 AND (LOWER(p.nombre) LIKE LOWER(%s) 
                 OR LOWER(p.apellidos) LIKE LOWER(%s))
                 ORDER BY p.apellidos, p.nombre

@@ -1,4 +1,5 @@
 from bd import obtener_conexion
+from datetime import datetime
 
 def obtener_instituciones():
     conexion = obtener_conexion()
@@ -475,5 +476,124 @@ def obtener_estado_informe_inicial_estudiante(idEstudiante):
             return {"estado": 0}  # No tiene informe de tipo 3
     except Exception as e:
         return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def agregar_constancia(idInforme, idPractica, anexos):
+
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    if  not idPractica or not anexos:
+        return {"error": "Faltan datos obligatorios para registrar la constancia."}
+
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT idInforme FROM informe WHERE idInforme = %s", (idInforme,))
+            informe_existente = cursor.fetchone()
+            
+            if informe_existente:
+                # Actualizar la constancia en el informe existente
+                cursor.execute("""
+                    UPDATE informe
+                    SET anexos = %s
+                    WHERE idInforme = %s
+                """, (anexos, idInforme))
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                    ON DUPLICATE KEY UPDATE idPractica = VALUES(idPractica)
+                """, (idPractica, idInforme))
+                
+                conexion.commit()
+                return {"mensaje": "Constancia de estudio actualizada correctamente."}
+            else:
+                estado = 'P'
+                tipoInforme = 6 
+                fecha_actual = datetime.now().strftime('%Y-%m-%d')  # Fecha actual
+
+                cursor.execute("""
+                    INSERT INTO informe (estado, fecha, anexos, idTipoInforme)
+                    VALUES (%s, %s, %s, %s)
+                """, (estado, fecha_actual, anexos, tipoInforme))
+                
+                # Obtener el nuevo ID de informe
+                idInformeNuevo = cursor.lastrowid
+                
+                # Insertar en la tabla de detalle asociada
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                """, (idPractica, idInformeNuevo))
+                
+                conexion.commit()
+                return {"mensaje": "Constancia de estudio registrada correctamente.", "idInforme": idInformeNuevo}
+    except Exception as e:
+        conexion.rollback()
+        return {"error": f"Error al registrar o modificar la constancia: {str(e)}"}
+    finally:
+        conexion.close()
+
+def obtener_estado_constancia(idEstudiante):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT i.estado
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s
+                  AND i.idTipoInforme = 6
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante,))
+            
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                estado = resultado[0]
+                if estado == 'A':  # Aprobado
+                    return {"estado": 3}
+                elif estado == 'P':  # Pendiente
+                    return {"estado": 2}
+                elif estado == 'R':  # Rechazado
+                    return {"estado": 1}
+            return {"estado": 0}  # No tiene informe de tipo 3
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+
+def obtener_constancia(idEstudiante, idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para obtener el informe final asociado al estudiante y la práctica
+            cursor.execute("""
+                SELECT 
+                    i.estado, i.anexos, i.idInforme
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE pp.idPersona = %s AND pp.idPractica = %s AND i.idTipoInforme = 6
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idEstudiante, idPractica))
+            informe = cursor.fetchone()
+            if not informe:
+                return {"error": "No se encontró un informe final asociado a esta práctica."}         
+            
+            # Crear un diccionario con los resultados
+            column_names = [desc[0] for desc in cursor.description]
+            informe_dict = dict(zip(column_names, informe))
+
+            return informe_dict
+    except Exception as e:
+        return {"error": f"Error al obtener el informe: {str(e)}"}
     finally:
         conexion.close()

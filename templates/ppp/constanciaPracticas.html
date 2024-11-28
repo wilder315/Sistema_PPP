@@ -1,0 +1,509 @@
+{% extends "/ppp/home.html" %}
+{% block titulo %} Informe Final de Prácticas (Estudiante) {% endblock %}
+{% block contenido %}
+<nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.index') }}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('router_main.practicas_pre_profesionales') }}">Módulo de Prácticas Pre Profesionales</a></li>
+        <li class="breadcrumb-item active">Constancia de Prácticas</li>
+    </ol>
+</nav>
+<style>
+    body {
+        overflow: hidden;
+    }
+    fieldset {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    .form-label {
+        margin-bottom: 5px;
+    }
+    td > textarea {
+        padding: 0;
+    }
+
+    td {
+        padding: 0 !important;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="container-fluid my-4 scrollable">
+    <div class="card w-100">
+        <div class="card-header bg-red-usat text-white">
+            Constancia de Prácticas
+        </div>
+        <div class="card-body">
+            <fieldset>   
+                <div class="row align-items-end">      
+                    <div class="col-4">
+                        <label for="estudiante" class="form-label">Estudiante:</label>
+                        <div class="d-flex align-items-end">
+                            <div class="flex-grow-1 me-2">
+                                <div class="custom-combo">
+                                    <input type="text" id="estudiante" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
+                                    <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
+                                </div>
+                            </div>
+                            <button id="btnBuscarE" type="submit" class="btn btn-secondary">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-4 offset-4 d-flex justify-content-end align-items-center">
+                        <span id="estado-indicador" class="badge d-none me-3"></span>
+                        <button id="btnCancelar" type="button" class="btn btn-danger me-2">Cancelar</button>
+                        <button id="btnGuardar" type="submit" class="btn btn-primary">Guardar</button>     
+                    </div> 
+                    <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                    <input type="hidden" id="idPersonaMod" name="idPersonaMod">
+                    <input type="hidden" id="idInformeMod" name="idInformeMod">                                                                                                
+                </div>   
+            </fieldset>
+            
+            <div class="mb-3">
+                <input type="file" class="form-control" id="anexos" name="anexos" accept="application/pdf" required>
+                <div class="mt-2" id="anexos-preview-container" style="display: none;">
+                    <iframe id="anexos-preview" style="width: 100%; height: 400px; border: 1px solid #ccc;"></iframe>
+                </div>
+            </div>  
+                
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    // Evento para cuando cargas la página
+    document.addEventListener('DOMContentLoaded', function() {
+        limpiarControles();
+    });
+    
+    // Evento para Cancelar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        limpiarControles();
+    });
+
+    // Función para convertir un archivo a Base64
+    function convertirABase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+        
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
+
+    function deshabilitarAnexo() {
+        const anexosInput = document.getElementById('anexos');
+        if (anexosInput) {
+            anexosInput.setAttribute('disabled', 'true');
+        }
+
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        if (anexosPreviewContainer) {
+            anexosPreviewContainer.style.display = 'none';
+        }
+
+        const anexosPreview = document.getElementById('anexos-preview');
+        if (anexosPreview) {
+            anexosPreview.src = ''; // Limpiar la vista previa
+        }
+        $('#btnGuardar').hide();
+    }
+
+    function habilitarAnexo() {
+        const anexosInput = document.getElementById('anexos');
+        if (anexosInput) {
+            anexosInput.removeAttribute('disabled');
+        }
+
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        if (anexosPreviewContainer) {
+            anexosPreviewContainer.style.display = '';
+        }
+        $('#btnGuardar').show();
+    }
+
+
+    function limpiarControles() {     
+        document.getElementById('estudiante').value = '';
+        document.getElementById('estudiante').disabled = false;
+        document.getElementById('dropdown-estudiantes').disabled = false;
+        document.getElementById('id').value = '';
+        document.getElementById('id').disabled = false;
+        document.getElementById('idInformeMod').value = '';
+        document.getElementById('idPersonaMod').value = '';
+        document.getElementById('idPersonaMod').disabled = false;
+        document.getElementById('anexos').value = '';
+        deshabilitarAnexo();
+        idPersona = '';
+        organigramaBase64Previo = null;
+        anexosBase64Previo = null;
+        $('#btnGuardar').hide();
+    }
+
+    // Función para cargar datos de la práctica
+    function cargarDatosPractica(data) {
+        document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
+        document.getElementById('idPersonaMod').value = data.idPersona || '';
+    }
+
+    // Evento para desaparecer la lista de estudiantes
+    document.addEventListener('click', function(event) {
+        if (!inputEstudiante.contains(event.target) && !dropdownEstudiantes.contains(event.target)) {
+            dropdownEstudiantes.classList.remove('show');
+        }
+    });
+
+    // Variables globales para almacenar los archivos previos
+    let anexosBase64Previo = null;
+
+    // Función para cargar datos del informe
+    function cargarDatosInforme(informe) {
+        if (!informe || informe.error) {
+            mostrarAlerta("warning", "Advertencia", informe ? informe.error : "No se encontraron datos del informe.");
+            return;
+        }
+        document.getElementById('idInformeMod').value = informe.idInforme || '';
+        const anexosPreviewContainer = document.getElementById('anexos-preview-container');
+        const anexosPreview = document.getElementById('anexos-preview');
+
+        if (informe.anexos) {
+            anexosBase64Previo = informe.anexos;
+            const fileURL = `data:application/pdf;base64,${informe.anexos}`;
+            anexosPreview.src = fileURL;
+            anexosPreviewContainer.style.display = 'block';
+
+            // Ajustar altura del iframe después de que se cargue el contenido
+            anexosPreview.onload = function () {
+                // Ajustar la altura del iframe, puedes cambiar el valor según tus necesidades
+                anexosPreview.style.height = '800px'; // Un valor estático de ejemplo
+            };
+
+        } else {
+            anexosBase64Previo = null;
+            anexosPreview.src = '';
+            anexosPreviewContainer.style.display = 'none';
+        }
+    }
+
+
+    // Función para mostrar el estado del informe
+    function actualizarEstadoIndicador(estado) {
+        const estadoIndicador = document.getElementById('estado-indicador');
+        estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+
+        if (estado === 3) {
+            estadoIndicador.textContent = 'Aprobado';
+            estadoIndicador.classList.add('bg-success');
+        } else if (estado === 2) {
+            estadoIndicador.textContent = 'Pendiente de aprobación';
+            estadoIndicador.classList.add('bg-warning');
+        } else if (estado === 1) {
+            estadoIndicador.textContent = 'Rechazado';
+            estadoIndicador.classList.add('bg-danger');
+        } else {
+            estadoIndicador.textContent = '';
+            estadoIndicador.classList.add('d-none');
+        }
+    }
+
+    // Evento para vista previa de los anexos
+    document.getElementById('anexos').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file && file.type === 'application/pdf') {
+            const fileURL = URL.createObjectURL(file);
+            const iframe = document.getElementById('anexos-preview');
+            iframe.src = fileURL;
+            document.getElementById('anexos-preview-container').style.display = 'block';
+
+            // Ajustar altura
+            iframe.style.height = '800px'; // Puedes modificar este valor dinámicamente si prefieres
+        } else {
+            alert('Por favor, selecciona un archivo PDF válido.');
+            document.getElementById('anexos').value = ''; // Limpiar selección
+            document.getElementById('anexos-preview-container').style.display = 'none';
+        }
+    });
+
+    // Función para mostrar y recuperar estudiantes en el dropdown-search
+    const inputEstudiante = document.getElementById('estudiante');
+    const dropdownEstudiantes = document.getElementById('dropdown-estudiantes');
+    let idPersona = 0;
+    inputEstudiante.addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_estudiantes_buscar')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEstudiantes.innerHTML = '';
+                const resultados = data.filter(estudiante => 
+                    `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(estudiante => {
+                        const li = document.createElement('li');
+                        li.textContent = `${estudiante.apellidos} ${estudiante.nombre}`;
+                        li.dataset.id = estudiante.idPersona;
+                        li.addEventListener('click', () => {
+                            inputEstudiante.value = li.textContent;
+                            idPersona = estudiante.idPersona;
+                            document.getElementById('idPersonaMod').value = estudiante.idPersona;
+                            dropdownEstudiantes.classList.remove('show');
+                        });
+                        dropdownEstudiantes.appendChild(li);
+                    });
+                    dropdownEstudiantes.classList.add('show');
+                } else {
+                    dropdownEstudiantes.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error al cargar los estudiantes:', error));
+    });
+
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault();
+        const idEstudiante = idPersona;
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
+            return;
+        }
+        fetch(`/estado_constancia/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener el estado de la constancia');
+                }
+                return response.json();
+            })
+            .then(estadoData => {
+                const estado = estadoData.estado;
+                estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
+                if (estado === 3) { // Estado aprobado
+                    estadoIndicador.textContent = 'Aprobado';
+                    estadoIndicador.classList.add('bg-success');
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_constancia/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar la constancia del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        setFormularioSoloLectura(true, false);
+                                        document.getElementById('estudiante').disabled = true;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar la constancia:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar la constancia.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else if (estado === 2 || estado === 1) { // Pendiente o Rechazado
+                    if (estado === 1) {
+                        estadoIndicador.textContent = 'Rechazado';
+                        estadoIndicador.classList.add('bg-danger');
+                        mostrarAlerta("warning", "Advertencia", "El estudiante tiene una constancia rechazada.");
+                    } else {
+                        estadoIndicador.textContent = 'Pendiente de aprobación';
+                        estadoIndicador.classList.add('bg-warning');
+                    }
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_constancia/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar la constancia del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        habilitarAnexo();
+                                        document.getElementById('estudiante').disabled = true;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar la constancia:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar la constancia del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else {
+                    estadoIndicador.textContent = '';
+                    estadoIndicador.classList.add('d-none');
+                }
+                fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener datos del estudiante');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            mostrarAlerta("error", "Error", data.error);
+                            limpiarControles();
+                        } else if (data.mensaje) {
+                            mostrarAlerta("info", "Información", data.mensaje);
+                            limpiarControles();
+                        } else {
+                            const idInput = document.getElementById('id');
+                            if (idInput) {
+                                idInput.value = data.idPractica || '';
+                                idInput.disabled = true;
+                            }
+                            cargarDatosPractica(data);
+                            habilitarAnexo();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar la práctica del estudiante:", error);
+                        mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
+                    });
+            })
+            .catch(error => {
+                console.error("Error al obtener el estado dla constancia:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar el estado dla constancia.");
+            });
+    });
+
+    // Función para habilitar/deshabilitar controles
+    function setFormularioSoloLectura(soloLectura) {
+        // Habilitar/deshabilitar elementos de entrada en la tarjeta de contenido
+        const inputs = document.querySelectorAll('.card-body input, .card-body textarea, .card-body select, .card-body button:not(.nav-link)');
+        inputs.forEach(input => {
+            if (soloLectura) {
+                input.setAttribute('disabled', 'true');
+            } else {
+                input.removeAttribute('disabled');
+            }
+        });
+
+        // Mostrar/ocultar botones según el modo de solo lectura
+        const guardarBtn = document.getElementById('btnGuardar');
+        const cancelarBtn = document.getElementById('btnCancelar');
+
+        if (guardarBtn) {
+            guardarBtn.style.display = soloLectura ? 'none' : ''; // Ocultar el botón 'Guardar' en solo lectura
+        }
+        if (cancelarBtn) {
+            cancelarBtn.style.display = soloLectura ? 'none' : ''; // Ocultar el botón 'Cancelar' en solo lectura
+        }
+
+        // Deshabilitar el botón de búsqueda de estudiante si está en modo solo lectura
+        const btnBuscarE = document.getElementById('btnBuscarE');
+        if (btnBuscarE) {
+            btnBuscarE.disabled = soloLectura;
+        }
+    }
+
+    // Función para guardar el informe
+    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const idPractica = document.getElementById('id').value;
+        const idInforme = document.getElementById('idInformeMod').value;
+        const anexosInput = document.getElementById('anexos');
+        const anexosBase64 = anexosInput.files[0]
+            ? await convertirABase64(anexosInput.files[0])
+            : anexosBase64Previo;
+
+        const data = {
+            idInforme,
+            idPractica,
+            anexos: anexosBase64
+        };
+
+        // Log de los datos que se van a enviar
+        console.log('Datos que se enviarán:', data);
+
+        fetch('/agregar_constancia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.log('Error al guardar el informe:', data.error);
+                mostrarAlerta("error", "Error", data.error);
+            } else {
+                console.log('Informe guardado con éxito:', data);
+                mostrarAlerta("success", "Éxito", data.mensaje);
+                limpiarControles();
+            }
+        })
+        .catch((error) => {
+            console.error('Error al guardar el informe:', error);
+            mostrarAlerta("error", "Error", "Hubo un error al guardar el informe.");
+        });
+    });
+
+
+</script>
+{% endblock %}
