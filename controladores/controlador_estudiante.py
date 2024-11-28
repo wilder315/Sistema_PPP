@@ -241,10 +241,18 @@ def obtener_estadisticas_estudiantes():
             cursor.execute(
                 """
                 SELECT 
-                (SELECT COUNT(*) FROM practicas_preprofesionales) AS registrados,
-                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 2) AS proceso,
-                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 3) AS espera_informes, 
-                (SELECT COUNT(*) FROM practicas_preprofesionales where idEstado = 4) AS finalizada
+                (SELECT 
+                COUNT(pp.idPersona)
+                FROM persona pe 
+                INNER JOIN practicas_preprofesionales pp ON pe.idPersona = pp.idPersona
+                INNER JOIN usuario usu ON usu.idUsuario = pe.idUsuario
+                WHERE usu.idTipoUsuario = 3 AND pe.estado = 'A') AS registrados,
+                
+                (SELECT COUNT(*) FROM informe where idTipoInforme = 1) AS proceso,
+                
+                (SELECT COUNT(*) FROM informe where idTipoInforme = 2) AS espera_informes, 
+                
+                (SELECT COUNT(*) FROM informe where idTipoInforme = 4) AS finalizada
                 """  
             )
             #obtener los resultados

@@ -109,3 +109,20 @@ def datos_estudiantes_semestre():
 def obtener_estudiante_por_doc(doc_estudiante):
     estudiante = controlador_estudiante.obtener_estudiante_por_doc(doc_estudiante)
     return jsonify(estudiante)
+
+@router_estudiante.route('/dashboard', methods=['POST'])
+def dashboard(): 
+    #data = request.json
+    datos = controlador_estudiante.obtener_estadisticas_estudiantes()
+    
+    return jsonify(datos)
+
+@router_estudiante.route('/obtener_ppp_finalizadas', methods=['POST'])
+def obtener_ppp_finalizadas(): 
+    datos = controlador_estudiante.obtener_ppp_finalizadas()
+    return jsonify(datos)
+
+@router_estudiante.route('/obtener_estudiantes_por_fecha', methods=['POST'])
+def obtener_estudiantes_por_fecha():
+    datos = controlador_estudiante.obtener_estudiantes_por_fecha()
+    return jsonify(datos)

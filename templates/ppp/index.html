@@ -100,7 +100,7 @@
                 <div class="small-box bg-info ">
                     <div class="inner">
                         <div class="numero-con-icono">
-                            <span>{{ estadisticas['registrados'] }}</span>
+                            <h1 id="estudiantes-registrados" class="mb-0">0</h1>
                             <h4>Estudiantes Registrados</h4>
                         </div>
                         <i class="fas fa-user-graduate icono-pleateado"></i>
@@ -113,8 +113,8 @@
                 <div class="small-box bg-success">
                     <div class="inner">
                         <div class="numero-con-icono">
-                            <span>{{ estadisticas['proceso'] }}</span>
-                            <h4>Prácticas en Curso</h4>
+                            <h1 id="practicas-en-curso" class="mb-0">0</h1>
+                            <h4>Informes Iniciales</h4>
                         </div>
                         <i class="fas fa-briefcase"></i> <!-- Ícono plateado -->
                     </div>
@@ -126,8 +126,8 @@
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <div class="numero-con-icono">
-                            <span>{{ estadisticas['espera_informes'] }}</span>
-                            <h4>Espera de Informes</h4>
+                            <h1 id="espera-informes" class="mb-0">0</h1>
+                            <h4>Inf. Inicial Empresa</h4>
                         </div>
                         <i class="fas fa-file-alt"></i> <!-- Ícono plateado -->
                     </div>
@@ -139,8 +139,8 @@
                 <div class="small-box bg-primary shadow-sm roundeds">
                     <div class="inner">
                         <div class="numero-con-icono">
-                            <span>{{ estadisticas['finalizada'] }}</span>
-                            <h4>Prácticas Finalizas</h4>
+                            <h1 id="practicas-finalizadas" class="mb-0">0</h1>
+                            <h4>Inf. Finales Empresa</h4>
                         </div>
                         <i class="fas fa-check-circle"></i>
                     </div>
@@ -150,6 +150,7 @@
         </div> 
 
         <div class="row mt-0">
+
             <!-- Custom tabs (Charts with tabs)-->
             <div class="col-lg-6 mb-4">
                 <div class="card">
@@ -158,19 +159,11 @@
                             <i class="fas fa-chart-pie mr-1"></i>
                             Gráfico Estudiantes registrados por los últimos 4 Semestres
                         </h3>
-                        <div class="card-tools">
-                            <ul class="nav nav-pills ml-auto">
-                            </ul>
-                        </div>
                     </div>
-
                     <div class="card-body">
                         <div class="tab-content p-0">
                             <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;">
                                 <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
-                            </div>
-                            <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                                <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -180,16 +173,15 @@
             <!-- Gráfico de torta-->
             <div class="col-lg-6 mb-4">
                 <div class="card card-primary card-outline">
-                    <div class="card-header bg-red-usat text-white" >
+                    <div class="card-header bg-red-usat text-white">
                         <h3 class="card-title" style="color: white !important;">
                             <i class="far fa-chart-bar"></i>
-                            Gráfico de Prácticas Profesionales Iniciadas vs Finalizadas
+                            Gráfico de Prácticas Iniciadas vs Finalizadas por último Ciclo
                         </h3>
                     </div>
                     <div class="card-body" style="display: flex; justify-content: center; align-items: center;">
-                        <!-- Canvas para Chart.js centrado -->
-                        <div id="donut-chart" style="height: 300px; width: 300px; padding: 0px; position: relative;">
-                            <canvas id="donutChart" width="300" height="300"></canvas>
+                        <div id="donut-chart" style="height: 310px; width: 300px; padding: 0px; position: relative;">
+                            <canvas id="donutChart" width="300" height="400"></canvas>
                         </div>
                     </div>
                 </div>
@@ -218,129 +210,143 @@
     <script src="https://cdn.jsdelivr.net/npm/jqvmap@1.5.1/dist/maps/jquery.vmap.world.js"></script>
 
     <script>
-        // Verifica los datos en la consola
-        console.log("Datos de registrosPorFecha:", {{ registrosPorFecha | tojson }});
-        console.log("Datos de ppp_finalizadas:", {{ ppp_finalizadas | tojson }});
+        $(document).ready(function () {
     
-    /**# Gráfico de lineas */   
-        var registrosPorFecha = {{ registrosPorFecha | tojson}}; 
-
-        var nombres = registrosPorFecha.map(r => r.nombre); // Eje x: nombres de los semestres
-        var total_ids = registrosPorFecha.map(r => r.total_id); // Eje y: total de estudiantes registrados
-    
-        var ctxRevenue = document.getElementById('revenue-chart-canvas').getContext('2d');
-        var revenueChart = new Chart(ctxRevenue, {
-            type: 'line',
-            data: {
-                labels: nombres, // Eje x
-                datasets: [{
-                    label: 'Estudiantes Registrados por Semestre Académico',
-                    data: total_ids, // Eje y
-                    borderColor: 'rgba(60,141,188,0.8)',
-                    backgroundColor: 'rgba(60,141,188,0.4)',
-                    fill: true, 
-                    tension: 0.4,
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'category',
-                        title: {
-                            display: true,
-                            text: 'Semestre'
-                        },
-                        ticks: {
-                            autoSkip: true,
-                            maxTicksLimit: 7
-                        }
+            // Función para cargar datos del dashboard
+            function cargarDashboard() {
+                $.ajax({
+                    url: '/dashboard',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({}),
+                    success: function (response) {
+                        // Actualizar elementos del dashboard
+                        $('#estudiantes-registrados').text(response.registrados);
+                        $('#practicas-en-curso').text(response.proceso);
+                        $('#espera-informes').text(response.espera_informes);
+                        $('#practicas-finalizadas').text(response.finalizada);
                     },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Cantidad de Estudiantes'
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) { return Number.isInteger(value) ? value : null; }
-                        }
+                    error: function (xhr, status, error) {
+                        console.error('Error al cargar el dashboard:', error);
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    intersect: false,
-                    axis: 'x'
-                }
+                });
             }
-        });
-        
-
-        /**# Gráfico de Torta */
-        const totalConFecha = {{ ppp_finalizadas['total_con_fecha']}}; 
-        const totalSinFecha = {{ ppp_finalizadas['total_sin_fecha']}}; 
-
-        //Configuración el gráfico usando Chart.js
-        const ctx = document.getElementById('donutChart').getContext('2d');
-        const donutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Prácticas Finalizadas', 'Prácticas Iniciadas'],
-                datasets: [{
-                    label: 'Prácticas Preprofesionales',
-                    data: [totalConFecha, totalSinFecha],
-                    backgroundColor: [
-                        'rgba(0, 123, 255, 0.7)',  // Azul fuerte para 'Con Fecha'
-                        'rgba(255, 165, 0, 0.7)'   // Anaranjado para 'Sin Fecha'
-                    ],
-                    borderColor: [
-                        'rgba(0, 123, 255, 1)',
-                        'rgba(255, 165, 0, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.raw;
-                            }
-                        }
-                    },
-                    datalabels: {
-                        color: '#fff',
-                        font: {
-                            size: 22,
-                            weight: 'bold'
-                        },
-                        formatter: (value, ctx) => {
-                            return value; // Muestra el valor directamente en el gráfico
-                        }
-                    }
+    
+            // Función para crear gráficos genéricos
+            function crearGrafico(ctx, tipo, etiquetas, datos, colores, titulo) {
+                if (etiquetas.length === 0 || datos.length === 0) {
+                    console.warn('No hay datos suficientes para mostrar el gráfico:', titulo);
+                    ctx.canvas.parentNode.innerHTML = `<p style="text-align: center; color: red;">No hay datos disponibles para el gráfico "${titulo}".</p>`;
+                    return;
                 }
-            },
-            plugins: [ChartDataLabels]
+    
+                new Chart(ctx, {
+                    type: tipo,
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            label: titulo,
+                            data: datos,
+                            backgroundColor: Array.isArray(colores.fondo) ? colores.fondo : [colores.fondo],
+                            borderColor: Array.isArray(colores.borde) ? colores.borde : [colores.borde],
+                            borderWidth: 1,
+                            fill: tipo === 'line' ? false : true,
+                            tension: 0.4 // Suavizado para gráficos de líneas
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return `${context.label}: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: tipo === 'line' ? {
+                            x: {
+                                type: 'category',
+                                title: { display: true, text: 'Semestre' },
+                                ticks: { autoSkip: true, maxTicksLimit: 7 }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Cantidad de Estudiantes' },
+                                ticks: { stepSize: 1 }
+                            }
+                        } : {}
+                    }
+                });
+            }
+    
+            // Llamar la función para cargar datos del dashboard al iniciar
+            cargarDashboard();
+    
+            // Gráfico de Líneas: Estudiantes registrados por semestre
+            fetch('/obtener_estudiantes_por_fecha', { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener estudiantes por fecha');
+                    }
+                    return response.json();
+                })
+                .then(registrosPorFecha => {
+                    const nombres = registrosPorFecha.map(r => r.nombre); // Eje X
+                    const total_ids = registrosPorFecha.map(r => r.total_id); // Eje Y
+    
+                    crearGrafico(
+                        document.getElementById('revenue-chart-canvas').getContext('2d'),
+                        'line',
+                        nombres,
+                        total_ids,
+                        { fondo: 'rgba(60,141,188,0.4)', borde: 'rgba(60,141,188,0.8)' },
+                        'Estudiantes Registrados por Semestre Académico'
+                    );
+                })
+                .catch(error => {
+                    console.error('Error en el gráfico de estudiantes:', error);
+                    document.getElementById('revenue-chart-canvas').parentNode.innerHTML = `<p style="text-align: center; color: red;">Error al cargar el gráfico de estudiantes.</p>`;
+                });
+    
+            // Gráfico de Torta: Prácticas iniciadas vs finalizadas
+            fetch('/obtener_ppp_finalizadas', { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener prácticas finalizadas');
+                    }
+                    return response.json();
+                })
+                .then(pppFinalizadas => {
+                    const totalConFecha = pppFinalizadas.total_con_fecha || 0;
+                    const totalSinFecha = pppFinalizadas.total_sin_fecha || 0;
+    
+                    if (totalConFecha === 0 && totalSinFecha === 0) {
+                        document.getElementById('donutChart').parentNode.innerHTML = `<p style="text-align: center; color: red;">No hay datos disponibles para el gráfico de prácticas.</p>`;
+                        return;
+                    }
+    
+                    crearGrafico(
+                        document.getElementById('donutChart').getContext('2d'),
+                        'doughnut',
+                        ['Prácticas Finalizadas', 'Prácticas Iniciadas'],
+                        [totalConFecha, totalSinFecha],
+                        {
+                            fondo: ['rgba(0, 123, 255, 0.7)', 'rgba(255, 165, 0, 0.7)'],
+                            borde: ['rgba(0, 123, 255, 1)', 'rgba(255, 165, 0, 1)']
+                        },
+                        'Prácticas Preprofesionales'
+                    );
+                })
+                .catch(error => {
+                    console.error('Error en el gráfico de prácticas:', error);
+                    document.getElementById('donutChart').parentNode.innerHTML = `<p style="text-align: center; color: red;">Error al cargar el gráfico de prácticas.</p>`;
+                });
         });
-
-        
     </script>
+    
+    
 {% endblock %}

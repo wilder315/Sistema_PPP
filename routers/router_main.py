@@ -116,10 +116,7 @@ def gestion_academica():
 @router_main.route("/indexppp")
 @no_cache_and_login_required
 def practicas_pre_profesionales():
-    registros_por_fecha = obtener_estudiantes_por_fecha() or []
-    estadisticas = obtener_estadisticas_estudiantes()
-    ppp_finalizadas = obtener_ppp_finalizadas()
-    return render_template("/ppp/index.html", registrosPorFecha=registros_por_fecha, estadisticas=estadisticas, ppp_finalizadas=ppp_finalizadas)
+    return render_template("/ppp/index.html")
 
 @router_main.route('/home')
 @no_cache_and_login_required
