@@ -207,7 +207,6 @@ class ControladorFichaEvaluacion:
                             fe.nombre_empresa,
                             fe.fecha_evaluacion,
                             fe.estado
-                            END as estado
                         FROM ficha_evaluacion fe
                         ORDER BY fe.fecha_evaluacion DESC
                     """)
@@ -386,8 +385,7 @@ class ControladorFichaEvaluacion:
                 sql = f"""
                     UPDATE ficha_evaluacion 
                     SET {', '.join(actualizaciones)}
-                    WHERE idFichaEvaluacion = %s 
-                    AND estado = 'P'
+                    WHERE idFichaEvaluacion = %s
                 """
                 
                 cursor.execute(sql, valores)

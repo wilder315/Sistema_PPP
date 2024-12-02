@@ -233,7 +233,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td><input type="number" min="0" class="form-control" name="num[]" required readonly></td>
+                                                    <td><input type="number" min="0" class="form-control" name="num[]" value=1 required readonly></td>
                                                     <td>
                                                         <input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required>
                                                     </td>
@@ -440,7 +440,7 @@
         tbody.innerHTML = '';
         const filaVacia = `
             <tr>
-                <td><input type="number" min="0" class="form-control" name="num[]" required readonly></td>
+                <td><input type="number" min="0" class="form-control" name="num[]" value=1 required readonly></td>
                 <td>
                     <input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required>
                 </td>
@@ -466,9 +466,9 @@
     // Función para nueva práctica
     function nuevaPractica() {
         const estudianteInput = document.getElementById('estudiante');
-        const idEstudiante = idPersona; // Asumiendo que idPersona almacena el ID del estudiante
+        const idEstudiante = idPersona;
         const semestreInput = document.getElementById('semestrea');
-
+        console.log(idEstudiante);
         // Verificar si los campos de estudiante y semestre están completos
         if (!estudianteInput.value.trim()) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante.");
@@ -740,6 +740,23 @@
         const idTipoPractica = document.getElementById('tipo_practica').value;
         const idPersona = document.getElementById('idPersonaMod').value;
         const idPractica = document.getElementById('id').value;
+        console.log({
+            fechaInicio,
+            fechaFin,
+            horario,
+            modalidad,
+            area,
+            numeroHorasPPP,
+            numeroHorasPendientes,
+            numeroHorasRealizadas,
+            idSemestre,
+            idLinea,
+            numDocInstitucion,
+            idTipoPractica,
+            idPersona,
+            idPractica
+        });
+
         if (
             !idPractica || !fechaInicio || !fechaFin || !modalidad || !horario || !area ||
             !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas ||
