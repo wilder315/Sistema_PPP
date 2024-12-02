@@ -13,6 +13,11 @@ def datos_empresas():
     empresas = controlador_institucion.obtener_empresas()
     return jsonify(empresas)
 
+@router_institucion.route("/datos_empresas_buscar", methods=["GET"])
+def datos_empresas_buscar():
+    empresas = controlador_institucion.obtener_empresas_buscar()
+    return jsonify(empresas)
+
 @router_institucion.route("/jefe_institucion", methods=["GET"])
 def jefe_institucion():
     ruc = request.args.get('ruc')

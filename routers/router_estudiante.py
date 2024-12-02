@@ -22,6 +22,11 @@ def datos_estudiantes_buscar():
     estudiantes = controlador_estudiante.obtener_estudiantes_buscar()
     return jsonify(estudiantes)
 
+@router_estudiante.route("/datos_estudiantes_institucion/<string:numDocInstitucion>", methods=["GET"])
+def datos_estudiantes_institucion(numDocInstitucion):
+    estudiantes = controlador_estudiante.obtener_estudiantes_institucion(numDocInstitucion)
+    return jsonify(estudiantes)
+
 @router_estudiante.route("/obtener_estudiante_por_id/<int:idEstudiante>", methods=["GET"])
 def obtener_estudiante_por_id(idEstudiante):
     estudiante = controlador_estudiante.obtener_estudiante_por_id(idEstudiante)

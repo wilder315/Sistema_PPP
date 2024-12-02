@@ -64,6 +64,42 @@ def obtener_estudiantes_buscar():
         conexion.close()
     return estudiantes
 
+def obtener_estudiantes_institucion(numDocInstitucion):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    estudiantes = []
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT 
+                    p.idPersona, p.numDoc, p.nombre, p.apellidos, p.codUniversitario, 
+                    p.tel1, p.tel2, p.correoP, p.correoUSAT, p.estado, 
+                    g.nombre AS genero, td.nombre AS tipoDocumento, 
+                    e.nombre AS escuela, u.username AS usuario
+                FROM persona p
+                LEFT JOIN genero g ON p.idGenero = g.idGenero
+                LEFT JOIN tipo_documento td ON p.idTipoDoc = td.idTipoDoc
+                LEFT JOIN escuela e ON p.idEscuela = e.idEscuela
+                LEFT JOIN usuario u ON p.idUsuario = u.idUsuario
+                INNER JOIN practicas_preprofesionales pp ON p.idPersona = pp.idPersona
+                INNER JOIN institucion i ON pp.numDocInstitucion = i.numDoc
+                WHERE u.idTipoUsuario = 3
+                  AND pp.estadoVigencia = 'P'
+                  AND i.numDoc = %s
+                ORDER BY p.apellidos ASC, p.nombre ASC
+            """, (numDocInstitucion,))          
+            column_names = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            for row in rows:
+                estudiante_dict = dict(zip(column_names, row))
+                estudiantes.append(estudiante_dict)
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        conexion.close()
+    return estudiantes
+
 def obtener_estudiante_por_id(idEstudiante):
     conexion = obtener_conexion()
     if not conexion:

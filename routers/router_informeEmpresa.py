@@ -112,18 +112,16 @@ def buscar_instituciones():
 def guardar_informe_inicial_empresa():
     try:
         # Obtener los datos del formulario
-        aceptacion = request.form.get('aceptacion')
         labor = request.form.get('labor')  # labores principales
         labores = request.form.get('labores')  # labores específicas
         firma1 = request.files.get('firma1')
         firma2 = request.files.get('firma2')
 
-        if not all([aceptacion, labor, labores, firma1, firma2]):
+        if not all([labor, labores, firma1, firma2]):
             return jsonify({"error": "Faltan campos requeridos"}), 400
 
         # Llamar al controlador
         resultado = controlador_informeEmpresa.guardar_informeInicialEmpresa(
-            aceptacion,
             json.loads(labor),
             json.loads(labores),
             firma1,
@@ -162,14 +160,13 @@ def actualizar_informe():
     try:
         id_informe = request.form.get('idInforme')
         fecha = request.form.get('fecha')
-        aceptacion = request.form.get('aceptacion')
         labor = request.form.get('labor')  
         labores = request.form.get('labores')  
         firma1 = request.files.get('firma1')
         firma2 = request.files.get('firma2')
 
         resultado = controlador_informeEmpresa.actualizar_informe(
-            id_informe, fecha, aceptacion, labor, labores, firma1, firma2
+            id_informe, fecha, labor, labores, firma1, firma2
         )
         return jsonify(resultado)
     except Exception as e:

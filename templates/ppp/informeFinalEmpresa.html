@@ -179,6 +179,11 @@
 
 <script>
 
+    // Evento para cuando cargas la página
+    document.addEventListener('DOMContentLoaded', function() {
+        limpiarFormulario();
+    });
+
     // Acción al buscar empresa
     $('#buscar_empresa').on('click', function() {
         var numDoc = $('#idEmpresaMod').val(); // Obtener el num del doc
@@ -208,8 +213,9 @@
                     $('#apellidos_responsable').val(response.apellidos);
                     $('#nombre_responsable').val(response.nombre);
                     $('#cargo_responsable').val(response.cargo);
-                    $('#doc_jefe').val(response.numDoc); 
-
+                    $('#doc_jefe').val(response.numDoc);
+                    document.getElementById('empresa').disabled = true;
+                    document.getElementById('estudiante').disabled = false;
                     //enfocar
                     $('#doc_estudiante').focus();
                 } else {
@@ -241,11 +247,23 @@
     let idPersona = 0;
     inputEstudiante.addEventListener('input', function () {
         const searchText = this.value.toLowerCase();
-        fetch('/datos_estudiantes_buscar')
-            .then(response => response.json())
+        const idEmpresaMod = document.getElementById('idEmpresaMod').value; // Obtiene el valor de idEmpresaMod
+        
+        if (!idEmpresaMod) {
+            console.error('El valor de idEmpresaMod está vacío o no definido.');
+            return;
+        }
+        // Realiza la solicitud a la ruta con el idEmpresaMod como parámetro
+        fetch(`/datos_estudiantes_institucion/${idEmpresaMod}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener los datos de los estudiantes');
+                }
+                return response.json();
+            })
             .then(data => {
-                dropdownEstudiantes.innerHTML = '';
-                const resultados = data.filter(estudiante => 
+                dropdownEstudiantes.innerHTML = ''; // Limpia el dropdown
+                const resultados = data.filter(estudiante =>
                     `${estudiante.apellidos} ${estudiante.nombre}`.toLowerCase().includes(searchText)
                 );
                 if (resultados.length > 0) {
@@ -257,6 +275,7 @@
                             inputEstudiante.value = li.textContent;
                             idPersona = estudiante.idPersona;
                             document.getElementById('idPersonaMod').value = estudiante.idPersona;
+                            document.getElementById('estudiante').disabled = true;
                             dropdownEstudiantes.classList.remove('show');
                         });
                         dropdownEstudiantes.appendChild(li);
@@ -269,13 +288,14 @@
             .catch(error => console.error('Error al cargar los estudiantes:', error));
     });
 
+
     // Función para mostrar y recuperar empresas en el dropdown-search
     const inputEmpresa = document.getElementById('empresa');
     const dropdownEmpresas = document.getElementById('dropdown-empresas');
     let idEmpresa = 0;
     inputEmpresa.addEventListener('input', function () {
         const searchText = this.value.toLowerCase();
-        fetch('/datos_empresas')
+        fetch('/datos_empresas_buscar')
             .then(response => response.json())
             .then(data => {
                 dropdownEmpresas.innerHTML = '';
@@ -329,9 +349,9 @@
         // Validar si el campo está vacío
         if (doc_estudiante === "") {
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Debe ingresar un número de documento.',
+                icon: 'warning',
+                title: 'Avertencia',
+                text: 'Debe seleccionar un estudiante',
                 confirmButtonText: 'Aceptar'
             });
             return;
@@ -484,6 +504,8 @@
         $('#fecha_fin').val('');
         $('#estudiante').val('');
         $('#empresa').val('');
+        document.getElementById('empresa').disabled = false;
+        document.getElementById('estudiante').disabled = true;
         // Limpiar el campo de archivo (firma)
         $('#firma_imagen').val('');
         const firma_imagenPreview = document.getElementById('firma_imagen-preview');

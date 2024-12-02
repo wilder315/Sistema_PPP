@@ -32,8 +32,8 @@ def guardar_informeFinalEmpresa(numDoc, area_desarrollo, texto_responsabilidad, 
             
             #Insertar en la tabla INFORMES
             cursor.execute("""
-                INSERT INTO informe (aceptacion, estado, labor, cumplehoras, responsabilidad, extras, idTipoInforme, fecha, firma1)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO informe ( estado, labor, cumplehoras, responsabilidad, extras, idTipoInforme, fecha, firma1)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,('ACEPTADO', 'P', area_desarrollo, 'S', texto_responsabilidad, texto_otros_aspectos, 4, fecha, file_path))
             
             print("se ejecuto el insert en informe")
@@ -167,7 +167,7 @@ def buscar_instituciones(termino_busqueda):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def guardar_informeInicialEmpresa(aceptacion, labor, labores, firma1, firma2):
+def guardar_informeInicialEmpresa(labor, labores, firma1, firma2):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -189,11 +189,10 @@ def guardar_informeInicialEmpresa(aceptacion, labor, labores, firma1, firma2):
             # Insertar en la tabla INFORMES
             cursor.execute("""
                 INSERT INTO informe (
-                    aceptacion, estado, labor, fecha, labores, 
+                    estado, labor, fecha, labores, 
                     firma1, firma2, idTipoInforme
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
-                    aceptacion,   # aceptacion
                     'A',          # estado
                     labor_str,    # labor (principales)
                     date.today(), # fecha del sistema
@@ -251,7 +250,6 @@ def obtener_informes_empresa():
             cursor.execute("""
                 SELECT i.idInforme, 
                        CONCAT(p.apellidos, ', ', p.nombre) as estudiante,
-                       i.aceptacion,
                        i.estado,
                        i.labor,
                        i.labores,
@@ -273,13 +271,12 @@ def obtener_informes_empresa():
                 informes_formateados.append({
                     'idInforme': informe[0],
                     'estudiante': informe[1],
-                    'aceptacion': informe[2],
-                    'estado': informe[3],
-                    'labor': informe[4],
-                    'labores': informe[5],
-                    'firma1': informe[6],
-                    'firma2': informe[7],
-                    'fecha': informe[8].strftime('%Y-%m-%d') if informe[8] else None
+                    'estado': informe[2],
+                    'labor': informe[3],
+                    'labores': informe[4],
+                    'firma1': informe[5],
+                    'firma2': informe[6],
+                    'fecha': informe[7].strftime('%Y-%m-%d') if informe[8] else None
                 })
             return informes_formateados
 
@@ -297,7 +294,6 @@ def obtener_informe_por_id(id_informe):
             cursor.execute("""
                 SELECT i.idInforme, 
                        CONCAT(p.apellidos, ', ', p.nombre) as estudiante,
-                       i.aceptacion,
                        i.estado,
                        i.labor,
                        i.labores,
@@ -316,29 +312,27 @@ def obtener_informe_por_id(id_informe):
                 return {
                     'idInforme': informe[0],
                     'estudiante': informe[1],
-                    'aceptacion': informe[2],
-                    'estado': informe[3],
-                    'labor': informe[4],
-                    'labores': informe[5],
-                    'firma1': informe[6],
-                    'firma2': informe[7],
-                    'fecha': informe[8].strftime('%Y-%m-%d') if informe[8] else None
+                    'estado': informe[2],
+                    'labor': informe[3],
+                    'labores': informe[4],
+                    'firma1': informe[5],
+                    'firma2': informe[6],
+                    'fecha': informe[7].strftime('%Y-%m-%d') if informe[8] else None
                 }
             return None
     finally:
         conexion.close()
 
-def actualizar_informe(id_informe, fecha, aceptacion, labor, labores, firma1, firma2):
+def actualizar_informe(id_informe, fecha, labor, labores, firma1, firma2):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             # Construir la consulta SQL dinámicamente
             sql = """UPDATE informe 
                      SET fecha = %s, 
-                         aceptacion = %s,
                          labor = %s,
                          labores = %s"""
-            params = [fecha, aceptacion, labor, labores]
+            params = [fecha, labor, labores]
 
             # Procesar firma1 si se proporcionó
             if firma1:
