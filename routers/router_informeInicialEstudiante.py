@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, jsonify, session
 from controladores.controlador_informeInicialEstudiante import obtener_instituciones, agregar_informe_final_estudiante, agregar_informe_inicial_estudiante, agregar_informe_inicial_empresa, agregar_informe_final_empresa
 from controladores import controlador_ppp as controlador_ppp
 from controladores import controlador_informeInicialEstudiante as controlador_informeInicialEstudiante
+from controladores import controlador_informeEmpresa as controlador_informeEmpresa
+
 
 router_informe = Blueprint('router_informe', __name__)
 
@@ -161,6 +163,11 @@ def agregar_informe_final_empresa():
 @router_informe.route("/estado_informe_final/<int:idEstudiante>", methods=["GET"])
 def estado_informe_final(idEstudiante):
     resultado = controlador_informeInicialEstudiante.obtener_estado_informe_final_estudiante(idEstudiante)
+    return jsonify(resultado)
+
+@router_informe.route("/estado_informe_final_empresa/<int:idEstudiante>", methods=["GET"])
+def estado_informe_final_empresa(idEstudiante):
+    resultado = controlador_informeEmpresa.obtener_estado_informe_final_empresa(idEstudiante)
     return jsonify(resultado)
 
 @router_informe.route("/estado_informe_inicial/<int:idEstudiante>", methods=["GET"])

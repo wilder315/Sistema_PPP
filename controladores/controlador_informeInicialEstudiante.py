@@ -53,6 +53,7 @@ def agregar_informe_inicial_estudiante(
     conexion = obtener_conexion()
     tipoInforme = 1
     estado = 'P'
+    estadoObj = 'I'
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     if not idPractica or not fecha or not firma1 or not firma2:
@@ -84,9 +85,9 @@ def agregar_informe_inicial_estudiante(
             # Insertar los nuevos objetivos
             for objetivo in objetivos:
                 cursor.execute("""
-                    INSERT INTO objetivos (descripcion, idInforme)
-                    VALUES (%s, %s)
-                """, (objetivo, idInforme))
+                    INSERT INTO objetivos (descripcion, idInforme, estado)
+                    VALUES (%s, %s, %s)
+                """, (objetivo, idInforme, estadoObj))
             
             # Insertar los nuevos planes de trabajo
             for plan_trabajo in plan_trabajos:
@@ -416,13 +417,13 @@ def obtener_informe_inicial_estudiante(idEstudiante, idPractica):
             column_names = [desc[0] for desc in cursor.description]
             informe_dict = dict(zip(column_names, informe))
             cursor.execute("""
-                SELECT idObjetivos, descripcion
+                SELECT idObjetivos, descripcion, estado
                 FROM objetivos
                 WHERE idInforme = %s
             """, (informe_dict['idInforme'],))
             objetivos = cursor.fetchall()
             informe_dict['objetivos'] = [
-                {"idObjetivos": obj[0], "descripcion": obj[1]} for obj in objetivos
+                {"idObjetivos": obj[0], "descripcion": obj[1], "estado": obj[2]} for obj in objetivos
             ]
             cursor.execute("""
                 SELECT idPlab, semana, fechaInicio, fechaFin, actividades, horas

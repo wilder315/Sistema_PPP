@@ -8,168 +8,212 @@
         <li class="breadcrumb-item active">Informe Final de Prácticas (Empresa)</li>
     </ol>
 </nav>
+<style>
+    body {
+        overflow: hidden;
+    }
+    td > textarea {
+        padding: 0;
+    }
 
+    td {
+        padding: 0 !important;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+</style>
 <div class="container-fluid my-4">
     <div class="card w-100">
         <div class="card-header bg-red-usat text-white">
             Informe Final de Prácticas Pre Profesionales (Elaborado por la Empresa)
         </div>
         <div class="card-body">
-            <form id="form-informe-final-empresa" action="{{ url_for('router_informe.agregar_informe_final_empresa') }}" method="post">
-                <!-- Datos de la Empresa/Institución -->
-                <div class="row"> 
+            <div class="row"> 
 
-                    <div class="col-lg-6"> 
+                <div class="col-lg-6"> 
 
-                        <fieldset>
-                            <legend>Datos de la Empresa/Institución</legend>
-                            <div class="mb-3">
-                                <label for="numDoc_empresa" class="form-label">Documento Identidad Empresa: *</label>
-                                <div class="input-group">
-                                    <div class="flex-grow-1 me-2">
-                                        <div class="custom-combo">
-                                            <input type="text" id="empresa" class="form-control" placeholder="Seleccionar empresa" autocomplete="off">
-                                            <ul id="dropdown-empresas" class="dropdown-menu"></ul>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-secondary" type="button" id="buscar_empresa">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <input type="hidden" id="idEmpresaMod" name="idEmpresaMod">
-                            <div class="mb-3">
-                                <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
-                                <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" required readonly>
-                            </div>
-                            
-                            <div class="row"> 
-                                <div class="col-lg-6 mb-3">
-                                    <label for="doc_jefe" class="form-label">Documento Identidad Responsable:</label>
-                                    <input type="text" class="form-control" id="doc_jefe" name="doc_jefe" required readonly readonly>
-                                </div>
-                                <div class="col-lg-6 mb-3">
-                                    <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
-                                    <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required readonly>
-                                </div>
-                            </div>
-                            <div class=" row mb-3">
-                                <div class="col-lg-6">
-                                    <label for="apellidos_responsable" class="form-label">Apellidos del Responsable:</label>
-                                    <input type="text" class="form-control" id="apellidos_responsable" name="apellidos_responsable" required readonly>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="nombre_responsable" class="form-label">Nombres del Responsable:</label>
-                                    <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" required readonly>
-                                </div>
-                                
-                            </div>
-                            
-                        </fieldset>
-    
-                    </div> 
-    
-                    <div class="col-lg-6">
+                    <fieldset>
                         
-                        <!-- Datos del Estudiante -->
-                        <fieldset>
-                            <legend>Datos del Estudiante</legend>
-                            <div class="mb-3">
-                                <label for="doc_estudiante" class="form-label">Documento Identidad Prácticante: *</label>
-                                <div class="input-group">
-                                    <div class="flex-grow-1 me-2">
-                                        <div class="custom-combo">
-                                            <input type="text" id="estudiante" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
-                                            <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-secondary" type="button" id="btnBuscarE">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>    
-                            </div>
-                            <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
-                            <input type="hidden" id="idPersonaMod" name="idPersonaMod">
-                            <input type="hidden" id="idInformeMod" name="idInformeMod">     
-                            <div class="row mb-3">
-                                <div class="col-lg-6">
-                                    <label for="apellidos_estudiante" class="form-label">Apellidos del Estudiante:</label>
-                                    <input type="text" class="form-control" id="apellidos_estudiante" name="apellidos_estudiante" required readonly>
-                                </div>
-                                <div class="col-lg-6">
-                                    <label for="nombre_estudiante" class="form-label">Nombres del Estudiante:</label>
-                                    <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required readonly>
-                                </div>
-                                
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6 mb-3">
-                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio de la Práctica:</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required readonly>
-                                </div>
-                                <div class="col-lg-6 mb-3">
-                                    <label for="fecha_fin" class="form-label">Fecha de Término de la Práctica:</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required readonly>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="area_estudiante" class="form-label">Area de Desarollo del Prácticante:</label>
-                                <input type="text" class="form-control" id="area_estudiante" name="area_estudiante" required readonly>
-                            </div>
-                        </fieldset>        
-                    </div>
-                </div> 
-                
-                <!-- Valoración sobre el Trabajo del Estudiante -->
-                <fieldset>
-                    <legend>Valoración sobre el Trabajo del Estudiante</legend>
-                    <div class="mb-3">
-                        <label for="cumplimiento_objetivos" class="form-label">Cumplimiento de los Objetivos:</label>
-                        <textarea class="form-control" id="cumplimiento_objetivos" name="cumplimiento_objetivos" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="responsabilidad" class="form-label">Responsabilidad (Disciplina, Puntualidad, Relaciones Humanas, etc.):</label>
-                        <textarea class="form-control" id="responsabilidad" name="responsabilidad" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="otros_aspectos" class="form-label">Otros Aspectos de Interés:</label>
-                        <textarea class="form-control" id="otros_aspectos" name="otros_aspectos" rows="3"></textarea>
-                    </div>
-                </fieldset>
-
-                <!-- Fecha y Firma -->
-                <fieldset>
-                    <legend>Fecha y Firma</legend>
-                    <div class="row"> 
-                        <div class="col-lg-4 mb-3">
-                            <label for="fecha_firma" class="form-label">Fecha de la Firma:</label>
-                            <input type="date" class="form-control" id="fecha_firma" name="fecha_firma" required>
-                        </div>
-                        <div class="col-lg-4 mb-3">
-                            <label for="horas_pp" class="form-label">Cumplimiento del Total de Horas Planificadas:</label>
+                        <div class="mb-3">
+                            <label for="numDoc_empresa" class="form-label">Documento Identidad Empresa: *</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="horas_pp" name="horas_pp" required readonly>
-                                <button class="btn btn-success" id="" id="">
-                                    <i class="fas fa-check"></i>
+                                <div class="flex-grow-1 me-2">
+                                    <div class="custom-combo">
+                                        <input type="text" id="empresa" class="form-control" placeholder="Seleccionar empresa" autocomplete="off">
+                                        <ul id="dropdown-empresas" class="dropdown-menu"></ul>
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary" type="button" id="buscar_empresa">
+                                    <i class="fas fa-search"></i>
                                 </button>
                             </div>
+                        </div>
+                        <input type="hidden" id="idEmpresaMod" name="idEmpresaMod">
+                        <div class="mb-3">
+                            <label for="nombre_empresa" class="form-label">Razón Social de la Empresa:</label>
+                            <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" required readonly>
+                        </div>
+                        
+                        <div class="row"> 
+                            <div class="col-lg-6 mb-3">
+                                <label for="doc_jefe" class="form-label">Documento Identidad Responsable:</label>
+                                <input type="text" class="form-control" id="doc_jefe" name="doc_jefe" required readonly readonly>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <label for="cargo_responsable" class="form-label">Cargo del Responsable:</label>
+                                <input type="text" class="form-control" id="cargo_responsable" name="cargo_responsable" required readonly>
+                            </div>
+                        </div>
+                        <div class=" row mb-3">
+                            <div class="col-lg-6">
+                                <label for="apellidos_responsable" class="form-label">Apellidos del Responsable:</label>
+                                <input type="text" class="form-control" id="apellidos_responsable" name="apellidos_responsable" required readonly>
+                            </div>
+                            <div class="col-lg-6">
+                                <label for="nombre_responsable" class="form-label">Nombres del Responsable:</label>
+                                <input type="text" class="form-control" id="nombre_responsable" name="nombre_responsable" required readonly>
+                            </div>
                             
                         </div>
-                        <div class="col-lg-4 mb-3"> 
-                            <label for="firma_imagen" class="form-label">Firma del Responsable:</label>
-                            <input type="file" class="form-control" id="firma_imagen" name="firma_imagen" accept="image/*" required>
-                            <div class="mt-2">
-                                <img id="firma_imagen-preview" src="#" alt="Vista previa de la firma_imagen" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                        
+                    </fieldset>
+
+                </div> 
+
+                <div class="col-lg-6">
+                    
+                    <!-- Datos del Estudiante -->
+                    <fieldset>
+                        
+                        <div class="mb-3">
+                            <label for="doc_estudiante" class="form-label">Documento Identidad Prácticante: *</label>
+                            <div class="input-group">
+                                <div class="flex-grow-1 me-2">
+                                    <div class="custom-combo">
+                                        <input type="text" id="estudiante" class="form-control" placeholder="Seleccionar estudiante" autocomplete="off">
+                                        <ul id="dropdown-estudiantes" class="dropdown-menu"></ul>
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary" type="button" id="btnBuscarE">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>    
+                        </div>
+                        <input type="hidden" class="form-control me-2" id="id" name="id" required>                 
+                        <input type="hidden" id="idPersonaMod" name="idPersonaMod">
+                        <input type="hidden" id="idInformeMod" name="idInformeMod">     
+                        <div class="row mb-3">
+                            <div class="col-lg-6">
+                                <label for="apellidos_estudiante" class="form-label">Apellidos del Estudiante:</label>
+                                <input type="text" class="form-control" id="apellidos_estudiante" name="apellidos_estudiante" required readonly>
                             </div>
-                        </div> 
+                            <div class="col-lg-6">
+                                <label for="nombre_estudiante" class="form-label">Nombres del Estudiante:</label>
+                                <input type="text" class="form-control" id="nombre_estudiante" name="nombre_estudiante" required readonly>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 mb-3">
+                                <label for="fecha_inicio" class="form-label">Fecha de Inicio de la Práctica:</label>
+                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required readonly>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <label for="fecha_fin" class="form-label">Fecha de Término de la Práctica:</label>
+                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="area_estudiante" class="form-label">Area de Desarollo del Prácticante:</label>
+                            <input type="text" class="form-control" id="area_estudiante" name="area_estudiante" required readonly>
+                        </div>
+                    </fieldset>        
+                </div>
+            </div> 
+            
+            <!-- Valoración sobre el Trabajo del Estudiante -->
+            <fieldset>
+                
+                <div class="row g-3">
+                    <!-- Tabla de Objetivos -->
+                    <div class="col-md-4">
+                        <label for="objetivos" class="form-label">Cumplimiento de objetivos:</label>
+                        <fieldset>
+                            <table class="table table-bordered" id="tabla-objetivos">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 13%;" class="text-center">N°</th>
+                                        <th>Objetivo</th>
+                                        <th style="width: 8%;" class="text-center">✓</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
+                                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+                                        <td class="text-center"><input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                     
-                </fieldset>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary mt-3">Guardar Informe</button>
+                    <!-- Responsabilidad -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="responsabilidad" class="form-label">Responsabilidad (Disciplina, Puntualidad, Relaciones Humanas, etc.):</label>
+                            <textarea class="form-control" id="responsabilidad" name="responsabilidad" rows="8" required></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Otros Aspectos -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="otros_aspectos" class="form-label">Otros Aspectos de Interés:</label>
+                            <textarea class="form-control" id="otros_aspectos" name="otros_aspectos" rows="8"></textarea>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </fieldset>
+            
+
+            <!-- Fecha y Firma -->
+            <fieldset>
+                
+                <div class="row"> 
+                    <div class="col-md-2">
+                        <label for="fecha_firma" class="form-label">Fecha de la firma:</label>
+                        <input type="date" class="form-control" id="fecha_firma" name="fecha_firma" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="horas_pp" class="form-label">Cumple horas planificadas:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="horas_pp" name="horas_pp" required readonly>
+                            <button class="btn btn-success" id="" id="">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-4">
+                        <label for="firma_imagen" class="form-label">Firma del responsable:</label>
+                        <input type="file" class="form-control" id="firma_imagen" name="firma_imagen" accept="image/*" required>
+                        <div class="mt-2">
+                            <img id="firma_imagen-preview" src="#" alt="Vista previa de la firma_imagen" style="display: none; max-width: 100%; height: auto; border: 1px solid #ccc; padding: 5px;" />
+                        </div>
+                    </div> 
+
+                    <div class="col-md-4 d-flex align-items-center justify-content-end">
+                        <span id="estado-indicador" class="badge d-none me-3"></span>
+                        <button id="btnGuardar" type="submit" class="btn btn-primary me-2">Guardar Informe</button>
+                        <button id="btnCancelar" type="button" class="btn btn-danger">Cancelar</button>
+                    </div>
+                </div>
+                
+            </fieldset>
         </div>
     </div>
 </div>
@@ -184,11 +228,123 @@
         limpiarFormulario();
     });
 
-    // Acción al buscar empresa
-    $('#buscar_empresa').on('click', function() {
-        var numDoc = $('#idEmpresaMod').val(); // Obtener el num del doc
+    // Evento para Cancelar
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        limpiarControles();
+    });
 
-        // Validar si el campo está vacío
+    // Función para convertir un archivo a Base64
+    function convertirABase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Función para formatear la fecha
+    function formatFechaParaInput(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate() + 1).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Funcion para mostrar alerta
+    function mostrarAlerta(tipo, titulo, mensaje) {
+        Swal.fire({
+            icon: tipo,
+            title: titulo,
+            html: mensaje,
+            showConfirmButton: true,
+            timer: 5000
+        });
+    }
+
+    // Función para limpiar controles
+    function limpiarControles() {
+        $('#nombre_empresa').val('');
+        $('#doc_jefe').val('');
+        $('#cargo_responsable').val('');
+        $('#apellidos_responsable').val('');
+        $('#nombre_responsable').val('');
+        $('#nombre_estudiante').val('');
+        $('#apellidos_estudiante').val('');
+        $('#horas_pp').val('');
+        $('#area_estudiante').val('');
+        $('#cumplimiento_objetivos').val('');
+        $('#responsabilidad').val('');
+        $('#otros_aspectos').val('');
+        $('#fecha_firma').val('');
+        $('#fecha_inicio').val('');
+        $('#fecha_fin').val('');
+        $('#estudiante').val('');
+        $('#empresa').val('');
+        document.getElementById('empresa').disabled = false;
+        document.getElementById('estudiante').disabled = true;
+        $('#firma_imagen').val('');
+        const firma_imagenPreview = document.getElementById('firma_imagen-preview');
+        if (firma_imagenPreview) {
+            firma_imagenPreview.src = '#';
+            firma_imagenPreview.style.display = 'none';
+        }
+        const tablaObjetivos = document.getElementById('tabla-objetivos');
+        if (tablaObjetivos) {
+            const tbodyO = tablaObjetivos.querySelector('tbody');
+            if (tbodyO) {
+                tbodyO.innerHTML = `
+                    <tr>
+                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
+                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+                        <td class="text-center"><input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo"></td>
+                    </tr>
+                `;
+            }
+        }
+        $('#idEmpresaMod').val('');
+        $('#idPersonaMod').val(''); 
+    }
+
+    // Función para mostrar y recuperar empresas en el dropdown-search
+    const inputEmpresa = document.getElementById('empresa');
+    const dropdownEmpresas = document.getElementById('dropdown-empresas');
+    let idEmpresa = 0;
+    inputEmpresa.addEventListener('input', function () {
+        const searchText = this.value.toLowerCase();
+        fetch('/datos_empresas_buscar')
+            .then(response => response.json())
+            .then(data => {
+                dropdownEmpresas.innerHTML = '';
+                const resultados = data.filter(empresa => 
+                    empresa.nombre.toLowerCase().includes(searchText)
+                );
+                if (resultados.length > 0) {
+                    resultados.forEach(empresa => {
+                        const li = document.createElement('li');
+                        li.textContent = empresa.nombre;
+                        li.dataset.id = empresa.idEmpresa;
+                        li.classList.add('dropdown-item'); // Clase de Bootstrap para estilo
+                        li.addEventListener('click', () => {
+                            inputEmpresa.value = li.textContent;
+                            idEmpresa = empresa.idEmpresa;
+                            document.getElementById('idEmpresaMod').value = empresa.idEmpresa;
+                            dropdownEmpresas.classList.remove('show');
+                        });
+                        dropdownEmpresas.appendChild(li);
+                    });
+                    dropdownEmpresas.classList.add('show'); // Clase de Bootstrap para mostrar el dropdown
+                } else {
+                    dropdownEmpresas.classList.remove('show');
+                }
+            })
+            .catch(error => console.error('Error al cargar las empresas:', error));
+    });
+
+    // Evento para buscar datos de la institución
+    $('#buscar_empresa').on('click', function() {
+        var numDoc = $('#idEmpresaMod').val();
         if (numDoc === "") {
             Swal.fire({
                 icon: 'error',
@@ -200,15 +356,12 @@
             });
             return;
         }
-
-        // Hacer la solicitud AJAX
         $.ajax({
-            url: "{{ url_for('router_jefe.obtener_jefe_por_docc', numDoc='') }}" + numDoc,  // Corregido para pasar el parámetro directamente
+            url: "{{ url_for('router_jefe.obtener_jefe_por_docc', numDoc='') }}" + numDoc,
             type: 'GET',
             dataType: 'json', 
             success: function(response) {
                 if (response.razonSocial) {
-                    // Si se encuentra, mostrar la razón social
                     $('#nombre_empresa').val(response.razonSocial);
                     $('#apellidos_responsable').val(response.apellidos);
                     $('#nombre_responsable').val(response.nombre);
@@ -216,17 +369,15 @@
                     $('#doc_jefe').val(response.numDoc);
                     document.getElementById('empresa').disabled = true;
                     document.getElementById('estudiante').disabled = false;
-                    //enfocar
                     $('#doc_estudiante').focus();
                 } else {
-                    // Si no se encuentra, mostrar un mensaje de error
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
                         text: 'No se encontró la empresa con el número de documento ingresado.',
                         confirmButtonText: 'Aceptar'
                     }).then(() => {
-                        $('#doc_estudiante').focus(); // Enfocar en el campo después del error
+                        $('#doc_estudiante').focus();
                     });
                 }
             },
@@ -288,42 +439,97 @@
             .catch(error => console.error('Error al cargar los estudiantes:', error));
     });
 
-
-    // Función para mostrar y recuperar empresas en el dropdown-search
-    const inputEmpresa = document.getElementById('empresa');
-    const dropdownEmpresas = document.getElementById('dropdown-empresas');
-    let idEmpresa = 0;
-    inputEmpresa.addEventListener('input', function () {
-        const searchText = this.value.toLowerCase();
-        fetch('/datos_empresas_buscar')
-            .then(response => response.json())
+    // Función para cargar datos del estudiante
+    function cargarDatosEstudiante(idEstudiante) {
+        if (!idEstudiante) {
+            console.error("ID de estudiante no proporcionado.");
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido.");
+            return;
+        }
+        fetch(`/obtener_estudiante_por_id/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos del estudiante');
+                }
+                return response.json();
+            })
             .then(data => {
-                dropdownEmpresas.innerHTML = '';
-                const resultados = data.filter(empresa => 
-                    empresa.nombre.toLowerCase().includes(searchText)
-                );
-                if (resultados.length > 0) {
-                    resultados.forEach(empresa => {
-                        const li = document.createElement('li');
-                        li.textContent = empresa.nombre;
-                        li.dataset.id = empresa.idEmpresa;
-                        li.classList.add('dropdown-item'); // Clase de Bootstrap para estilo
-                        li.addEventListener('click', () => {
-                            inputEmpresa.value = li.textContent;
-                            idEmpresa = empresa.idEmpresa;
-                            document.getElementById('idEmpresaMod').value = empresa.idEmpresa;
-                            dropdownEmpresas.classList.remove('show');
-                        });
-                        dropdownEmpresas.appendChild(li);
-                    });
-                    dropdownEmpresas.classList.add('show'); // Clase de Bootstrap para mostrar el dropdown
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('nombre_estudiante').value = data.nombre || 'Sin nombre';
+                    document.getElementById('apellidos_estudiante').value = data.apellidos || 'Sin apellidos';
                 } else {
-                    dropdownEmpresas.classList.remove('show');
+                    mostrarAlerta("info", "Información", "No se encontraron datos para este estudiante.");
                 }
             })
-            .catch(error => console.error('Error al cargar las empresas:', error));
-    });
+            .catch(error => {
+                console.error("Error al buscar el estudiante:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al buscar el estudiante.");
+            });
+    }
 
+    // Función para cargar datos de la práctica
+    function cargarDatosPractica(data) {
+        document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
+        document.getElementById('idPersonaMod').value = data.idPersona || '';
+        if (data.numDocInstitucion) {
+            obtenerDatosInstitucion(data.numDocInstitucion);
+        }
+    }
+
+    // Variables globales para almacenar los archivos previos
+    let firma1Base64Previo = null;
+
+    // Función para cargar datos del informe
+    function cargarDatosInforme(informe) {
+        if (!informe || informe.error) {
+            mostrarAlerta("warning", "Advertencia", informe ? informe.error : "No se encontraron datos del informe.");
+            return;
+        }
+        document.getElementById('idInformeMod').value = informe.idInforme || '';
+        document.getElementById('fecha_entrega').value = informe.fecha || '';
+        document.getElementById('area_estudiante').value = informe.area || '';
+        document.getElementById('responsabilidad').value = informe.responsabilidad || '';
+        document.getElementById('otros_aspectos').value = informe.extras || '';
+        const firma1Preview = document.getElementById('firma1_imagen-preview');
+        if (informe.firma1) {
+            firma1Base64Previo = informe.firma1;
+            firma1Preview.src = `data:image/png;base64,${informe.firma1}`;
+            firma1Preview.style.display = 'block';
+        } else {
+            firma1Base64Previo = null;
+            firma1Preview.src = '#';
+            firma1Preview.style.display = 'none';
+        }
+        const objetivosTableBody = document.querySelector('#tabla-objetivos tbody');
+        objetivosTableBody.innerHTML = '';
+        if (informe.objetivos && informe.objetivos.length > 0) {
+            informe.objetivos.forEach((objetivo, index) => {
+                const isChecked = objetivo.estado === 'C' ? 'checked' : '';
+                const row = `
+                    <tr>
+                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="${index + 1}" required readonly></td>
+                        <td><textarea type="text" class="form-control" name="objetivo[]" required>${objetivo.descripcion}</textarea></td>
+                        <td class="text-center">
+                            <input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo" ${isChecked}>
+                        </td>
+                    </tr>
+                `;
+                objetivosTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        } else {
+            // Si no hay objetivos, mostrar una fila vacía
+            const emptyRow = `
+                <tr>
+                    <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="1" required readonly></td>
+                    <td><textarea type="text" class="form-control" name="objetivo[]" required></textarea></td>
+                    <td class="text-center">
+                        <input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo">
+                    </td>
+                </tr>
+            `;
+            objetivosTableBody.insertAdjacentHTML('beforeend', emptyRow);
+        }
+    }
 
     // Evento para vista previa de la firma_imagen
     document.getElementById('firma_imagen').addEventListener('change', function (event) {
@@ -342,182 +548,172 @@
             }
         });
 
-    // Acción al buscar estudiante
-    $('#btnBuscarE').on('click', function() {
-        var doc_estudiante = $('#idPersonaMod').val(); // Obtener el doc_estudiante
-
-        // Validar si el campo está vacío
-        if (doc_estudiante === "") {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Avertencia',
-                text: 'Debe seleccionar un estudiante',
-                confirmButtonText: 'Aceptar'
-            });
+    // Función para buscar por Estudiante
+    document.getElementById('btnBuscarE').addEventListener('click', function (event) {
+        event.preventDefault();
+        const idEstudiante = idPersona;
+        const fechaActualFormateada = formatFechaParaInput(new Date());
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (!idEstudiante) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
+        fetch(`/estado_informe_final/${idEstudiante}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener el estado del informe final');
+                }
+                return response.json();
+            })
+            .then(estadoData => {
+                const estado = estadoData.estado;
+                estadoIndicador.classList.remove('d-none', 'bg-success', 'bg-warning', 'bg-danger');
 
-        // Función para formatear la fecha
-        function convertirFecha(fecha) {
-            const date = new Date(fecha);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate() + 1).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
+                if (estado === 3) { // Estado aprobado
+                    estadoIndicador.textContent = 'Aprobado';
+                    estadoIndicador.classList.add('bg-success');
 
-        // Hacer la solicitud AJAX
-        $.ajax({
-            url: "{{ url_for('router_estudiante.obtener_estudiante_por_doc', doc_estudiante='') }}" + doc_estudiante,
-            type: 'GET',
-            dataType: 'json', 
-            success: function(response) {
-                if (response.nombre) {
-                    // Si se encuentra, mostrar el nombre
-                    $('#nombre_estudiante').val(response.nombre);
-                    $('#apellidos_estudiante').val(response.apellidos);
-                    $('#horas_pp').val(response.numeroHorasPPP); 
-                    
-                    // Convertir y asignar fechas
-                    if (response.fechaInicio) {
-                        let fechaInicio = convertirFecha(response.fechaInicio);
-                        $('#fecha_inicio').val(fechaInicio);
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe final del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        // Cargar datos del informe
+                                        cargarDatosInforme(informeData);
+
+                                        // Cargar datos de la práctica y estudiante
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+
+                                        // Habilitar solo lectura (sin deshabilitar tabs)
+                                        setFormularioSoloLectura(true, false);
+
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe final:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
+                } else if (estado === 2 || estado === 1) { // Pendiente o Rechazado
+                    if (estado === 1) {
+                        estadoIndicador.textContent = 'Rechazado';
+                        estadoIndicador.classList.add('bg-danger');
+                        mostrarAlerta("warning", "Advertencia", "El estudiante tiene un informe final rechazado.");
+                    } else {
+                        estadoIndicador.textContent = 'Pendiente de aprobación';
+                        estadoIndicador.classList.add('bg-warning');
                     }
 
-                    if (response.fechaFin) {
-                        let fechaFin = convertirFecha(response.fechaFin);
-                        $('#fecha_fin').val(fechaFin);
-                    }
-
-                    $('#area_estudiante').val(response.area); 
-
+                    fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al obtener datos de la práctica del estudiante');
+                            }
+                            return response.json();
+                        })
+                        .then(practicaData => {
+                            if (practicaData.idPractica) {
+                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error al cargar el informe final del estudiante');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(informeData => {
+                                        cargarDatosInforme(informeData);
+                                        const idInput = document.getElementById('id');
+                                        if (idInput) {
+                                            idInput.value = practicaData.idPractica || '';
+                                            idInput.disabled = true;
+                                        }
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        enableTabs();
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al cargar el informe final:", error);
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                    });
+                            } else {
+                                mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener la práctica del estudiante:", error);
+                            mostrarAlerta("error", "Error", "Hubo un error al obtener la práctica del estudiante.");
+                        });
+                    return;
                 } else {
-                    // Si no se encuentra, mostrar un mensaje de error
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se encontró el estudiante con el número de documento ingresado.',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    estadoIndicador.textContent = '';
+                    estadoIndicador.classList.add('d-none');
                 }
-            },
-            error: function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un error al buscar el estudiante.',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-        });
-    });
-
-    // Enviar el formulario con AJAX
-    $('#form-informe-final-empresa').on('submit', function(event) {
-        event.preventDefault();  
-        
-        const formData = new FormData(this);  // Recoger los datos del formulario
-
-        //obtener la imagen  
-        var firma_imagen = $('#firma_imagen')[0].files[0];
-
-        // Crear un FileReader para convertir la imagen a base64
-        var reader = new FileReader();
-
-        reader.onloadend = function() {
-            // La imagen ya está convertida en base64
-            var base64Firma = reader.result;
-    
-            // Recoger los demás datos del formulario
-            var dataToSend = {
-                numDoc: $('#idPersonaMod').val(),
-                area_desarrollo: $('#area_estudiante').val(),
-                texto_responsabilidad: $('#responsabilidad').val(),
-                texto_otros_aspectos: $('#otros_aspectos').val(),
-                firma_imagen: base64Firma,  // Enviar la imagen como base64
-                cumplimiento_objetivos: $('#cumplimiento_objetivos').val(),
-                fecha: $('#fecha_firma').val()
-            };
-
-            // Hacer la solicitud AJAX para guardar el informe
-            $.ajax({
-                url: "{{ url_for('router_informeEmpresa.guardar_informe_final_empresa') }}",  // Aquí se llama al endpoint
-                type: 'POST',
-                //data: formData,
-                contentType: 'application/json', //enviar como JSON
-                data: JSON.stringify(dataToSend),  // Convertir el objeto a JSON para enviarlo en el body de la petición
-                success: function(response){
-                    console.log(response);
-                    if(response.message){
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                            text: response.message,  // Respuesta del servidor
-                            confirmButtonText: 'Aceptar'
-                        }).then(() => {
-                            limpiarFormulario(); 
-                            // Realiza alguna acción después de un envío exitoso
-                        });
-                    } else if (response.error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.error,  // Mensaje de error desde el servidor
-                            confirmButtonText: 'Aceptar'
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un error al enviar el formulario.',
-                        confirmButtonText: 'Aceptar'
+                fetch(`/obtener_practica_por_estudiante/${idEstudiante}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al obtener datos del estudiante');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            mostrarAlerta("error", "Error", data.error);
+                            limpiarControles();
+                        } else if (data.mensaje) {
+                            mostrarAlerta("info", "Información", data.mensaje);
+                            limpiarControles();
+                        } else {
+                            const idInput = document.getElementById('id');
+                            if (idInput) {
+                                idInput.value = data.idPractica || '';
+                                idInput.disabled = true;
+                            }
+                            cargarDatosPractica(data);
+                            cargarDatosEstudiante(idEstudiante);
+                            enableTabs();
+                            document.getElementById('estudiante').disabled = true;
+                            document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al buscar la práctica del estudiante:", error);
+                        mostrarAlerta("error", "Error", "Hubo un error al buscar la práctica del estudiante.");
                     });
-                }
+            })
+            .catch(error => {
+                console.error("Error al obtener el estado del informe final:", error);
+                mostrarAlerta("error", "Error", "Hubo un error al verificar el estado del informe final.");
             });
-        }; //cierre agregado
-
-        //leer la imagen con base64
-        if (firma_imagen){
-            reader.readAsDataURL(firma_imagen);
-        }
     });
-
-    // Función para limpiar los campos del formulario
-    function limpiarFormulario() {
-        // Limpiar campos de texto
-        $('#nombre_empresa').val('');
-        $('#doc_jefe').val('');
-        $('#cargo_responsable').val('');
-        $('#apellidos_responsable').val('');
-        $('#nombre_responsable').val('');
-        $('#nombre_estudiante').val('');
-        $('#apellidos_estudiante').val('');
-        $('#horas_pp').val('');
-        $('#area_estudiante').val('');
-        $('#cumplimiento_objetivos').val('');
-        $('#responsabilidad').val('');
-        $('#otros_aspectos').val('');
-        $('#fecha_firma').val('');
-        $('#fecha_inicio').val('');
-        $('#fecha_fin').val('');
-        $('#estudiante').val('');
-        $('#empresa').val('');
-        document.getElementById('empresa').disabled = false;
-        document.getElementById('estudiante').disabled = true;
-        // Limpiar el campo de archivo (firma)
-        $('#firma_imagen').val('');
-        const firma_imagenPreview = document.getElementById('firma_imagen-preview');
-        if (firma_imagenPreview) {
-            firma_imagenPreview.src = '#';
-            firma_imagenPreview.style.display = 'none';
-        }
-        $('#idEmpresaMod').val('');
-        $('#idPersonaMod').val(''); 
-    }
-
-        
 
 </script>
     

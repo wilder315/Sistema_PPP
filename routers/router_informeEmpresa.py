@@ -42,29 +42,22 @@ def subir_firma():
 @router_informeEmpresa.route('/guardar_informe_final_empresa', methods=["POST"])
 def guardar_informe_final_empresa(): 
     try:
-        # Obtener los datos del formulario
         data = request.json
         numDoc = data.get('numDoc')
-        area_desarrollo = data.get('area_desarrollo')
         texto_responsabilidad = data.get('texto_responsabilidad')
         texto_otros_aspectos = data.get('texto_otros_aspectos')
         firma_imagen_base64 = data.get('firma_imagen')
         cumplimiento_objetivos = data.get('cumplimiento_objetivos')
         fecha = data.get('fecha')
         
-        # Convertir la imagen base64 a archivo
         if firma_imagen_base64:
-            
-            # Eliminar el prefijo de la cadena base64 (data:image/png;base64,...)
             if firma_imagen_base64.startswith('data:image'):
                 header, base64_data = firma_imagen_base64.split(',', 1)
             else:
                 base64_data = firma_imagen_base64
 
-            # Decodificar la imagen base64
             img_data = base64.b64decode(base64_data)
 
-            # Crear un nombre único para el archivo (usando UUID)
             unique_filename = str(uuid.uuid4()) + '.png'  # Puedes cambiar la extensión según el tipo de imagen
             file_path = os.path.join('static', 'img', unique_filename)
 
@@ -73,7 +66,7 @@ def guardar_informe_final_empresa():
                 f.write(img_data)
         
         #llamar al controlador para agregar el informe
-        resultado = controlador_informeEmpresa.guardar_informeFinalEmpresa(numDoc, area_desarrollo, texto_responsabilidad, texto_otros_aspectos, file_path, cumplimiento_objetivos, fecha)
+        resultado = controlador_informeEmpresa.guardar_informeFinalEmpresa(numDoc, texto_responsabilidad, texto_otros_aspectos, file_path, cumplimiento_objetivos, fecha)
         
         return jsonify(resultado) #retornar un mensaje de exito 
         
@@ -111,32 +104,23 @@ def buscar_instituciones():
 @router_informeEmpresa.route('/guardar_informe_inicial_empresa', methods=['POST'])
 def guardar_informe_inicial_empresa():
     try:
-        # Obtener los datos del formulario
-        labor = request.form.get('labor')  # labores principales
-        labores = request.form.get('labores')  # labores específicas
+        labor = request.form.get('labor')
+        labores = request.form.get('labores')
         firma1 = request.files.get('firma1')
         firma2 = request.files.get('firma2')
-
         if not all([labor, labores, firma1, firma2]):
             return jsonify({"error": "Faltan campos requeridos"}), 400
-
-        # Llamar al controlador
         resultado = controlador_informeEmpresa.guardar_informeInicialEmpresa(
             json.loads(labor),
             json.loads(labores),
             firma1,
             firma2
         )
-        
         print(resultado)
-
         return jsonify(resultado)
-
     except Exception as e:
         print("Error en guardar_informe_inicial_empresa:", str(e))
-        return jsonify({"error": str(e)}), 500
-    
-    
+        return jsonify({"error": str(e)}), 500  
 
 @router_informeEmpresa.route('/listar_informes_empresa', methods=['GET'])
 def listar_informes_empresa():
