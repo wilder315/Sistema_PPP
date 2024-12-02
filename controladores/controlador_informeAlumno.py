@@ -1,8 +1,6 @@
 from bd import obtener_conexion
 from datetime import datetime
 
-# Obtener informes de los alumnos con sus prácticas y tipos de informes
-# Obtener informes de los alumnos con sus prácticas y tipos de informes
 def obtener_informeAlumno():
     conexion = obtener_conexion()
     if not conexion:
@@ -25,10 +23,10 @@ def obtener_informeAlumno():
                     WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
                 ) AS Informe_Inicial_Existe,
                 (SELECT i.idInforme 
-                 FROM informes_practicas_preprofesionales ippp 
-                 JOIN informe i ON ippp.IidInforme = i.idInforme
-                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
-                 LIMIT 1) AS Informe_Inicial_ID,
+                FROM informes_practicas_preprofesionales ippp 
+                JOIN informe i ON ippp.IidInforme = i.idInforme
+                WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
+                LIMIT 1) AS Informe_Inicial_ID,
                 -- Informe final (tipo 2)
                 EXISTS(
                     SELECT 1 
@@ -37,10 +35,10 @@ def obtener_informeAlumno():
                     WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
                 ) AS Informe_Final_Existe,
                 (SELECT i.idInforme 
-                 FROM informes_practicas_preprofesionales ippp 
-                 JOIN informe i ON ippp.IidInforme = i.idInforme
-                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
-                 LIMIT 1) AS Informe_Final_ID,
+                FROM informes_practicas_preprofesionales ippp 
+                JOIN informe i ON ippp.IidInforme = i.idInforme
+                WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
+                LIMIT 1) AS Informe_Final_ID,
                 -- Informe de tipo 3
                 EXISTS(
                     SELECT 1 
@@ -49,10 +47,10 @@ def obtener_informeAlumno():
                     WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
                 ) AS Informe_Tipo3_Existe,
                 (SELECT i.idInforme 
-                 FROM informes_practicas_preprofesionales ippp 
-                 JOIN informe i ON ippp.IidInforme = i.idInforme
-                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
-                 LIMIT 1) AS Informe_Tipo3_ID,
+                FROM informes_practicas_preprofesionales ippp 
+                JOIN informe i ON ippp.IidInforme = i.idInforme
+                WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
+                LIMIT 1) AS Informe_Tipo3_ID,
                 -- Informe de tipo 4
                 EXISTS(
                     SELECT 1 
@@ -61,10 +59,20 @@ def obtener_informeAlumno():
                     WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
                 ) AS Informe_Tipo4_Existe,
                 (SELECT i.idInforme 
-                 FROM informes_practicas_preprofesionales ippp 
-                 JOIN informe i ON ippp.IidInforme = i.idInforme
-                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
-                 LIMIT 1) AS Informe_Tipo4_ID,
+                FROM informes_practicas_preprofesionales ippp 
+                JOIN informe i ON ippp.IidInforme = i.idInforme
+                WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
+                LIMIT 1) AS Informe_Tipo4_ID,
+                -- Informe de tipo 5 (en la tabla ficha_evaluacion)
+                EXISTS(
+                    SELECT 1 
+                    FROM ficha_evaluacion fe
+                    WHERE fe.idPractica = ppp.idPractica AND fe.idTipoInforme = 5
+                ) AS Informe_Tipo5_Existe,
+                (SELECT fe.idFichaEvaluacion 
+                FROM ficha_evaluacion fe
+                WHERE fe.idPractica = ppp.idPractica AND fe.idTipoInforme = 5
+                LIMIT 1) AS Informe_Tipo5_ID,
                 -- Informe de tipo 6
                 EXISTS(
                     SELECT 1 
@@ -73,10 +81,10 @@ def obtener_informeAlumno():
                     WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
                 ) AS Informe_Tipo6_Existe,
                 (SELECT i.idInforme 
-                 FROM informes_practicas_preprofesionales ippp 
-                 JOIN informe i ON ippp.IidInforme = i.idInforme
-                 WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
-                 LIMIT 1) AS Informe_Tipo6_ID
+                FROM informes_practicas_preprofesionales ippp 
+                JOIN informe i ON ippp.IidInforme = i.idInforme
+                WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
+                LIMIT 1) AS Informe_Tipo6_ID
             FROM 
                 persona p
             JOIN 
@@ -543,6 +551,7 @@ def obtener_detalle_informe(idInforme):
     
     try:
         with conexion.cursor() as cursor:
+            # Intentar obtener el informe de la tabla 'informe'
             cursor.execute("""
                 SELECT 
                     idInforme AS ID_Informe,
@@ -554,29 +563,60 @@ def obtener_detalle_informe(idInforme):
             """, (idInforme,))
             resultado = cursor.fetchone()
             
-            if not resultado:
-                return {"error": "No se encontró ningún informe con el ID proporcionado."}
-            
-            # Mapear el estado del informe
-            estado_map = {
-                "A": "Aprobado",
-                "P": "Pendiente de aprobación",
-                "R": "Rechazado"
-            }
-            
-            # Mapeamos los resultados a un diccionario
-            detalle_informe = {
-                "idInforme": resultado[0],
-                "fecha": resultado[1],
-                "estado": estado_map.get(resultado[2], "Estado desconocido"),
-                "tipoInforme": resultado[3]
-            }
-            return detalle_informe
+            if resultado:
+                # Mapear el estado del informe
+                estado_map = {
+                    "A": "Aprobado",
+                    "P": "Pendiente de aprobación",
+                    "R": "Rechazado"
+                }
+                
+                # Mapeamos los resultados a un diccionario
+                detalle_informe = {
+                    "idInforme": resultado[0],
+                    "fecha": resultado[1],
+                    "estado": estado_map.get(resultado[2], "Estado desconocido"),
+                    "tipoInforme": resultado[3]
+                }
+                return detalle_informe
+            else:
+                # Si no se encuentra en la tabla 'informe', buscar en 'ficha_evaluacion'
+                cursor.execute("""
+                    SELECT 
+                        idFichaEvaluacion AS ID_Informe,
+                        fecha_evaluacion AS Fecha,
+                        estado AS Estado,
+                        idTipoInforme AS TipoInforme
+                    FROM ficha_evaluacion
+                    WHERE idFichaEvaluacion = %s
+                """, (idInforme,))
+                resultado_ficha = cursor.fetchone()
+                
+                if resultado_ficha:
+                    # Mapear el estado del informe
+                    estado_map = {
+                        "A": "Aprobado",
+                        "P": "Pendiente de aprobación",
+                        "R": "Rechazado"
+                    }
+                    
+                    # Mapeamos los resultados a un diccionario
+                    detalle_informe = {
+                        "idInforme": resultado_ficha[0],
+                        "fecha": resultado_ficha[1],
+                        "estado": estado_map.get(resultado_ficha[2], "Estado desconocido"),
+                        "tipoInforme": resultado_ficha[3]
+                    }
+                    return detalle_informe
+                else:
+                    # Si no se encuentra en ambas tablas
+                    return {"error": "No se encontró ningún informe con el ID proporcionado."}
     except Exception as e:
         return {"error": f"Error al obtener el detalle del informe: {str(e)}"}
     finally:
         conexion.close()
 
+# Controlador para aprobar un informe
 def aprobar_informe(idInforme):
     conexion = obtener_conexion()
     if not conexion:
@@ -584,7 +624,7 @@ def aprobar_informe(idInforme):
 
     try:
         with conexion.cursor() as cursor:
-            # Verificar el estado actual del informe
+            # Verificar el estado del informe en la tabla 'informe'
             cursor.execute("""
                 SELECT estado
                 FROM informe
@@ -593,18 +633,41 @@ def aprobar_informe(idInforme):
             resultado = cursor.fetchone()
 
             if not resultado:
-                return {"error": "El informe no existe."}
+                # Si no se encuentra en 'informe', buscar en 'ficha_evaluacion'
+                cursor.execute("""
+                    SELECT estado
+                    FROM ficha_evaluacion
+                    WHERE idFichaEvaluacion = %s
+                """, (idInforme,))
+                resultado_ficha = cursor.fetchone()
 
-            estado_actual = resultado[0]
-            if estado_actual == 'A':
-                return {"error": "El informe ya está aprobado."}
+                if not resultado_ficha:
+                    return {"error": "El informe no existe."}
 
-            # Actualizar el estado del informe a 'A' (Aprobado)
-            cursor.execute("""
-                UPDATE informe
-                SET estado = 'A'
-                WHERE idInforme = %s
-            """, (idInforme,))
+                # Si se encuentra en 'ficha_evaluacion', actualizar su estado
+                estado_actual_ficha = resultado_ficha[0]
+                if estado_actual_ficha == 'A':
+                    return {"error": "El informe ya está aprobado."}
+
+                # Actualizar el estado del informe en 'ficha_evaluacion'
+                cursor.execute("""
+                    UPDATE ficha_evaluacion
+                    SET estado = 'A'
+                    WHERE idFichaEvaluacion = %s
+                """, (idInforme,))
+                
+            else:
+                # Si se encuentra en 'informe', verificar y actualizar su estado
+                estado_actual = resultado[0]
+                if estado_actual == 'A':
+                    return {"error": "El informe ya está aprobado."}
+
+                # Actualizar el estado del informe a 'A' (Aprobado)
+                cursor.execute("""
+                    UPDATE informe
+                    SET estado = 'A'
+                    WHERE idInforme = %s
+                """, (idInforme,))
 
             # Confirmar los cambios
             conexion.commit()
@@ -616,6 +679,8 @@ def aprobar_informe(idInforme):
     finally:
         conexion.close()
 
+
+# Controlador para rechazar un informe
 def rechazar_informe(idInforme):
     conexion = obtener_conexion()
     if not conexion:
@@ -623,7 +688,7 @@ def rechazar_informe(idInforme):
 
     try:
         with conexion.cursor() as cursor:
-            # Verificar el estado actual del informe
+            # Verificar el estado del informe en la tabla 'informe'
             cursor.execute("""
                 SELECT estado
                 FROM informe
@@ -632,26 +697,50 @@ def rechazar_informe(idInforme):
             resultado = cursor.fetchone()
 
             if not resultado:
-                return {"error": "El informe no existe."}
+                # Si no se encuentra en 'informe', buscar en 'ficha_evaluacion'
+                cursor.execute("""
+                    SELECT estado
+                    FROM ficha_evaluacion
+                    WHERE idFichaEvaluacion = %s
+                """, (idInforme,))
+                resultado_ficha = cursor.fetchone()
 
-            estado_actual = resultado[0]
-            if estado_actual == 'R':
-                return {"error": "El informe ya está rechazado."}
+                if not resultado_ficha:
+                    return {"error": "El informe no existe."}
 
-            # Actualizar el estado del informe a 'R' (Rechazado)
-            cursor.execute("""
-                UPDATE informe
-                SET estado = 'R'
-                WHERE idInforme = %s
-            """, (idInforme,))
+                # Si se encuentra en 'ficha_evaluacion', verificar y actualizar su estado
+                estado_actual_ficha = resultado_ficha[0]
+                if estado_actual_ficha == 'R':
+                    return {"error": "El informe ya está rechazado."}
+
+                # Actualizar el estado del informe en 'ficha_evaluacion'
+                cursor.execute("""
+                    UPDATE ficha_evaluacion
+                    SET estado = 'R'
+                    WHERE idFichaEvaluacion = %s
+                """, (idInforme,))
+                
+            else:
+                # Si se encuentra en 'informe', verificar y actualizar su estado
+                estado_actual = resultado[0]
+                if estado_actual == 'R':
+                    return {"error": "El informe ya está rechazado."}
+
+                # Actualizar el estado del informe a 'R' (Rechazado)
+                cursor.execute("""
+                    UPDATE informe
+                    SET estado = 'R'
+                    WHERE idInforme = %s
+                """, (idInforme,))
 
             # Confirmar los cambios
             conexion.commit()
-
+            
             return {"mensaje": "El informe fue rechazado correctamente."}
     except Exception as e:
         conexion.rollback()  # Revertir los cambios en caso de error
         return {"error": f"Error al rechazar el informe: {str(e)}"}
     finally:
         conexion.close()
+
 

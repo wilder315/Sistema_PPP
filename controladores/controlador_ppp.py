@@ -161,12 +161,14 @@ def verificar_practica_activa(id_estudiante):
     finally:
         conexion.close()
 
+
 def informes_practica(idPractica):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
     try:
         with conexion.cursor() as cursor:
+            # Verificar existencia de informes de tipo 1 a 4 en la tabla 'informe'
             cursor.execute(""" 
                 SELECT 
                     p.idPractica,
@@ -209,7 +211,14 @@ def informes_practica(idPractica):
                         WHERE dipp.idPractica = p.idPractica 
                         AND i.idTipoInforme = 6 
                         AND i.estado = 'A'
-                    ) AS informe6
+                    ) AS informe6,
+                    EXISTS (
+                        SELECT 1
+                        FROM ficha_evaluacion fe
+                        WHERE fe.idPractica = p.idPractica
+                        AND fe.idTipoInforme = 5
+                        AND fe.estado = 'A'
+                    ) AS informe5
                 FROM 
                     practicas_preprofesionales p
                 WHERE 

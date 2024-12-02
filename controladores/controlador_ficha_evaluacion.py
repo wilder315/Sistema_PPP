@@ -66,7 +66,7 @@ class ControladorFichaEvaluacion:
                         INNER JOIN institucion i ON pp.numDocInstitucion = i.numDoc
                         LEFT JOIN persona resp ON i.idPersona = resp.idPersona
                         WHERE p.idPersona = %s
-                        AND pp.estadoVigencia = 'A'
+                        AND pp.estadoVigencia = 'P'
                         LIMIT 1
                     """, (id_estudiante,))
                     
@@ -126,13 +126,13 @@ class ControladorFichaEvaluacion:
                         resultado9, calificacion_resultado9,
                         resultado10, calificacion_resultado10,
                         -- Conclusiones
-                        conclusiones
+                        conclusiones, idTipoInforme
                     ) VALUES (
-                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'1',
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'P',
                         %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
-                        %s
+                        %s, %s
                     )
                 """, (
                     datos_ficha['idPractica'],
@@ -166,7 +166,8 @@ class ControladorFichaEvaluacion:
                     datos_ficha.get('resultado9'), datos_ficha.get('calificacion_resultado9'),
                     datos_ficha.get('resultado10'), datos_ficha.get('calificacion_resultado10'),
                     # Conclusiones
-                    datos_ficha.get('conclusiones')
+                    datos_ficha.get('conclusiones'),
+                    5
                 ))
                 conexion.commit()
                 return {"mensaje": "Ficha de evaluación guardada correctamente"}
@@ -192,12 +193,9 @@ class ControladorFichaEvaluacion:
                             fe.escuela_profesional,
                             fe.nombre_empresa,
                             fe.fecha_evaluacion,
-                            CASE 
-                                WHEN fe.estado = '1' THEN 'Activo'
-                                ELSE 'Inactivo'
-                            END as estado
+                            fe.estado
                         FROM ficha_evaluacion fe
-                        WHERE fe.idPractica = %s AND fe.estado = '1'
+                        WHERE fe.idPractica = %s
                         ORDER BY fe.fecha_evaluacion DESC
                     """, (id_practica,))
                 else:
@@ -208,12 +206,9 @@ class ControladorFichaEvaluacion:
                             fe.escuela_profesional,
                             fe.nombre_empresa,
                             fe.fecha_evaluacion,
-                            CASE 
-                                WHEN fe.estado = '1' THEN 'Activo'
-                                ELSE 'Inactivo'
+                            fe.estado
                             END as estado
                         FROM ficha_evaluacion fe
-                        WHERE fe.estado = '1'
                         ORDER BY fe.fecha_evaluacion DESC
                     """)
                 
@@ -282,7 +277,6 @@ class ControladorFichaEvaluacion:
                         fe.estado
                     FROM ficha_evaluacion fe
                     WHERE fe.idFichaEvaluacion = %s
-                    AND fe.estado = '1'
                 """, (id_ficha,))
                 
                 resultado = cursor.fetchone()
@@ -393,7 +387,7 @@ class ControladorFichaEvaluacion:
                     UPDATE ficha_evaluacion 
                     SET {', '.join(actualizaciones)}
                     WHERE idFichaEvaluacion = %s 
-                    AND estado = '1'
+                    AND estado = 'P'
                 """
                 
                 cursor.execute(sql, valores)

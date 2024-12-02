@@ -18,7 +18,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         <td>${informe.idInforme}</td>
                         <td>${informe.estudiante}</td>
                         <td>${informe.fecha || ''}</td>
-                        <td>${informe.estado === 'A' ? 'Activo' : 'Inactivo'}</td>
+                        <td>
+                            ${informe.estado === 'P' ? 'Pendiente de aprobación' : 
+                            informe.estado === 'A' ? 'Aprobado' : 
+                            informe.estado === 'R' ? 'Rechazado' : 
+                            informe.estado || ''}
+                        </td>
                         <td>
                             <button class="btn btn-info btn-sm" style="border-radius: 5px; margin-right: 5px;" onclick="verInforme(${informe.idInforme})">
                                 <i class="fas fa-eye"></i>

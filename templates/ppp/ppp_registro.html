@@ -301,10 +301,16 @@
                                     <div class="row mb-3">                     
                                         <div class="col-md-6">
                                             <div class="form-check">
+                                                <label for="ficha" class="form-check-label ms-2">Ficha de evaluación de desempeño:</label>
+                                                <input type="checkbox" class="form-check-input" id="ficha" name="ficha">                      
+                                            </div>
+                                        </div>  
+                                        <div class="col-md-6">
+                                            <div class="form-check">
                                                 <label for="constanciappp" class="form-check-label ms-2">Constancia de PPP:</label>
                                                 <input type="checkbox" class="form-check-input" id="constanciappp" name="constanciappp">                      
                                             </div>
-                                        </div>          
+                                        </div>                                             
                                     </div>
                                 </div>
                                 <div class="text-end">
@@ -334,10 +340,13 @@
     document.getElementById('finalinstitucion').addEventListener('click', function (e) {
         e.preventDefault(); // Evita el cambio de estado
     });
+    document.getElementById('ficha').addEventListener('click', function (e) {
+        e.preventDefault(); // Evita el cambio de estado
+    });
     document.getElementById('constanciappp').addEventListener('click', function (e) {
         e.preventDefault(); // Evita el cambio de estado
     });
-
+    
     // Evento para cuando cargas la página
     document.addEventListener('DOMContentLoaded', function() {
         limpiarControles();
@@ -827,6 +836,7 @@
         document.getElementById('inicialinstitucion').checked = data.informe2 || false;
         document.getElementById('finalestudiante').checked = data.informe3 || false;
         document.getElementById('finalinstitucion').checked = data.informe4 || false;
+        document.getElementById('ficha').checked = data.informe5 || false;
         document.getElementById('constanciappp').checked = data.informe6 || false;
     }
 
@@ -936,6 +946,7 @@
         const inicialInstitucionCheck = document.getElementById('inicialinstitucion');
         const finalEstudianteCheck = document.getElementById('finalestudiante');
         const finalInstitucionCheck = document.getElementById('finalinstitucion');
+        const fichaCheck = document.getElementById('ficha');
         const constanciaCheck = document.getElementById('constanciappp');
         const idPractica = document.getElementById('id').value;
         const allChecksSelected =
@@ -943,6 +954,7 @@
             inicialInstitucionCheck.checked &&
             finalEstudianteCheck.checked &&
             finalInstitucionCheck.checked &&
+            fichaCheck.checked &&
             constanciaCheck.checked;
         if (fechaFinInput.value && semestreSelect.value && allChecksSelected) {
             fetch(`/finalizar_practica/${idPractica}`, {

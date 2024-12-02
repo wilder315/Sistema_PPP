@@ -104,13 +104,15 @@ def buscar_instituciones():
 @router_informeEmpresa.route('/guardar_informe_inicial_empresa', methods=['POST'])
 def guardar_informe_inicial_empresa():
     try:
+        aceptacion = request.form.get('aceptacion')
         labor = request.form.get('labor')
         labores = request.form.get('labores')
         firma1 = request.files.get('firma1')
         firma2 = request.files.get('firma2')
-        if not all([labor, labores, firma1, firma2]):
+        if not all([aceptacion, labor, labores, firma1, firma2]):
             return jsonify({"error": "Faltan campos requeridos"}), 400
         resultado = controlador_informeEmpresa.guardar_informeInicialEmpresa(
+            aceptacion,
             json.loads(labor),
             json.loads(labores),
             firma1,
@@ -122,6 +124,31 @@ def guardar_informe_inicial_empresa():
         print("Error en guardar_informe_inicial_empresa:", str(e))
         return jsonify({"error": str(e)}), 500  
 
+@router_informeEmpresa.route('/actualizar_informe', methods=['POST'])
+def actualizar_informe():
+    try:
+        id_informe = request.form.get('idInforme')
+        fecha = request.form.get('fecha')
+        aceptacion = request.form.get('aceptacion')
+        labor = request.form.get('labor')  
+        labores = request.form.get('labores')  
+        firma1 = request.files.get('firma1')
+        firma2 = request.files.get('firma2')
+
+        resultado = controlador_informeEmpresa.actualizar_informe(
+            id_informe,
+            fecha,
+            aceptacion,
+            json.loads(labor),
+            json.loads(labores),
+            firma1,
+            firma2
+        )
+        return jsonify(resultado)
+    except Exception as e:
+        print("Error en ruta actualizar_informe:", str(e))
+        return jsonify({"error": str(e)}), 500
+    
 @router_informeEmpresa.route('/listar_informes_empresa', methods=['GET'])
 def listar_informes_empresa():
     try:
@@ -138,21 +165,3 @@ def obtener_informe(id_informe):
         return jsonify(informe)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@router_informeEmpresa.route('/actualizar_informe', methods=['POST'])
-def actualizar_informe():
-    try:
-        id_informe = request.form.get('idInforme')
-        fecha = request.form.get('fecha')
-        labor = request.form.get('labor')  
-        labores = request.form.get('labores')  
-        firma1 = request.files.get('firma1')
-        firma2 = request.files.get('firma2')
-
-        resultado = controlador_informeEmpresa.actualizar_informe(
-            id_informe, fecha, labor, labores, firma1, firma2
-        )
-        return jsonify(resultado)
-    except Exception as e:
-        print("Error en ruta actualizar_informe:", str(e))
-        return jsonify({"error": str(e)}), 500     

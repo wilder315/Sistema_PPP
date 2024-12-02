@@ -308,6 +308,72 @@ def guardar_archivo(archivo):
         return filepath
     return None
 
+def guardar_informeInicialEmpresa(aceptacion, labor, labores, firma1, firma2):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            # Guardar archivos de firmas
+            firma1_url = guardar_archivo(firma1)
+            firma2_url = guardar_archivo(firma2)
+            
+            if not firma1_url or not firma2_url:
+                raise Exception("Error al guardar las firmas")
+
+            # Preparar el campo labor (labores principales)
+            labor_str = ", ".join(labor)
+            
+            # Preparar el campo labores (labores específicas)
+            labores_str = ", ".join(labores)
+            
+            # Insertar en la tabla INFORMES
+            cursor.execute("""
+                INSERT INTO informe (
+                    aceptacion, estado, labor, fecha, labores, 
+                    firma1, firma2, idTipoInforme
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    aceptacion,
+                    'P',          # estado
+                    labor_str,    # labor (principales)
+                    date.today(), # fecha del sistema
+                    labores_str,  # labores (específicas)
+                    firma1_url,   # firma1
+                    firma2_url,   # firma2
+                    2            # idTipoInforme = 2
+                ))
+            
+            id_informe = cursor.lastrowid
+            
+            # Obtener el idPractica del estudiante actual
+            cursor.execute("""
+                SELECT idPractica 
+                FROM practicas_preprofesionales 
+                WHERE estadoVigencia = 'P'
+                LIMIT 1
+            """)
+            practica = cursor.fetchone()
+            
+            if not practica:
+                raise Exception("No se encontró una práctica activa")
+            
+            id_practica = practica[0]
+            
+            # Insertar en informes_practicas_preprofesionales
+            cursor.execute("""
+                INSERT INTO informes_practicas_preprofesionales (IidInforme, idPractica)
+                VALUES (%s, %s)
+                """, (id_informe, id_practica))
+            
+            conexion.commit()
+            return {"message": "Informe guardado correctamente"}
+        
+    except Exception as e:
+        conexion.rollback()
+        return {"error": str(e)}
+    finally:
+        conexion.close()
 
 def obtener_informes_empresa():
     conexion = obtener_conexion()
@@ -317,6 +383,7 @@ def obtener_informes_empresa():
             cursor.execute("""
                 SELECT i.idInforme, 
                        CONCAT(p.apellidos, ', ', p.nombre) as estudiante,
+                       i.aceptacion,
                        i.estado,
                        i.labor,
                        i.labores,
@@ -327,7 +394,7 @@ def obtener_informes_empresa():
                 INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 INNER JOIN persona p ON pp.idPersona = p.idPersona
-                WHERE i.idTipoInforme = 2 and i.estado = 'A'
+                WHERE i.idTipoInforme = 2
                 ORDER BY i.idInforme DESC
             """)
             informes = cursor.fetchall()
@@ -338,12 +405,13 @@ def obtener_informes_empresa():
                 informes_formateados.append({
                     'idInforme': informe[0],
                     'estudiante': informe[1],
-                    'estado': informe[2],
-                    'labor': informe[3],
-                    'labores': informe[4],
-                    'firma1': informe[5],
-                    'firma2': informe[6],
-                    'fecha': informe[7].strftime('%Y-%m-%d') if informe[8] else None
+                    'aceptacion': informe[2],
+                    'estado': informe[3],
+                    'labor': informe[4],
+                    'labores': informe[5],
+                    'firma1': informe[6],
+                    'firma2': informe[7],
+                    'fecha': informe[8].strftime('%Y-%m-%d') if informe[8] else None
                 })
             return informes_formateados
 
@@ -360,6 +428,7 @@ def obtener_informe_por_id(id_informe):
             cursor.execute("""
                 SELECT i.idInforme, 
                        CONCAT(p.apellidos, ', ', p.nombre) as estudiante,
+                       i.aceptacion,
                        i.estado,
                        i.labor,
                        i.labores,
@@ -378,27 +447,29 @@ def obtener_informe_por_id(id_informe):
                 return {
                     'idInforme': informe[0],
                     'estudiante': informe[1],
-                    'estado': informe[2],
-                    'labor': informe[3],
-                    'labores': informe[4],
-                    'firma1': informe[5],
-                    'firma2': informe[6],
-                    'fecha': informe[7].strftime('%Y-%m-%d') if informe[8] else None
+                    'aceptacion': informe[2],
+                    'estado': informe[3],
+                    'labor': informe[4],
+                    'labores': informe[5],
+                    'firma1': informe[6],
+                    'firma2': informe[7],
+                    'fecha': informe[8].strftime('%Y-%m-%d') if informe[8] else None
                 }
             return None
     finally:
         conexion.close()
 
-def actualizar_informe(id_informe, fecha, labor, labores, firma1, firma2):
+def actualizar_informe(id_informe, fecha, aceptacion, labor, labores, firma1, firma2):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             # Construir la consulta SQL dinámicamente
             sql = """UPDATE informe 
-                     SET fecha = %s, 
+                     SET fecha = %s,
+                         aceptacion = %s,
                          labor = %s,
                          labores = %s"""
-            params = [fecha, labor, labores]
+            params = [fecha, aceptacion, labor, labores]
 
             # Procesar firma1 si se proporcionó
             if firma1:

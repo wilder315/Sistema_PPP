@@ -37,6 +37,7 @@
                             <th style="text-align:center">I. Empresa</th>
                             <th style="text-align:center">F. Estudiante</th>
                             <th style="text-align:center">F. Empresa</th>
+                            <th style="text-align:center">F. Evaluación</th>
                             <th style="text-align:center">Constancia</th>
                         </tr>
                     </thead>
@@ -159,6 +160,17 @@
                     }
                 },
                 {
+                    data: "Informe_Tipo5_Existe",
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        const isEnabled = data === 1; // Existe el informe
+                        return `<button class="btn ${isEnabled ? 'btn-primary btnVerInforme' : 'btn-secondary'}" 
+                                    ${isEnabled ? '' : 'disabled'} data-id="${isEnabled ? row.Informe_Tipo5_ID : ''}" data-tipo="Ficha de Evaluación de Desempeño">
+                                    <i class="fas fa-eye"></i>
+                                </button>`;
+                    }
+                },
+                {
                     data: "Informe_Tipo6_Existe",
                     className: 'text-center',
                     render: function (data, type, row) {
@@ -206,6 +218,7 @@
             2: "Informe Inicial (Empresa)",
             3: "Informe Final (Estudiante)",
             4: "Informe Final (Empresa)",
+            5: "Ficha de evaluación de desempeño",
             6: "Constancia de Prácticas"
         };
 
