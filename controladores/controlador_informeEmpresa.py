@@ -9,48 +9,116 @@ from datetime import date
 UPLOAD_FOLDER = 'static/uploads/firmas'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
 
-
-def guardar_informeFinalEmpresa(numDoc, cumplehoras, texto_responsabilidad, texto_otros_aspectos, file_path, cumplimiento_objetivos, fecha): 
+def agregar_informe_final_empresa(
+    idInforme, idPractica, fecha, firma1, responsabilidad, extras, cumpleHoras, objetivos
+):
     conexion = obtener_conexion()
+    tipoInforme = 4
+    estado = 'P'
+    
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    if not idPractica or not fecha or not firma1 or not responsabilidad or not cumpleHoras:
+        return {"error": "Faltan datos obligatorios para registrar el informe final."}
+    
     try:
         with conexion.cursor() as cursor:
+            if idInforme:  # Si `idInforme` está presente, actualizamos el informe existente
+                cursor.execute("""
+                    UPDATE informe
+                    SET estado = %s, fecha = %s, firma1 = %s, responsabilidad = %s, extras = %s, cumpleHoras = %s
+                    WHERE idInforme = %s
+                """, (
+                    estado, fecha, firma1, responsabilidad, extras, cumpleHoras, idInforme
+                ))
+            else:  # Si no hay `idInforme`, creamos uno nuevo
+                cursor.execute("""
+                    INSERT INTO informe (
+                        estado, fecha, firma1, idTipoInforme, responsabilidad, extras, cumpleHoras
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    estado, fecha, firma1, tipoInforme, responsabilidad, extras, cumpleHoras
+                ))
+                idInforme = cursor.lastrowid  # Obtener el ID del nuevo informe
+            
+            # Modificar los objetivos existentes
+            for objetivo in objetivos:
+                if 'idObjetivos' in objetivo and 'estado' in objetivo:
+                    cursor.execute("""
+                        UPDATE objetivos
+                        SET estado = %s
+                        WHERE idObjetivos = %s
+                    """, (objetivo['estado'], objetivo['idObjetivos']))
+            
+            # Verificar si ya existe la relación en informes_practicas_preprofesionales
             cursor.execute("""
-                SELECT idPractica 
-                FROM practicas_preprofesionales pp
-                INNER JOIN persona pe ON pp.idPersona = pe.idPersona
-                WHERE pe.idPersona = %s""", (numDoc))
-            practica = cursor.fetchone()   
-            if not practica: 
-                return {"error": "No se encontró la práctica."}
-            idPractica = practica[0]
-            cursor.execute("""
-                INSERT INTO informe (estado, labor, cumplehoras, responsabilidad, extras, idTipoInforme, fecha, firma1)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """,('P', cumplehoras, texto_responsabilidad, texto_otros_aspectos, 4, fecha, file_path))
-            print("se ejecuto el insert en informe")
-            cursor.execute("SELECT inf.idInforme FROM informe inf where inf.idInforme = LAST_INSERT_ID()")
-            practica_informe = cursor.fetchone()         
-            idInforme = practica_informe[0]
-            if not idInforme: 
-                return {"error": "No se pudo obtener el id del informe."}
-            cursor.execute("""
-                    INSERT INTO objetivos (descripcion, idInforme)
-                    VALUES (%s,%s)
-            """, (cumplimiento_objetivos,idInforme))
-            cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (IidInforme, idPractica)
-                VALUES (%s, %s)
-            """, (idInforme, idPractica))
-            conexion.commit()          
-            return {"message": "Informe guardado correctamente."}
+                SELECT COUNT(*) FROM informes_practicas_preprofesionales
+                WHERE idPractica = %s AND IidInforme = %s
+            """, (idPractica, idInforme))
+            relacion_existe = cursor.fetchone()[0] > 0
+            
+            if not relacion_existe:  # Si no existe, insertamos la relación
+                cursor.execute("""
+                    INSERT INTO informes_practicas_preprofesionales (idPractica, IidInforme)
+                    VALUES (%s, %s)
+                """, (idPractica, idInforme))
+            
+            conexion.commit()
+            return {"mensaje": "Informe final de empresa guardado correctamente."}
     except Exception as e:
+        print(f"Error al registrar o modificar el informe final: {str(e)}")
         conexion.rollback()
-        return {"error": str(e)}    
+        return {"error": f"Error al registrar o modificar el informe final: {str(e)}"}
     finally:
         conexion.close()
-        
+
+def obtener_objetivos_estudiante(idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            # Obtener idInforme con idTipoInforme = 1
+            cursor.execute("""
+                SELECT ip.IidInforme
+                FROM informes_practicas_preprofesionales ip
+                JOIN informe i ON ip.IidInforme = i.idInforme
+                WHERE ip.idPractica = %s AND i.idTipoInforme = 1
+            """, (idPractica,))
+            informe_resultado = cursor.fetchone()
+            if not informe_resultado:
+                return {"error": "El estudiante no tiene objetivos registrados."}
+            idInforme = informe_resultado[0]
+
+            # Obtener los objetivos relacionados al idInforme
+            cursor.execute("""
+                SELECT idObjetivos, descripcion, estado
+                FROM objetivos
+                WHERE idInforme = %s
+            """, (idInforme,))
+            objetivos = cursor.fetchall()
+            if not objetivos:
+                return {"error": "No se encontraron objetivos para el informe."}
+
+            # Construir la lista de objetivos como diccionarios
+            lista_objetivos = []
+            for objetivo in objetivos:
+                objetivo_dict = {
+                    "idObjetivos": objetivo[0],
+                    "descripcion": objetivo[1],
+                    "estado": objetivo[2]
+                }
+                lista_objetivos.append(objetivo_dict)
+
+            return {"objetivos": lista_objetivos}
+
+    except Exception as e:
+        print(f"Error al obtener los objetivos del estudiante: {str(e)}")
+        return {"error": f"Error al obtener los objetivos del estudiante: {str(e)}"}
+    finally:
+        conexion.close()
+
 def obtener_estado_informe_final_empresa(idEstudiante):
     conexion = obtener_conexion()
     if not conexion:
@@ -83,6 +151,68 @@ def obtener_estado_informe_final_empresa(idEstudiante):
         return {"error": str(e)}
     finally:
         conexion.close()
+
+def obtener_informe_final_empresa(idEstudiante, idPractica):
+    conexion = obtener_conexion()
+    if not conexion:
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    try:
+        with conexion.cursor() as cursor:
+            # Obtener los datos principales del informe final de empresa
+            cursor.execute("""
+                SELECT 
+                    i.idInforme, 
+                    i.fecha, 
+                    i.firma1, 
+                    i.responsabilidad, 
+                    i.extras, 
+                    i.cumpleHoras, 
+                    i.estado
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
+                WHERE ipp.idPractica = %s AND pp.idPersona = %s AND i.idTipoInforme = 4
+                ORDER BY i.fecha DESC
+                LIMIT 1
+            """, (idPractica, idEstudiante))
+            informe = cursor.fetchone()
+            
+            if not informe:
+                return {"error": "No se encontró un informe final de empresa asociado a esta práctica."}
+            
+            # Convertir los datos del informe a un diccionario
+            column_names = [desc[0] for desc in cursor.description]
+            informe_dict = dict(zip(column_names, informe))
+            
+            # Obtener los objetivos asociados al informe
+            cursor.execute("""
+                SELECT idObjetivos, descripcion, estado
+                FROM objetivos
+                WHERE idInforme = %s
+            """, (informe_dict['idInforme'],))
+            objetivos = cursor.fetchall()
+            informe_dict['objetivos'] = [
+                {"idObjetivos": obj[0], "descripcion": obj[1], "estado": obj[2]} for obj in objetivos
+            ]
+            
+            # Verificar relación con prácticas preprofesionales
+            cursor.execute("""
+                SELECT idPractica, IidInforme
+                FROM informes_practicas_preprofesionales
+                WHERE idPractica = %s AND IidInforme = %s
+            """, (idPractica, informe_dict['idInforme']))
+            relacion = cursor.fetchone()
+            informe_dict['relacion'] = {
+                "idPractica": relacion[0],
+                "IidInforme": relacion[1]
+            } if relacion else None
+            
+            return informe_dict
+    except Exception as e:
+        return {"error": f"Error al obtener el informe final de empresa: {str(e)}"}
+    finally:
+        conexion.close()
+
 
 def buscar_estudiantes_practicas(termino_busqueda):
     conexion = obtener_conexion()
@@ -170,72 +300,6 @@ def buscar_instituciones(termino_busqueda):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def guardar_informeInicialEmpresa(labor, labores, firma1, firma2):
-    conexion = obtener_conexion()
-    if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}
-    try:
-        with conexion.cursor() as cursor:
-            # Guardar archivos de firmas
-            firma1_url = guardar_archivo(firma1)
-            firma2_url = guardar_archivo(firma2)
-            
-            if not firma1_url or not firma2_url:
-                raise Exception("Error al guardar las firmas")
-
-            # Preparar el campo labor (labores principales)
-            labor_str = ", ".join(labor)
-            
-            # Preparar el campo labores (labores específicas)
-            labores_str = ", ".join(labores)
-            
-            # Insertar en la tabla INFORMES
-            cursor.execute("""
-                INSERT INTO informe (
-                    estado, labor, fecha, labores, 
-                    firma1, firma2, idTipoInforme
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    'A',          # estado
-                    labor_str,    # labor (principales)
-                    date.today(), # fecha del sistema
-                    labores_str,  # labores (específicas)
-                    firma1_url,   # firma1
-                    firma2_url,   # firma2
-                    2            # idTipoInforme = 2
-                ))
-            
-            id_informe = cursor.lastrowid
-            
-            # Obtener el idPractica del estudiante actual
-            cursor.execute("""
-                SELECT idPractica 
-                FROM practicas_preprofesionales 
-                WHERE estadoVigencia = 'A'
-                LIMIT 1
-            """)
-            practica = cursor.fetchone()
-            
-            if not practica:
-                raise Exception("No se encontró una práctica activa")
-            
-            id_practica = practica[0]
-            
-            # Insertar en informes_practicas_preprofesionales
-            cursor.execute("""
-                INSERT INTO informes_practicas_preprofesionales (IidInforme, idPractica)
-                VALUES (%s, %s)
-                """, (id_informe, id_practica))
-            
-            conexion.commit()
-            return {"message": "Informe guardado correctamente"}
-        
-    except Exception as e:
-        conexion.rollback()
-        return {"error": str(e)}
-    finally:
-        conexion.close()
-
 def guardar_archivo(archivo):
     if archivo and allowed_file(archivo.filename):
         filename = secure_filename(archivo.filename)
@@ -288,8 +352,7 @@ def obtener_informes_empresa():
         return []
     finally:
         conexion.close()
-        
-        
+           
 def obtener_informe_por_id(id_informe):
     conexion = obtener_conexion()
     try:

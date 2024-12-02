@@ -153,7 +153,7 @@
                                 <tbody>
                                     <tr>
                                         <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
-                                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+                                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required readonly></textarea></td>
                                         <td class="text-center"><input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo"></td>
                                     </tr>
                                 </tbody>
@@ -192,11 +192,10 @@
                         <label for="horas_pp" class="form-label">Cumple horas planificadas:</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="horas_pp" name="horas_pp" required readonly>
-                            <button class="btn btn-success" id="" id="">
-                                <i class="fas fa-check"></i>
+                            <button class="btn btn-danger" id="horas_status">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        
                     </div>
                     <div class="col-md-4">
                         <label for="firma_imagen" class="form-label">Firma del responsable:</label>
@@ -225,7 +224,7 @@
 
     // Evento para cuando cargas la página
     document.addEventListener('DOMContentLoaded', function() {
-        limpiarFormulario();
+        limpiarControles();
     });
 
     // Evento para Cancelar
@@ -248,7 +247,7 @@
         const date = new Date(fecha);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 
@@ -261,6 +260,90 @@
             showConfirmButton: true,
             timer: 5000
         });
+    }
+
+    // Función para deshabilitar controles
+    function disableControles() {
+        $('#nombre_empresa').prop('disabled', true);
+        $('#doc_jefe').prop('disabled', true);
+        $('#cargo_responsable').prop('disabled', true);
+        $('#apellidos_responsable').prop('disabled', true);
+        $('#nombre_responsable').prop('disabled', true);
+        $('#nombre_estudiante').prop('disabled', true);
+        $('#apellidos_estudiante').prop('disabled', true);
+        $('#horas_pp').prop('disabled', true);
+        $('#area_estudiante').prop('disabled', true);
+        $('#cumplimiento_objetivos').prop('disabled', true);
+        $('#responsabilidad').prop('disabled', true);
+        $('#otros_aspectos').prop('disabled', true);
+        $('#fecha_firma').prop('disabled', true);
+        $('#fecha_inicio').prop('disabled', true);
+        $('#fecha_fin').prop('disabled', true);
+        $('#estudiante').prop('disabled', true);
+        $('#empresa').prop('disabled', false);
+        $('#firma_imagen').prop('disabled', true);
+        $('#idEmpresaMod').prop('disabled', true);
+        $('#idPersonaMod').prop('disabled', true);
+        $('#horas_status').prop('disabled', true);
+        $('#btnGuardar').hide();
+
+        // Deshabilitar los controles de la tabla de objetivos (número, objetivo, estado)
+        const tablaObjetivos = document.getElementById('tabla-objetivos');
+        if (tablaObjetivos) {
+            const filas = tablaObjetivos.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+                // Deshabilitar la celda de número y la de objetivo
+                const inputs = fila.querySelectorAll('input, textarea');
+                inputs.forEach(input => input.disabled = true);
+                // Deshabilitar la celda de estado (checkbox)
+                const checkbox = fila.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.disabled = true;
+                }
+            });
+        }
+    }
+
+    // Función para habilitar controles
+    function enableControles() {
+        $('#nombre_empresa').prop('disabled', false);
+        $('#doc_jefe').prop('disabled', false);
+        $('#cargo_responsable').prop('disabled', false);
+        $('#apellidos_responsable').prop('disabled', false);
+        $('#nombre_responsable').prop('disabled', false);
+        $('#nombre_estudiante').prop('disabled', false);
+        $('#apellidos_estudiante').prop('disabled', false);
+        $('#horas_pp').prop('disabled', false);
+        $('#area_estudiante').prop('disabled', false);
+        $('#cumplimiento_objetivos').prop('disabled', false);
+        $('#responsabilidad').prop('disabled', false);
+        $('#otros_aspectos').prop('disabled', false);
+        $('#fecha_firma').prop('disabled', false);
+        $('#fecha_inicio').prop('disabled', false);
+        $('#fecha_fin').prop('disabled', false);
+        $('#estudiante').prop('disabled', false);
+        $('#empresa').prop('disabled', false);
+        $('#firma_imagen').prop('disabled', false);
+        $('#idEmpresaMod').prop('disabled', false);
+        $('#idPersonaMod').prop('disabled', false);
+        $('#horas_status').prop('disabled', false);
+        $('#btnGuardar').show();
+
+        // Habilitar los controles de la tabla de objetivos (número, objetivo, estado)
+        const tablaObjetivos = document.getElementById('tabla-objetivos');
+        if (tablaObjetivos) {
+            const filas = tablaObjetivos.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+                // Habilitar la celda de número y la de objetivo
+                const inputs = fila.querySelectorAll('input, textarea');
+                inputs.forEach(input => input.disabled = false);
+                // Habilitar la celda de estado (checkbox)
+                const checkbox = fila.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.disabled = false;
+                }
+            });
+        }
     }
 
     // Función para limpiar controles
@@ -297,15 +380,29 @@
                 tbodyO.innerHTML = `
                     <tr>
                         <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value=1 required readonly></td>
-                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required></textarea></td>
+                        <td><textarea type="text" id="objetivo" class="form-control" name="objetivo[]" required readonly></textarea></td>
                         <td class="text-center"><input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo"></td>
                     </tr>
                 `;
             }
         }
         $('#idEmpresaMod').val('');
-        $('#idPersonaMod').val(''); 
+        $('#idPersonaMod').val('');
+        const horasStatusButton = document.getElementById('horas_status');
+        const icon = horasStatusButton.querySelector('i');
+        if (icon) {
+            icon.className = 'fa fa-times'; // Cambiar el ícono a la equis
+            horasStatusButton.classList.remove('btn-success');
+            horasStatusButton.classList.add('btn-danger');
+        }
+        const estadoIndicador = document.getElementById('estado-indicador');
+        if (estadoIndicador) {
+            estadoIndicador.textContent = '';  // Limpiar el texto del indicador
+            estadoIndicador.classList.add('d-none');  // Ocultar el indicador
+        }
+        disableControles();
     }
+
 
     // Función para mostrar y recuperar empresas en el dropdown-search
     const inputEmpresa = document.getElementById('empresa');
@@ -369,6 +466,11 @@
                     $('#doc_jefe').val(response.numDoc);
                     document.getElementById('empresa').disabled = true;
                     document.getElementById('estudiante').disabled = false;
+                    $('#nombre_empresa').prop('disabled', false);
+                    $('#doc_jefe').prop('disabled', false);
+                    $('#cargo_responsable').prop('disabled', false);
+                    $('#apellidos_responsable').prop('disabled', false);
+                    $('#nombre_responsable').prop('disabled', false);
                     $('#doc_estudiante').focus();
                 } else {
                     Swal.fire({
@@ -467,14 +569,60 @@
             });
     }
 
+    async function cargarDatosObjetivos(idPractica) {
+        try {
+            const response = await fetch(`/obtener_objetivos_estudiante?idPractica=${idPractica}`);
+            const data = await response.json();
+
+            if (!data.objetivos) {
+                alert("Error: El estudiante no tiene objetivos registrados.");
+                return;
+            }
+            const objetivosTableBody = document.querySelector('#tabla-objetivos tbody');
+            objetivosTableBody.innerHTML = ''; // Limpiar la tabla antes de llenarla
+            data.objetivos.forEach((objetivo) => {
+                const estadoObjChecked = objetivo.estado === 'C' ? 'checked' : ''; // Marca el checkbox si el estado es 'C'
+
+                const row = `
+                    <tr>
+                        <td><input type="number" min="0" class="form-control" name="numero_objetivo[]" value="${objetivo.idObjetivos}" required readonly></td>
+                        <td><textarea type="text" class="form-control" name="objetivo[]" required>${objetivo.descripcion}</textarea></td>
+                        <td class="text-center"><input id="estadoObj" type="checkbox" class="form-check-input completar-objetivo" ${estadoObjChecked}></td>
+                    </tr>
+                `;
+                objetivosTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (error) {
+            console.error("Error al cargar los objetivos:", error);
+        }
+    }
+
     // Función para cargar datos de la práctica
     function cargarDatosPractica(data) {
         document.getElementById('estudiante').value = `${data.apellidosEstudiante} ${data.nombreEstudiante}`;
         document.getElementById('idPersonaMod').value = data.idPersona || '';
-        if (data.numDocInstitucion) {
-            obtenerDatosInstitucion(data.numDocInstitucion);
-        }
+        document.getElementById('fecha_inicio').value = data.fechaInicio ? formatFechaParaInput(data.fechaInicio) : '';
+        document.getElementById('fecha_fin').value = data.fechaFin ? formatFechaParaInput(data.fechaFin) : '';
+        document.getElementById('area_estudiante').value = data.area || '';
+        document.getElementById('horas_pp').value = data.numeroHorasRealizadas || '';
+        cargarDatosObjetivos(data.idPractica);
     }
+
+    // Evento para cambiar estado de cumplimiento
+    document.getElementById('horas_status').addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        if (icon.classList.contains('fa-check')) {
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-times');
+            this.classList.remove('btn-success');
+            this.classList.add('btn-danger');
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-check');
+            this.classList.remove('btn-danger');
+            this.classList.add('btn-success');
+        }
+    });
 
     // Variables globales para almacenar los archivos previos
     let firma1Base64Previo = null;
@@ -486,11 +634,10 @@
             return;
         }
         document.getElementById('idInformeMod').value = informe.idInforme || '';
-        document.getElementById('fecha_entrega').value = informe.fecha || '';
-        document.getElementById('area_estudiante').value = informe.area || '';
+        document.getElementById('fecha_firma').value = informe.fecha ? formatFechaParaInput(informe.fecha) : '';
         document.getElementById('responsabilidad').value = informe.responsabilidad || '';
         document.getElementById('otros_aspectos').value = informe.extras || '';
-        const firma1Preview = document.getElementById('firma1_imagen-preview');
+        const firma1Preview = document.getElementById('firma_imagen-preview');
         if (informe.firma1) {
             firma1Base64Previo = informe.firma1;
             firma1Preview.src = `data:image/png;base64,${informe.firma1}`;
@@ -500,6 +647,61 @@
             firma1Preview.src = '#';
             firma1Preview.style.display = 'none';
         }
+
+        // Configurar el botón de estado de cumplimiento de horas
+        const horasStatusButton = document.getElementById('horas_status');
+        if (horasStatusButton) {
+            const icon = horasStatusButton.querySelector('i');
+            if (informe.cumpleHoras === 'C') {
+                icon.classList.add('fa-check');
+                icon.classList.remove('fa-times');
+                horasStatusButton.classList.add('btn-success');
+                horasStatusButton.classList.remove('btn-danger');
+            } else if (informe.cumpleHoras === 'I') {
+                icon.classList.add('fa-times');
+                icon.classList.remove('fa-check');
+                horasStatusButton.classList.add('btn-danger');
+                horasStatusButton.classList.remove('btn-success');
+            }
+            // Remover cualquier evento anterior antes de agregar uno nuevo
+            horasStatusButton.removeEventListener('click', manejarClickHorasStatus);
+
+            // Agregar el evento para cambiar estado de cumplimiento
+            horasStatusButton.addEventListener('click', manejarClickHorasStatus);
+        }
+
+        // Evento para cambiar estado de cumplimiento
+        document.getElementById('horas_status').addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-check')) {
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-times');
+                this.classList.remove('btn-success');
+                this.classList.add('btn-danger');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-check');
+                this.classList.remove('btn-danger');
+                this.classList.add('btn-success');
+            }
+        });
+
+        // Función manejadora del evento click
+        function manejarClickHorasStatus() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-check')) {
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-times');
+                this.classList.remove('btn-success');
+                this.classList.add('btn-danger');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-check');
+                this.classList.remove('btn-danger');
+                this.classList.add('btn-success');
+            }
+        }
+
         const objetivosTableBody = document.querySelector('#tabla-objetivos tbody');
         objetivosTableBody.innerHTML = '';
         if (informe.objetivos && informe.objetivos.length > 0) {
@@ -531,6 +733,7 @@
         }
     }
 
+
     // Evento para vista previa de la firma_imagen
     document.getElementById('firma_imagen').addEventListener('change', function (event) {
             const file = event.target.files[0];
@@ -558,7 +761,7 @@
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
             return;
         }
-        fetch(`/estado_informe_final/${idEstudiante}`)
+        fetch(`/estado_informe_final_empresa/${idEstudiante}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error al obtener el estado del informe final');
@@ -582,7 +785,7 @@
                         })
                         .then(practicaData => {
                             if (practicaData.idPractica) {
-                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                fetch(`/obtener_informe_final_empresa/${idEstudiante}/${practicaData.idPractica}`)
                                     .then(response => {
                                         if (!response.ok) {
                                             throw new Error('Error al cargar el informe final del estudiante');
@@ -606,11 +809,11 @@
                                         setFormularioSoloLectura(true, false);
 
                                         document.getElementById('estudiante').disabled = true;
-                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                        document.getElementById('fecha_firma').value = fechaActualFormateada;
                                     })
                                     .catch(error => {
                                         console.error("Error al cargar el informe final:", error);
-                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final de la institución 1.");
                                     });
                             } else {
                                 mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
@@ -640,7 +843,7 @@
                         })
                         .then(practicaData => {
                             if (practicaData.idPractica) {
-                                fetch(`/obtener_informe_final_estudiante/${idEstudiante}/${practicaData.idPractica}`)
+                                fetch(`/obtener_informe_final_empresa/${idEstudiante}/${practicaData.idPractica}`)
                                     .then(response => {
                                         if (!response.ok) {
                                             throw new Error('Error al cargar el informe final del estudiante');
@@ -649,20 +852,21 @@
                                     })
                                     .then(informeData => {
                                         cargarDatosInforme(informeData);
+                                        cargarDatosPractica(practicaData);
+                                        cargarDatosEstudiante(idEstudiante);
+                                        enableControles();
+                                        document.getElementById('estudiante').disabled = true;
+                                        document.getElementById('fecha_firma').value = fechaActualFormateada;
                                         const idInput = document.getElementById('id');
                                         if (idInput) {
                                             idInput.value = practicaData.idPractica || '';
                                             idInput.disabled = true;
                                         }
-                                        cargarDatosPractica(practicaData);
-                                        cargarDatosEstudiante(idEstudiante);
-                                        enableTabs();
-                                        document.getElementById('estudiante').disabled = true;
-                                        document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                                        document.getElementById('horas_status').disabled = false;
                                     })
                                     .catch(error => {
                                         console.error("Error al cargar el informe final:", error);
-                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final del estudiante.");
+                                        mostrarAlerta("error", "Error", "Hubo un error al cargar el informe final de la institución 2.");
                                     });
                             } else {
                                 mostrarAlerta("error", "Error", "No se encontró una práctica activa para el estudiante.");
@@ -699,9 +903,9 @@
                             }
                             cargarDatosPractica(data);
                             cargarDatosEstudiante(idEstudiante);
-                            enableTabs();
+                            enableControles();
                             document.getElementById('estudiante').disabled = true;
-                            document.getElementById('fecha_entrega').value = fechaActualFormateada;
+                            document.getElementById('fecha_firma').value = fechaActualFormateada;
                         }
                     })
                     .catch(error => {
@@ -714,6 +918,91 @@
                 mostrarAlerta("error", "Error", "Hubo un error al verificar el estado del informe final.");
             });
     });
+
+    // Función para guardar el informe
+    document.getElementById('btnGuardar').addEventListener('click', async function (event) {
+        event.preventDefault();
+
+        const idPractica = document.getElementById('id').value;
+        const idInforme = document.getElementById('idInformeMod').value;
+        const fecha = document.getElementById('fecha_firma').value;
+        const responsabilidad = document.getElementById('responsabilidad').value;
+        const extras = document.getElementById('otros_aspectos').value;
+
+        const horasStatusButton = document.getElementById('horas_status');
+        const icon = horasStatusButton.querySelector('i');
+        let cumpleHoras;
+        if (icon.classList.contains('fa-check')) {
+            cumpleHoras = 'C';
+        } else if (icon.classList.contains('fa-times')) {
+            cumpleHoras = 'I';
+        }
+
+        const firma1Input = document.getElementById('firma_imagen');
+        const firma1Base64 = firma1Input.files[0]
+            ? await convertirABase64(firma1Input.files[0])
+            : firma1Base64Previo;
+
+        // Obtener objetivos con id, descripción y estado
+        const objetivos = Array.from(document.querySelectorAll('#tabla-objetivos tbody tr')).map((row) => {
+            const idObjetivo = row.querySelector('input[name="numero_objetivo[]"]').value;
+            const descripcion = row.querySelector('textarea[name="objetivo[]"]').value.trim();
+            const estado = row.querySelector('input.completar-objetivo').checked ? 'C' : 'I';
+
+            return {
+                idObjetivos: idObjetivo,
+                descripcion,
+                estado
+            };
+        }).filter((objetivo) => objetivo.descripcion !== ''); // Filtrar objetivos vacíos
+
+        // Validar campos obligatorios
+        if (!idPractica || !fecha || !firma1Base64 || !cumpleHoras) {
+            mostrarAlerta("warning", "Advertencia", "Por favor, complete todos los campos requeridos.");
+            return;
+        }
+
+        // Preparar datos para enviar
+        const data = {
+            idInforme,
+            idPractica,
+            fecha,
+            firma1: firma1Base64,
+            responsabilidad,
+            extras,
+            cumpleHoras,
+            objetivos
+        };
+
+        // Enviar solicitud al servidor
+        fetch('/agregar_informe_final_empresa', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    mostrarAlerta("error", "Error", data.error);
+                } else {
+                    mostrarAlerta("success", "Éxito", data.mensaje);
+                    limpiarControles();
+                }
+            })
+            .catch((error) => {
+                console.error('Error al guardar el informe:', error);
+                mostrarAlerta("error", "Error", "Hubo un error al guardar el informe.");
+            });
+    });
+
+    // Función para habilitar/deshabilitar controles
+    function setFormularioSoloLectura(soloLectura) {
+        disableControles();
+        $('#btnCancelar').show();
+        $('#btnGuardar').hide();
+    }
 
 </script>
     

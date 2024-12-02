@@ -121,6 +121,11 @@ def obtener_informe_final_estudiante(idEstudiante, idPractica):
     resultado = controlador_informeInicialEstudiante.obtener_informe_final_estudiante(idEstudiante, idPractica)
     return jsonify(resultado)
 
+@router_informe.route("/obtener_informe_final_empresa/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
+def obtener_informe_final_empresa(idEstudiante, idPractica):
+    resultado = controlador_informeEmpresa.obtener_informe_final_empresa(idEstudiante, idPractica)
+    return jsonify(resultado)
+
 @router_informe.route("/obtener_informe_inicial_estudiante/<int:idEstudiante>/<int:idPractica>", methods=["GET"])
 def obtener_informe_inicial_estudiante(idEstudiante, idPractica):
     resultado = controlador_informeInicialEstudiante.obtener_informe_inicial_estudiante(idEstudiante, idPractica)
@@ -134,32 +139,38 @@ def obtener_constancia(idEstudiante, idPractica):
 @router_informe.route('/agregar_informe_final_empresa', methods=['POST'])
 def agregar_informe_final_empresa():
     try:
-        nombre_empresa = request.form.get('nombre_empresa')
-        responsable = request.form.get('responsable')
-        grado_responsable = request.form.get('grado_responsable')
-        cargo_responsable = request.form.get('cargo_responsable')
-        nombre_estudiante = request.form.get('nombre_estudiante')
-        fecha_inicio = request.form.get('fecha_inicio')
-        fecha_fin = request.form.get('fecha_fin')
-        cumplimiento_objetivos = request.form.get('cumplimiento_objetivos')
-        cumplimiento_horas = request.form.get('cumplimiento_horas')
-        responsabilidad = request.form.get('responsabilidad')
-        otros_aspectos = request.form.get('otros_aspectos')
-        fecha_firma = request.form.get('fecha_firma')
-        firma_responsable = request.form.get('firma_responsable')
-        cargo_firma = request.form.get('cargo_firma')
+        # Obtener los datos del cuerpo de la solicitud como JSON
+        datos = request.get_json()
 
-        resultado = agregar_informe_final_empresa(
-            nombre_empresa, responsable, grado_responsable, cargo_responsable,
-            nombre_estudiante, fecha_inicio, fecha_fin, cumplimiento_objetivos,
-            cumplimiento_horas, responsabilidad, otros_aspectos, fecha_firma,
-            firma_responsable, cargo_firma
+        # Extraer los campos
+        idInforme = datos.get('idInforme')
+        idPractica = datos.get('idPractica')
+        fecha = datos.get('fecha')
+        firma1 = datos.get('firma1')
+        responsabilidad = datos.get('responsabilidad')
+        extras = datos.get('extras')  # Cambiado de 'otros_aspectos' a 'extras' para coincidir con el script JS
+        cumpleHoras = datos.get('cumpleHoras')
+        objetivos = datos.get('objetivos', [])
+        resultado = controlador_informeEmpresa.agregar_informe_final_empresa(
+            idInforme, idPractica, fecha, firma1, responsabilidad, extras, cumpleHoras, objetivos
         )
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"Error al procesar la solicitud: {e}")
+        return jsonify({"success": False, "error": str(e)})
+    
+@router_informe.route('/obtener_objetivos_estudiante', methods=['GET'])
+def obtener_objetivos_estudiante_route():
+    try:
+        idPractica = request.args.get('idPractica')
+        if not idPractica:
+            return jsonify({"error": "El parámetro 'idPractica' es obligatorio."})
+        resultado = controlador_informeEmpresa.obtener_objetivos_estudiante(idPractica)
 
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
-    
+
 @router_informe.route("/estado_informe_final/<int:idEstudiante>", methods=["GET"])
 def estado_informe_final(idEstudiante):
     resultado = controlador_informeInicialEstudiante.obtener_estado_informe_final_estudiante(idEstudiante)

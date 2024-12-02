@@ -127,7 +127,6 @@ def agregar_informe_inicial_estudiante(
     finally:
         conexion.close()
 
-
 def obtener_practicas_informe_inicial():
     conexion = obtener_conexion()
     if not conexion:
