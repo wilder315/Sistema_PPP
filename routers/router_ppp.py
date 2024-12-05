@@ -46,6 +46,16 @@ def supervisiones_practica(idPractica):
     supervisiones = controlador_practicas.obtener_supervisiones(idPractica)
     return jsonify(supervisiones)
 
+@router_practicas.route('/verificar_en_espera/<int:idPractica>', methods=['GET'])
+def verificar_informes(idPractica):
+    try:
+        resultado = controlador_practicas.verificar_en_espera(idPractica)
+        if "error" in resultado:
+            return jsonify({"error": resultado["error"]}), 500
+        return jsonify({"verificado": resultado["verificado"]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @router_practicas.route("/agregar_practica", methods=["POST"])
 def agregar_practica():
     data = request.json
@@ -59,6 +69,7 @@ def agregar_practica():
     numeroHorasPendientes = data.get('numeroHorasPendientes')
     numeroHorasRealizadas = data.get('numeroHorasRealizadas')
     idSemestre = data.get('idSemestre')
+    semestreFinal = data.get('idSemestre')
     idLinea = data.get('idLinea')
     numDocInstitucion = data.get('numDocInstitucion')
     idTipoPractica = data.get('idTipoPractica')
@@ -66,7 +77,7 @@ def agregar_practica():
     supervisiones = data.get('supervisiones', [])
     resultado = controlador_practicas.agregar_practica(
         idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, 
-        numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, 
+        numeroHorasPendientes, numeroHorasRealizadas, idSemestre, semestreFinal, idLinea, 
         numDocInstitucion, idTipoPractica, idPersona, supervisiones
     )
     return jsonify(resultado)

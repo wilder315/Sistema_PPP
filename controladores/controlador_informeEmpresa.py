@@ -229,7 +229,7 @@ def buscar_estudiantes_practicas(termino_busqueda):
                 FROM persona p
                 INNER JOIN practicas_preprofesionales pp ON p.idPersona = pp.idPersona
                 WHERE p.estado = 'A' 
-                AND pp.idEstado in (1, 2)
+                AND pp.idEstado IN (1, 2)
                 AND (LOWER(p.nombre) LIKE LOWER(%s) 
                 OR LOWER(p.apellidos) LIKE LOWER(%s))
                 ORDER BY p.apellidos, p.nombre
@@ -308,7 +308,7 @@ def guardar_archivo(archivo):
         return filepath
     return None
 
-def guardar_informeInicialEmpresa(aceptacion, labor, labores, firma1, firma2):
+def guardar_informeInicialEmpresa(idEstudiante, aceptacion, labor, labores, firma1, firma2):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
@@ -351,8 +351,9 @@ def guardar_informeInicialEmpresa(aceptacion, labor, labores, firma1, firma2):
                 SELECT idPractica 
                 FROM practicas_preprofesionales 
                 WHERE estadoVigencia = 'P'
+                AND idPersona = %s
                 LIMIT 1
-            """)
+            """, (idEstudiante))
             practica = cursor.fetchone()
             
             if not practica:

@@ -19,8 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // Crear FormData
             const formData = new FormData();
 
+            const idEstudiante = document.getElementById('estudiante_seleccionado').value;
+            formData.append('idEstudiante', idEstudiante); // O el valor que corresponda
+
+            const aceptacion = document.getElementById('aceptacion').value;
             // Agregar campos del formulario
-            formData.append('aceptacion', 'ACEPTADO'); // O el valor que corresponda
+            formData.append('aceptacion', aceptacion); // O el valor que corresponda
             
             // Obtener y formatear las labores principales
             const laboresPrincipalesArray = [];

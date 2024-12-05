@@ -211,11 +211,11 @@
                         $('#modal-porcentaje').text(detalles.Porcentaje_Avance + '%');
                         
                         // Establecer el estado con el badge correspondiente
-                        var estadoBadge = detalles.Estado_Horas === 'Completado' 
-                            ? '<span class="badge bg-success">Completado</span>'
-                            : '<span class="badge bg-warning">En Proceso</span>';
+                        var estadoBadge = detalles.Estado_Horas === 'Finalizada' 
+                            ? '<span class="badge bg-success">Finalizada</span>'
+                            : '<span class="badge bg-warning">' + detalles.Estado_Horas + '</span>';
                         $('#modal-estado').html(estadoBadge);
-                        
+         
                         // Mostrar el modal
                         $('#detallesModal').modal('show');
                     } else {

@@ -104,6 +104,7 @@ def buscar_instituciones():
 @router_informeEmpresa.route('/guardar_informe_inicial_empresa', methods=['POST'])
 def guardar_informe_inicial_empresa():
     try:
+        idEstudiante = request.form.get('idEstudiante')
         aceptacion = request.form.get('aceptacion')
         labor = request.form.get('labor')
         labores = request.form.get('labores')
@@ -112,6 +113,7 @@ def guardar_informe_inicial_empresa():
         if not all([aceptacion, labor, labores, firma1, firma2]):
             return jsonify({"error": "Faltan campos requeridos"}), 400
         resultado = controlador_informeEmpresa.guardar_informeInicialEmpresa(
+            idEstudiante,
             aceptacion,
             json.loads(labor),
             json.loads(labores),

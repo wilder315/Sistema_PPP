@@ -267,66 +267,66 @@ def obtener_supervisiones(idPractica):
     finally:
         conexion.close()
 
-def agregar_practica(idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, idLinea, numDocInstitucion, idTipoPractica, idPersona, supervisiones):
-    if not fechaInicio or not fechaFin or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
+def agregar_practica(idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas, idSemestre, semestreFinal, idLinea, numDocInstitucion, idTipoPractica, idPersona, supervisiones):
+    if not fechaInicio or not fechaFin or not horario or not modalidad or not area or not numeroHorasPPP or not numeroHorasPendientes or not numeroHorasRealizadas or not idSemestre or not semestreFinal or not idLinea or not numDocInstitucion or not idTipoPractica or not idPersona:
         return {"error": "Todos los campos son requeridos."}
+    
     conexion = obtener_conexion()
     if not conexion:
-        return {"error": "No se pudo establecer conexión con la base de datos."}  
+        return {"error": "No se pudo establecer conexión con la base de datos."}
+    
     try:
         with conexion.cursor() as cursor:
+            # Verificar si la práctica ya existe
             cursor.execute("SELECT idPractica FROM practicas_preprofesionales WHERE idPractica = %s", (idPractica,))
-            practica_existente = cursor.fetchone()        
+            practica_existente = cursor.fetchone()
+
             if practica_existente:
+                # Actualizar los datos de la práctica
                 cursor.execute("""
                     UPDATE practicas_preprofesionales
                     SET fechaFin = %s, horario = %s, modalidad = %s, area = %s,
-                        numeroHorasPPP = %s, numeroHorasPendientes = %s, numeroHorasRealizadas = %s,
+                        numeroHorasPPP = %s, numeroHorasPendientes = %s, numeroHorasRealizadas = %s, semestreFinal = %s,
                         idLinea = %s, numDocInstitucion = %s, idTipoPractica = %s, estadoVigencia = %s, idEstado = %s
                     WHERE idPractica = %s
                 """, (fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
-                      idLinea, numDocInstitucion, idTipoPractica, 'P', 1, idPractica))
+                      semestreFinal, idLinea, numDocInstitucion, idTipoPractica, 'P', 1, idPractica))
+                
+                # Eliminar supervisiones existentes para esta práctica
+                cursor.execute("DELETE FROM supervision WHERE idPractica = %s", (idPractica,))
             else:
+                # Insertar una nueva práctica
                 cursor.execute("""
                     INSERT INTO practicas_preprofesionales (idPractica, fechaInicio, fechaFin, horario, modalidad, area,
                                                             numeroHorasPPP, numeroHorasPendientes, numeroHorasRealizadas,
-                                                            estadoVigencia, idSemestre, idLinea, numDocInstitucion, idEstado,
+                                                            estadoVigencia, idSemestre, semestreFinal, idLinea, numDocInstitucion, idEstado,
                                                             idTipoPractica, idPersona)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (idPractica, fechaInicio, fechaFin, horario, modalidad, area, numeroHorasPPP, numeroHorasPendientes,
-                      numeroHorasRealizadas, 'P', idSemestre, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
+                      numeroHorasRealizadas, 'P', idSemestre, semestreFinal, idLinea, numDocInstitucion, 1, idTipoPractica, idPersona))
+            
+            # Insertar nuevas supervisiones
             for supervision in supervisiones:
-                idSupervision = supervision.get('idSupervision')
-                fecha = supervision.get('fecha')
-                funciones = supervision.get('funciones')
-                observaciones = supervision.get('observaciones')
-                estado = supervision.get('estado')
-                if idSupervision:
-                    cursor.execute("""
-                        SELECT idSupervision FROM supervision WHERE idSupervision = %s
-                    """, (idSupervision,))
-                    supervision_existente = cursor.fetchone()
-                    if supervision_existente:
-                        cursor.execute("""
-                            UPDATE supervision
-                            SET fecha = %s, funciones = %s, observaciones = %s, estado = %s
-                            WHERE idSupervision = %s
-                        """, (fecha, funciones, observaciones, estado, idSupervision))
-                    else:
-                        cursor.execute("""
-                            INSERT INTO supervision (idSupervision, fecha, funciones, observaciones, estado, idPractica)
-                            VALUES (%s, %s, %s, %s, %s, %s)
-                        """, (idSupervision, fecha, funciones, observaciones, estado, idPractica))
-                else:
-                    cursor.execute("""
-                        INSERT INTO supervision (fecha, funciones, observaciones, estado, idPractica)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (fecha, funciones, observaciones, estado, idPractica))
+                if not all(key in supervision for key in ['fecha', 'funciones', 'observaciones']):
+                    return {"error": "Las supervisiones no tienen todos los campos requeridos."}
+                
+                cursor.execute("""
+                    INSERT INTO supervision (fecha, funciones, observaciones, estado, idPractica)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (
+                    supervision['fecha'],
+                    supervision['funciones'],
+                    supervision['observaciones'],
+                    'A',
+                    idPractica  
+                ))
+
+            # Confirmar los cambios
             conexion.commit()
             if practica_existente:
                 return {"mensaje": "Práctica actualizada correctamente"}
             else:
-                return {"mensaje": "Práctica agregada correctamente"} 
+                return {"mensaje": "Práctica agregada correctamente"}
     except Exception as e:
         conexion.rollback()
         return {"error": str(e)}
@@ -547,11 +547,43 @@ def reporte_practicas_estudiantes(idSemestre, idEscuela, idEstado, numDoc):
 
     return {"data": practicas_estudiante}
 
-def obtener_reporte_horas_practicas2(codUniversitario=None):
+def verificar_en_espera(idPractica):
     conexion = obtener_conexion()
     if not conexion:
         return {"error": "No se pudo establecer conexión con la base de datos."}
-    
+
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para verificar si existen los informes requeridos
+            cursor.execute("""
+                SELECT idTipoInforme
+                FROM informe
+                INNER JOIN informes_practicas_preprofesionales ON informe.idInforme = informes_practicas_preprofesionales.IidInforme
+                WHERE informes_practicas_preprofesionales.idPractica = %s AND idTipoInforme IN (1, 2, 3, 4) AND estado = 'A'
+            """, (idPractica,))
+            tipos_encontrados = {row[0] for row in cursor.fetchall()}
+            tipos_necesarios = {1, 2, 3, 4}
+            todos_presentes = tipos_necesarios.issubset(tipos_encontrados)
+
+            if todos_presentes:
+                # Si se encuentran todos los tipos de informes, actualizar el idEstado de la práctica a 3
+                cursor.execute("""
+                    UPDATE practicas_preprofesionales
+                    SET idEstado = 3
+                    WHERE idPractica = %s
+                """, (idPractica,))
+                # Confirmar los cambios
+                conexion.commit()
+                return {"mensaje": "La práctica se actualizó a estado 3 correctamente."}
+            else:
+                return {"mensaje": "No se encontraron todos los informes necesarios."}
+
+    except Exception as e:
+        conexion.rollback()  # Revertir cambios en caso de error
+        return {"error": f"Error al verificar los informes: {str(e)}"}
+    finally:
+        conexion.close()
+
     reporte_horas = []
     try:
         with conexion.cursor() as cursor:
@@ -604,7 +636,7 @@ def obtener_reporte_horas_practicas2(codUniversitario=None):
             for row in rows:
                 reporte_dict = dict(zip(column_names, row))
                 # Agregar información adicional sobre el estado de las horas
-                reporte_dict['Estado_Horas'] = 'Completado' if reporte_dict['Horas_Pendientes'] == 0 else 'En Proceso'
+                reporte_dict['Estado_Horas'] = reporte_dict['Estado_Practica']
                 # Formatear modalidad
                 reporte_dict['Modalidad'] = 'Presencial' if reporte_dict['Modalidad'] == 'P' else 'Virtual' if reporte_dict['Modalidad'] == 'V' else 'Híbrido'
                 reporte_horas.append(reporte_dict)

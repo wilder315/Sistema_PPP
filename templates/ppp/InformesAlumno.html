@@ -249,9 +249,11 @@
     });
 
     // Evento para el botón "Aprobar Informe"
-    document.getElementById('btnAprobarInforme').addEventListener('click', function () {
+    document.getElementById('btnAprobarInforme').addEventListener('click', function (event) {
         event.preventDefault();
         const idInforme = document.getElementById('idInforme').textContent.trim(); // Recuperar el ID del control en el modal
+        
+        // Llamada a la ruta para aprobar el informe
         fetch(`/aprobar_informe/${idInforme}`, { method: 'POST' })
             .then(response => response.json())
             .then(data => {
@@ -261,11 +263,31 @@
                     mostrarAlerta('success', 'Éxito', data.mensaje);
                     $('#modalVisualizarInforme').modal('hide');
                     $('#tabla-informes-estudiantes').DataTable().ajax.reload(); // Recargar tabla
+
+                    // Llamada a la ruta para verificar en espera después de aprobar el informe
+                    const idPractica = document.getElementById('idPractica').textContent.trim(); // Recuperar el ID de la práctica
+                    fetch(`/verificar_en_espera/${idPractica}`, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                console.error('Error al verificar la práctica:', data.error);
+                            } else {
+                                if (data.mensaje === "La práctica se actualizó a estado 3 correctamente.") {
+                                    mostrarAlerta('success', 'Éxito', 'La práctica se actualizó correctamente a estado 3.');
+                                    // Aquí puedes agregar lógica adicional si es necesario
+                                } else {
+                                    console.log('La práctica no se actualizó:', data.mensaje);
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al verificar la práctica:', error);
+                            mostrarAlerta('error', 'Error', 'Hubo un problema al verificar la práctica.');
+                        });
                 }
             })
             .catch(error => {
                 console.error('Error al aprobar el informe:', error);
-                mostrarAlerta('error', 'Error', 'Hubo un problema al aprobar el informe.');
             });
     });
 

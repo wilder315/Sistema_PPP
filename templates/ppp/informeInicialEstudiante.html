@@ -290,6 +290,16 @@
         return `${year}-${month}-${day}`;
     }
 
+    // Función para formatear la fecha actual
+    function formatFechaActual(fecha) {
+        const date = new Date(fecha);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+
     // Funcion para mostrar alerta
     function mostrarAlerta(tipo, titulo, mensaje) {
         Swal.fire({
@@ -778,7 +788,7 @@
     document.getElementById('btnBuscarE').addEventListener('click', function (event) {
         event.preventDefault();
         const idEstudiante = idPersona;
-        const fechaActualFormateada = formatFechaParaInput(new Date());
+        const fechaActualFormateada = formatFechaActual(new Date());
         const estadoIndicador = document.getElementById('estado-indicador');
         if (!idEstudiante) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante válido para buscar.");
@@ -1015,6 +1025,8 @@
             firma1: firma1Base64,
             firma2: firma2Base64,
         };
+
+        console.log(objetivos, plan_trabajos);
 
         // Enviar solicitud al servidor
         fetch('/agregar_informe_inicial_estudiante', {

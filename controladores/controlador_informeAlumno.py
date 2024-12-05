@@ -160,7 +160,7 @@ def obtener_reporte_horas_practicas():
             for row in rows:
                 reporte_dict = dict(zip(column_names, row))
                 # Agregar información adicional sobre el estado de las horas
-                reporte_dict['Estado_Horas'] = 'Completado' if reporte_dict['Horas_Pendientes'] == 0 else 'En Proceso'
+                reporte_dict['Estado_Horas'] = reporte_dict['Estado_Practica']
                 # Formatear modalidad
                 reporte_dict['Modalidad'] = 'Presencial' if reporte_dict['Modalidad'] == 'P' else 'Virtual' if reporte_dict['Modalidad'] == 'V' else 'Híbrido'
                 reporte_horas.append(reporte_dict)
@@ -462,8 +462,7 @@ def obtener_practicas_terminadas_semestre(id_semestre):
             WHERE 
                 p.estado = 'A'
                 AND ppp.idSemestre = %s
-                AND ppp.numeroHorasRealizadas >= ppp.numeroHorasPPP
-                AND ppp.estadoVigencia = 'P'
+                AND est.nombre = 'Finalizada'
             ORDER BY 
                 p.apellidos, p.nombre;
             """, (id_semestre,))
@@ -624,11 +623,12 @@ def aprobar_informe(idInforme):
 
     try:
         with conexion.cursor() as cursor:
-            # Verificar el estado del informe en la tabla 'informe'
+            # Verificar el estado del informe en la tabla 'informe' y obtener el idPractica asociado
             cursor.execute("""
-                SELECT estado
-                FROM informe
-                WHERE idInforme = %s
+                SELECT i.estado, i.idTipoInforme, ipp.idPractica
+                FROM informe i
+                INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
+                WHERE i.idInforme = %s
             """, (idInforme,))
             resultado = cursor.fetchone()
 
@@ -655,10 +655,13 @@ def aprobar_informe(idInforme):
                     SET estado = 'A'
                     WHERE idFichaEvaluacion = %s
                 """, (idInforme,))
-                
+
             else:
                 # Si se encuentra en 'informe', verificar y actualizar su estado
                 estado_actual = resultado[0]
+                idTipoInforme = resultado[1]
+                idPractica = resultado[2]
+
                 if estado_actual == 'A':
                     return {"error": "El informe ya está aprobado."}
 
@@ -668,6 +671,14 @@ def aprobar_informe(idInforme):
                     SET estado = 'A'
                     WHERE idInforme = %s
                 """, (idInforme,))
+
+                # Si el idTipoInforme es 1, actualizar el estado de la práctica a 2
+                if idTipoInforme == 1 and idPractica:
+                    cursor.execute("""
+                        UPDATE practicas_preprofesionales
+                        SET idEstado = 2
+                        WHERE idPractica = %s
+                    """, (idPractica,))
 
             # Confirmar los cambios
             conexion.commit()

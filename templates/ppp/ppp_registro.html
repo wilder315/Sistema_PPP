@@ -78,19 +78,9 @@
                     <div class="col-md-6">
                         <div class="practicas-tabs">
                             <!-- Tab Datos de la Práctica -->
-                            <legend>Datos de la Práctica Pre Profesional</legend>
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <a class="nav-link active" id="ppp-tab" data-bs-toggle="tab" href="#ppp" role="tab" aria-controls="ppp" aria-selected="true">Datos de la PPP</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="institucion-tab" data-bs-toggle="tab" href="#institucion" role="tab" aria-controls="institucion" aria-selected="false">Datos de la Institución</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="estado-tab" data-bs-toggle="tab" href="#estado" role="tab" aria-controls="estado" aria-selected="false">Estado</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="supervision-tab" data-bs-toggle="tab" href="#supervision" role="tab" aria-controls="supervision" aria-selected="false">Supervisión</a>
                                 </li>
                             </ul>
 
@@ -129,7 +119,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="horasrequeridas" class="form-label">Horas Requeridas:</label>
-                                            <input type="number" class="form-control" id="horasrequeridas" name="horasrequeridas" required>
+                                            <input type="number" min="0" class="form-control" id="horasrequeridas" name="horasrequeridas" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="horaspendientes" class="form-label">Horas Pendientes:</label>
@@ -162,7 +152,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="institucion" role="tabpanel" aria-labelledby="institucion-tab">
+                            </div>
+                        </div>   
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Bloque Supervisión -->
+                        <div class="practicas-tabs mb-4"> <!-- Añadimos un margen inferior para separarlos -->
+                            <!-- Tab Cumplimiento de los Informes -->
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="institucion-tab" data-bs-toggle="tab" href="#institucion" role="tab" aria-controls="institucion" aria-selected="false">Datos de la Institución</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="estado-tab" data-bs-toggle="tab" href="#estado" role="tab" aria-controls="estado" aria-selected="false">Estado</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="supervision-tab" data-bs-toggle="tab" href="#supervision" role="tab" aria-controls="supervision" aria-selected="false">Supervisión</a>
+                                </li>
+                            </ul>
+                            <!-- Contenido de cada Tab -->
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="institucion" role="tabpanel" aria-labelledby="institucion-tab">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="razonsocial" class="form-label">Razón Social:</label>
@@ -209,105 +219,86 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="semestrefinal" class="form-label">Semestre Finalización:</label>
-                                            <select class="form-select" id="semestrefinal" name="semestrefinal">
+                                            <select class="form-select" id="semestrefinal" name="semestrefinal" required>
                                                 <option value="" disabled selected>Seleccionar semestre</option>
                                             </select>
                                         </div>
                                     </div> 
                                 </div>
                                 <div class="tab-pane fade" id="supervision" role="tabpanel" aria-labelledby="supervision-tab">
-                                    <fieldset>
-                                        <div class="d-flex mb-2">
-                                            <button type="button" class="btn btn-primary btn-sm" id="btnAgregar"><i class="fas fa-plus"></i> Agregar</button>
-                                            <button type="button" class="btn btn-danger btn-sm ms-2" id="btnBorrar"><i class="fas fa-trash-alt"></i></i> Eliminar</button>
-                                        </div>
-                                        <table class="table table-bordered" id="tabla-supervision">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 10%;">N°</th>
-                                                    <th>Fecha</th>
-                                                    <th>Funciones</th>
-                                                    <th>Observación</th>
-                                                    <th style="width: 10%;">Select</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td><input type="number" min="0" class="form-control" name="num[]" value=1 required readonly></td>
-                                                    <td>
-                                                        <input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required>
-                                                    </td>
-                                                    <td><textarea type="text" id="funciones" class="form-control" name="funciones[]" required></textarea>
-                                                    <td><textarea type="text" id="observacion" class="form-control" name="observacion[]" required></textarea>
-                                                    <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-supervision"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </fieldset>
+                                    <div class="d-flex mb-2">
+                                        <button type="button" class="btn btn-primary btn-sm" id="btnAgregar"><i class="fas fa-plus"></i> Agregar</button>
+                                        <button type="button" class="btn btn-danger btn-sm ms-2" id="btnBorrar"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                                    </div>
+                                    <table class="table table-bordered" id="tabla-supervision">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10%;">N°</th>
+                                                <th>Fecha</th>
+                                                <th>Funciones</th>
+                                                <th>Observación</th>
+                                                <th style="width: 10%;">Select</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input type="number" min="0" class="form-control" name="num[]" value="1" required readonly></td>
+                                                <td>
+                                                    <input type="date" id="fechasupervision" class="form-control" name="fechasupervision[]" required>
+                                                </td>
+                                                <td><textarea type="text" id="funciones" class="form-control" name="funciones[]" required></textarea></td>
+                                                <td><textarea type="text" id="observacion" class="form-control" name="observacion[]" required></textarea></td>
+                                                <td class="text-center"><input type="checkbox" class="form-check-input seleccionar-supervision"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
-                        </div>   
-                    </div>
-                    <div class="col-md-6">
+                            </div> 
+                        </div>
+                        
+                        <!-- Bloque Informes Requeridos -->
                         <div class="practicas-tabs">
-                            <!-- Tab Cumplimiento de los Informes -->
-                            <legend>Cumplimiento de los Informes</legend>
-                            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" id="iiniciales-tab" data-bs-toggle="tab" href="#iiniciales" role="tab" aria-controls="iiniciales" aria-selected="true">Informes Iniciales</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="ifinales-tab" data-bs-toggle="tab" href="#ifinales" role="tab" aria-controls="ifinales" aria-selected="false">Informes Finales</a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link" id="constancia-tab" data-bs-toggle="tab" href="#constancia" role="tab" aria-controls="constancia" aria-selected="false">Ficha de Evaluación - Constancia de PPP</a>
-                                </li>
-                            </ul>
                             <!-- Contenido de cada Tab -->
                             <div class="tab-content" id="myTabContent">
-                                <div class="tab-pane fade show active" id="iiniciales" role="tabpanel" aria-labelledby="iiniciales-tab">
+                                <div class="tab-pane fade show active" id="iiniciales" role="tabpanel" aria-labelledby="iiniciales-tab" style="padding-bottom: 0px;">
                                     <div class="row mb-3">                     
                                         <div class="col-md-6">     
                                             <div class="form-check">
-                                                <label for="inicialestudiante" class="form-label">Informe Inicial (Estudiante):</label>
-                                                <input type="checkbox" class="form-check-input" id="inicialestudiante" name="inicialestudiante"readonly >
+                                                <label for="inicialestudiante" class="form-label">Informe Inicial (Estudiante)</label>
+                                                <input type="checkbox" class="form-check-input" id="inicialestudiante" name="inicialestudiante" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6">                                        
                                             <div class="form-check">
-                                                <label for="inicialinstitucion" class="form-label">Informe Inicial (Institución):</label>
-                                                <input type="checkbox" class="form-check-input" id="inicialinstitucion" name="inicialinstitucion"readonly >
+                                                <label for="inicialinstitucion" class="form-label">Informe Inicial (Institución)</label>
+                                                <input type="checkbox" class="form-check-input" id="inicialinstitucion" name="inicialinstitucion" readonly>
                                             </div>
                                         </div>                      
                                     </div>
-                                </div>
-                                <div class="tab-pane fade" id="ifinales" role="tabpanel" aria-labelledby="ifinales-tab">
                                     <div class="row mb-3">                     
                                         <div class="col-md-6">                                       
                                             <div class="form-check">
-                                                <label for="finalestudiante" class="form-label">Informe Final (Estudiante):</label>
+                                                <label for="finalestudiante" class="form-label">Informe Final (Estudiante)</label>
                                                 <input type="checkbox" class="form-check-input" id="finalestudiante" name="finalestudiante" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-6">                                    
                                             <div class="form-check">
-                                                <label for="finalinstitucion" class="form-label">Informe Final (Institución):</label>
+                                                <label for="finalinstitucion" class="form-label">Informe Final (Institución)</label>
                                                 <input type="checkbox" class="form-check-input" id="finalinstitucion" name="finalinstitucion" readonly>
                                             </div>
                                         </div>                      
                                     </div>
-                                </div>
-                                <div class="tab-pane fade" id="constancia" role="tabpanel" aria-labelledby="constancia-tab">
                                     <div class="row mb-3">                     
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <label for="ficha" class="form-check-label ms-2">Ficha de evaluación de desempeño:</label>
+                                                <label for="ficha" class="form-check-label ms-2">Ficha de evaluación de desempeño</label>
                                                 <input type="checkbox" class="form-check-input" id="ficha" name="ficha">                      
                                             </div>
                                         </div>  
                                         <div class="col-md-6">
                                             <div class="form-check">
-                                                <label for="constanciappp" class="form-check-label ms-2">Constancia de PPP:</label>
+                                                <label for="constanciappp" class="form-check-label ms-2">Constancia de PPP</label>
                                                 <input type="checkbox" class="form-check-input" id="constanciappp" name="constanciappp">                      
                                             </div>
                                         </div>                                             
@@ -321,6 +312,7 @@
                             </div> 
                         </div>
                     </div>
+                    
                 </div>       
         </div>
     </div>
@@ -362,7 +354,7 @@
         const date = new Date(fecha);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate() + 1).padStart(2, '0');
+        const day = String(date.getDate() +1).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
         
@@ -427,13 +419,14 @@
         document.getElementById('idPersonaMod').value = '';
         document.getElementById('idPersonaMod').disabled = false;
         document.getElementById('semestrea').selectedIndex = 0;
+        document.getElementById('semestrefinal').selectedIndex = 0;
         document.getElementById('lineadesarrollo').selectedIndex = 0;
         document.getElementById('razonsocial').selectedIndex = 0;
         document.getElementById('tipo_practica').selectedIndex = 0;
         idPersona = '';
         const modalidadRadios = document.querySelectorAll('input[name="modalidad"]');
         modalidadRadios.forEach(radio => {
-            radio.checked = false;
+            radio.checked = radio.value === "P";
         });
         const tablaSupervision = document.getElementById('tabla-supervision');
         const tbody = tablaSupervision.querySelector('tbody');
@@ -453,6 +446,10 @@
         const pppTab = document.getElementById('ppp-tab');
         const bootstrapTab = new bootstrap.Tab(pppTab);
         bootstrapTab.show();
+
+        const institucionTab = document.getElementById('institucion-tab');
+        const bootstrapTab2 = new bootstrap.Tab(institucionTab);
+        bootstrapTab2.show();
         disableTabs();
     }
 
@@ -467,8 +464,9 @@
     function nuevaPractica() {
         const estudianteInput = document.getElementById('estudiante');
         const idEstudiante = idPersona;
+        document.getElementById('idPersonaMod').value = idEstudiante;
         const semestreInput = document.getElementById('semestrea');
-        console.log(idEstudiante);
+        
         // Verificar si los campos de estudiante y semestre están completos
         if (!estudianteInput.value.trim()) {
             mostrarAlerta("warning", "Advertencia", "Por favor, seleccione un estudiante.");
@@ -735,54 +733,39 @@
         const numeroHorasPendientes = document.getElementById('horaspendientes').value;
         const numeroHorasRealizadas = document.getElementById('horaspractica').value;
         const idSemestre = document.getElementById('semestrea').value;
+        const semestreFinal = document.getElementById('semestrefinal').value;
         const idLinea = document.getElementById('lineadesarrollo').value;
         const numDocInstitucion = document.getElementById('razonsocial').value;
         const idTipoPractica = document.getElementById('tipo_practica').value;
-        const idPersona = document.getElementById('idPersonaMod').value;
         const idPractica = document.getElementById('id').value;
-        console.log({
-            fechaInicio,
-            fechaFin,
-            horario,
-            modalidad,
-            area,
-            numeroHorasPPP,
-            numeroHorasPendientes,
-            numeroHorasRealizadas,
-            idSemestre,
-            idLinea,
-            numDocInstitucion,
-            idTipoPractica,
-            idPersona,
-            idPractica
-        });
 
         if (
             !idPractica || !fechaInicio || !fechaFin || !modalidad || !horario || !area ||
             !numeroHorasPPP || !numeroHorasPendientes || !numeroHorasRealizadas ||
-            !idSemestre || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona
+            !idSemestre || !semestreFinal || !idLinea || !numDocInstitucion || !idTipoPractica || !idPersona
         ) {
             mostrarAlerta("warning", "Advertencia", "Todos los campos son requeridos.");
             return;
         }
-        const supervisiones = [];
-        const filasSupervision = document.querySelectorAll('#tabla-supervision tbody tr');
-        filasSupervision.forEach(fila => {
-            const idSupervision = fila.querySelector('input[name="num[]"]')?.value || null;
-            const fecha = fila.querySelector('input[name="fechasupervision[]"]').value;
-            const funciones = fila.querySelector('textarea[name="funciones[]"]').value;
-            const observaciones = fila.querySelector('textarea[name="observacion[]"]').value;
+
+        const supervisiones = Array.from(document.querySelectorAll('#tabla-supervision tbody tr')).map((row) => {
+            const fecha = row.querySelector('input[name="fechasupervision[]"]').value;
+            const funciones = row.querySelector('textarea[name="funciones[]"]').value.trim();
+            const observaciones = row.querySelector('textarea[name="observacion[]"]').value.trim();
+
             if (!fecha || !funciones || !observaciones) {
-                mostrarAlerta("info", "Advertencia", "No se registraron supervisiones.");
-                return;
+                return null;
             }
-            supervisiones.push({
-                idSupervision: idSupervision || null,
-                fecha: fecha,
-                funciones: funciones,
-                observaciones: observaciones,
-                estado: "A"
-            });
+
+            return {
+                fecha,
+                funciones,
+                observaciones,
+            };
+        }).filter((item) => item !== null);
+
+        console.log({
+            supervisiones
         });
         fetch('/agregar_practica', {
             method: 'POST',
@@ -800,6 +783,7 @@
                 numeroHorasPendientes,
                 numeroHorasRealizadas,
                 idSemestre,
+                semestreFinal,
                 idLinea,
                 numDocInstitucion,
                 idTipoPractica,
@@ -831,8 +815,9 @@
         document.getElementById('area').value = data.area || '';
         document.getElementById('horasrequeridas').value = data.numeroHorasPPP || '';
         document.getElementById('horaspendientes').value = data.numeroHorasPendientes || '';
-        document.getElementById('horaspractica').value = data.numeroHorasRealizadas || '';
+        document.getElementById('horaspractica').value = data.numeroHorasRealizadas || '0';
         document.getElementById('semestrea').value = data.idSemestre || '';
+        document.getElementById('semestrefinal').value = data.semestreFinal || '';
         document.getElementById('lineadesarrollo').value = data.idLinea || '';
         document.getElementById('razonsocial').value = data.numDocInstitucion || '';
         document.getElementById('estadopractica').value = data.idEstado || '';
@@ -844,7 +829,6 @@
         if (data.numDocInstitucion) {
             obtenerDatosInstitucion(data.numDocInstitucion);
         }
-        semestreFinal();
     }
     
     // Función para cargar cumplimiento de los informes

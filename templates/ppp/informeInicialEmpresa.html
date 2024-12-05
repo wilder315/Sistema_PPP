@@ -69,54 +69,6 @@
                     <div class="tab-pane fade show active" id="panel-generales" role="tabpanel"
                         aria-labelledby="tab-generales">
                         <fieldset>
-                            <legend>Datos del Estudiante</legend>
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="busqueda_estudiante" class="form-label">Buscar Estudiante:</label>
-                                    <div class="position-relative">
-                                        <input type="text" class="form-control" id="busqueda_estudiante"
-                                            placeholder="Escriba nombre o apellidos" autocomplete="off" />
-                                        <button type="button" class="btn btn-secondary btn-sm mt-2"
-                                            id="limpiar_estudiante">
-                                            Limpiar campos
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="estudiante_seleccionado_nombre" class="form-label">Estudiante
-                                        Seleccionado:</label>
-                                    <input type="text" class="form-control" id="estudiante_seleccionado_nombre" readonly
-                                        disabled />
-                                    <input type="hidden" id="estudiante_seleccionado" name="estudiante_seleccionado" />
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
-                                        readonly required />
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="fecha_fin" class="form-label">Fecha de Final:</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" readonly
-                                        required />
-                                </div>
-                            </div>
-
-                            <!-- Tabla de resultados -->
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="tabla_estudiantes">
-                                    <thead>
-                                        <tr>
-                                            <th>Apellidos y Nombres</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Fin</th>
-                                            <th>Seleccionar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </fieldset>
-                        <fieldset>
                             <legend>Datos de la Institución</legend>
                             <div class="row mb-3">
                                 <div class="col-md-4">
@@ -167,7 +119,54 @@
                                 </table>
                             </div>
                         </fieldset>
+                        <fieldset>
+                            <legend>Datos del Estudiante</legend>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="busqueda_estudiante" class="form-label">Buscar Estudiante:</label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control" id="busqueda_estudiante"
+                                            placeholder="Escriba nombre o apellidos" autocomplete="off" />
+                                        <button type="button" class="btn btn-secondary btn-sm mt-2"
+                                            id="limpiar_estudiante">
+                                            Limpiar campos
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="estudiante_seleccionado_nombre" class="form-label">Estudiante
+                                        Seleccionado:</label>
+                                    <input type="text" class="form-control" id="estudiante_seleccionado_nombre" readonly
+                                        disabled />
+                                    <input type="hidden" id="estudiante_seleccionado" name="estudiante_seleccionado" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                                        readonly required />
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="fecha_fin" class="form-label">Fecha de Final:</label>
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" readonly
+                                        required />
+                                </div>
+                            </div>
 
+                            <!-- Tabla de resultados -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tabla_estudiantes">
+                                    <thead>
+                                        <tr>
+                                            <th>Apellidos y Nombres</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Fecha Fin</th>
+                                            <th>Seleccionar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </fieldset>
                     </div>
 
                     <!-- Compromiso y Labores -->
