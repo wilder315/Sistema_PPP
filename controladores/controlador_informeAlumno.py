@@ -20,7 +20,7 @@ def obtener_informeAlumno():
                     SELECT 1 
                     FROM informes_practicas_preprofesionales ippp 
                     JOIN informe i ON ippp.IidInforme = i.idInforme
-                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 1 AND i.estado <> 'R'
                 ) AS Informe_Inicial_Existe,
                 (SELECT i.idInforme 
                 FROM informes_practicas_preprofesionales ippp 
@@ -32,7 +32,7 @@ def obtener_informeAlumno():
                     SELECT 1 
                     FROM informes_practicas_preprofesionales ippp 
                     JOIN informe i ON ippp.IidInforme = i.idInforme
-                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 2 AND i.estado <> 'R'
                 ) AS Informe_Final_Existe,
                 (SELECT i.idInforme 
                 FROM informes_practicas_preprofesionales ippp 
@@ -44,7 +44,7 @@ def obtener_informeAlumno():
                     SELECT 1 
                     FROM informes_practicas_preprofesionales ippp 
                     JOIN informe i ON ippp.IidInforme = i.idInforme
-                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 3 AND i.estado <> 'R'
                 ) AS Informe_Tipo3_Existe,
                 (SELECT i.idInforme 
                 FROM informes_practicas_preprofesionales ippp 
@@ -56,7 +56,7 @@ def obtener_informeAlumno():
                     SELECT 1 
                     FROM informes_practicas_preprofesionales ippp 
                     JOIN informe i ON ippp.IidInforme = i.idInforme
-                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 4 AND i.estado <> 'R'
                 ) AS Informe_Tipo4_Existe,
                 (SELECT i.idInforme 
                 FROM informes_practicas_preprofesionales ippp 
@@ -67,7 +67,7 @@ def obtener_informeAlumno():
                 EXISTS(
                     SELECT 1 
                     FROM ficha_evaluacion fe
-                    WHERE fe.idPractica = ppp.idPractica AND fe.idTipoInforme = 5
+                    WHERE fe.idPractica = ppp.idPractica AND fe.idTipoInforme = 5 AND fe.estado <> 'R'
                 ) AS Informe_Tipo5_Existe,
                 (SELECT fe.idFichaEvaluacion 
                 FROM ficha_evaluacion fe
@@ -78,7 +78,7 @@ def obtener_informeAlumno():
                     SELECT 1 
                     FROM informes_practicas_preprofesionales ippp 
                     JOIN informe i ON ippp.IidInforme = i.idInforme
-                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6
+                    WHERE ippp.idPractica = ppp.idPractica AND i.idTipoInforme = 6 AND i.estado <> 'R'
                 ) AS Informe_Tipo6_Existe,
                 (SELECT i.idInforme 
                 FROM informes_practicas_preprofesionales ippp 

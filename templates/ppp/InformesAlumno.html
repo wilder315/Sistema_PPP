@@ -92,6 +92,7 @@
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function () {
+
         if ($.fn.DataTable.isDataTable('#tabla-informes-estudiantes')) {
             $('#tabla-informes-estudiantes').DataTable().clear().destroy();
         }
@@ -260,30 +261,11 @@
                 if (data.error) {
                     mostrarAlerta('error', 'Error', data.error);
                 } else {
+                    limpiarControles();
+
                     mostrarAlerta('success', 'Éxito', data.mensaje);
                     $('#modalVisualizarInforme').modal('hide');
                     $('#tabla-informes-estudiantes').DataTable().ajax.reload(); // Recargar tabla
-
-                    // Llamada a la ruta para verificar en espera después de aprobar el informe
-                    const idPractica = document.getElementById('idPractica').textContent.trim(); // Recuperar el ID de la práctica
-                    fetch(`/verificar_en_espera/${idPractica}`, { method: 'GET' })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                console.error('Error al verificar la práctica:', data.error);
-                            } else {
-                                if (data.mensaje === "La práctica se actualizó a estado 3 correctamente.") {
-                                    mostrarAlerta('success', 'Éxito', 'La práctica se actualizó correctamente a estado 3.');
-                                    // Aquí puedes agregar lógica adicional si es necesario
-                                } else {
-                                    console.log('La práctica no se actualizó:', data.mensaje);
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error al verificar la práctica:', error);
-                            mostrarAlerta('error', 'Error', 'Hubo un problema al verificar la práctica.');
-                        });
                 }
             })
             .catch(error => {
@@ -305,13 +287,21 @@
                     mostrarAlerta('success', 'Éxito', data.mensaje);
                     $('#modalVisualizarInforme').modal('hide');
                     $('#tabla-informes-estudiantes').DataTable().ajax.reload(); // Recargar tabla
+                    limpiarControles();
                 }
             })
             .catch(error => {
                 console.error('Error al rechazar el informe:', error);
-                mostrarAlerta('error', 'Error', 'Hubo un problema al rechazar el informe.');
             });
     });
+
+    function limpiarControles() { 
+        document.getElementById('idInforme').value = '';    
+        document.getElementById('tipoInfomre').text = '';
+        document.getElementById('fechaInforme').text = '';
+        document.getElementById('estadoInforme').text = '';
+
+    }
 
 
 

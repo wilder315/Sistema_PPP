@@ -132,6 +132,7 @@ def obtener_estado_informe_final_empresa(idEstudiante):
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 WHERE pp.idPersona = %s
                   AND i.idTipoInforme = 4
+                           AND pp.idEstado <> 4
                 ORDER BY i.fecha DESC
                 LIMIT 1
             """, (idEstudiante,))

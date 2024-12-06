@@ -374,6 +374,7 @@ def obtener_estado_informe_final_estudiante(idEstudiante):
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 WHERE pp.idPersona = %s
                   AND i.idTipoInforme = 3
+                           AND pp.idEstado <> 4 
                 ORDER BY i.fecha DESC
                 LIMIT 1
             """, (idEstudiante,))
@@ -458,7 +459,8 @@ def obtener_estado_informe_inicial_estudiante(idEstudiante):
                 INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 WHERE pp.idPersona = %s
-                  AND i.idTipoInforme = 1
+                AND i.idTipoInforme = 1
+                AND pp.idEstado <> 4 
                 ORDER BY i.fecha DESC
                 LIMIT 1
             """, (idEstudiante,))
@@ -546,7 +548,7 @@ def obtener_estado_constancia(idEstudiante):
                 INNER JOIN informes_practicas_preprofesionales ipp ON i.idInforme = ipp.IidInforme
                 INNER JOIN practicas_preprofesionales pp ON ipp.idPractica = pp.idPractica
                 WHERE pp.idPersona = %s
-                  AND i.idTipoInforme = 6
+                  AND i.idTipoInforme = 6 AND pp.idEstado <> 4 
                 ORDER BY i.fecha DESC
                 LIMIT 1
             """, (idEstudiante,))
